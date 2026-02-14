@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hellcastle Football Tournament</title>
+  <style>
+    :root {
+      --bg: #050308;
+      --panel: #151018;
+      --accent: #ff4b1f;
+      --accent2: #f7b733;
+      --text: #f5f5f5;
+      --muted: #888;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2b0b19 0, #050308 55%, #000 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      background: linear-gradient(145deg, #120b16, #050308);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 75, 31, 0.4);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 75, 31, 0.25);
+      padding: 20px 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 0, rgba(255, 75, 31, 0.12), transparent 55%),
+        radial-gradient(circle at 90% 100%, rgba(247, 183, 51, 0.12), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: -1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      text-shadow: 0 0 12px rgba(247, 183, 51, 0.7);
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+    }
+    .badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 75, 31, 0.6);
+      background: radial-gradient(circle at top, rgba(255, 75, 31, 0.35), rgba(0, 0, 0, 0.9));
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(255, 75, 31, 0.9);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      background: radial-gradient(circle at top left, rgba(255, 75, 31, 0.12), rgba(0, 0, 0, 0.9));
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 14px 14px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 40%, transparent 60%, rgba(255, 255, 255, 0.03));
+      mix-blend-mode: soft-light;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .panel-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+    .panel-title span {
+      color: var(--accent2);
+    }
+    .panel-body {
+      position: relative;
+      z-index: 1;
+    }
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .status-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+    .status-value {
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .status-value-strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .mode-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    select {
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--text);
+      font-size: 0.8rem;
+      outline: none;
+    }
+    .players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .player-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) 0.9fr 0.9fr;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid transparent;
+      transition: border 0.15s, background 0.15s, transform 0.1s;
+      font-size: 0.85rem;
+    }
+    .player-row.active {
+      border-color: rgba(255, 75, 31, 0.9);
+      background: radial-gradient(circle at left, rgba(255, 75, 31, 0.35), rgba(0, 0, 0, 0.9));
+      transform: translateX(1px);
+      box-shadow: 0 0 12px rgba(255, 75, 31, 0.4);
+    }
+    .player-name {
+      font-weight: 600;
+    }
+    .player-name span {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .player-total {
+      text-align: right;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .player-extra {
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    .add-player-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    input[type="text"]::placeholder {
+      color: var(--muted);
+    }
+    button {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: radial-gradient(circle at top, rgba(255, 75, 31, 0.9), rgba(255, 75, 31, 0.6));
+      color: #fff;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+      white-space: nowrap;
+    }
+    button.secondary {
+      background: rgba(0, 0, 0, 0.7);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: var(--muted);
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    button:not(:disabled):hover {
+      box-shadow: 0 0 12px rgba(255, 75, 31, 0.7);
+      transform: translateY(-1px);
+    }
+    button:not(:disabled):active {
+      transform: translateY(0);
+      box-shadow: 0 0 4px rgba(255, 75, 31, 0.6);
+    }
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .winner-banner {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #ff7a00; /* solid orange */
+      border: 2px solid #ffb347;
+      font-size: 0.8rem;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      color: #000;
+    }
+    .winner-banner.show {
+      display: inline-flex;
+    }
+    .winner-crown {
+      font-size: 1rem;
+    }
+
+    .play-mode-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      align-items: center;
+    }
+    .mode-pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .mode-pill.active {
+      background: radial-gradient(circle at top, rgba(255, 75, 31, 0.9), rgba(255, 75, 31, 0.6));
+      color: #fff;
+      border-color: rgba(255, 75, 31, 0.9);
+    }
+    .mode-pill.disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+    .score-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .score-meta-row strong {
+      color: var(--accent2);
+    }
+    .bag-counter {
+      font-size: 0.85rem;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .score-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .score-buttons-grid button {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .score-label {
+      font-size: 0.8rem;
+    }
+    .score-points {
+      font-size: 0.8rem;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .controls-row button {
+      flex: 1;
+      min-width: 140px;
+    }
+    .scorecard-table-wrapper {
+      max-height: 260px;
+      overflow: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.7);
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    thead {
+      position: sticky;
+      top: 0;
+      background: rgba(10, 8, 12, 0.96);
+      backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+    th,
+    td {
+      padding: 6px 8px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+    }
+    th {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    tbody tr.highlight {
+      background: rgba(255, 75, 31, 0.18);
+    }
+    td.player-cell {
+      text-align: left;
+      font-weight: 600;
+    }
+    td.total-cell {
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .hellcastle-footer {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-align: right;
+    }
+    .hellcastle-footer span {
+      color: var(--accent);
+    }
+    .next-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease-out;
+      z-index: 20;
+    }
+    .next-overlay.show {
+      opacity: 1;
+    }
+    .next-banner {
+      padding: 18px 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, rgba(255, 75, 31, 0.95), rgba(0, 0, 0, 0.95));
+      border: 2px solid rgba(247, 183, 51, 0.9);
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 30px rgba(255, 75, 31, 0.9);
+      animation: pulseGlow 0.7s ease-out forwards, floatUp 0.7s ease-out forwards;
+    }
+    .next-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.9);
+    }
+    @keyframes pulseGlow {
+      0% { transform: scale(0.7); opacity: 0; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(12px); }
+      100% { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="next-overlay" id="nextOverlay">
+      <div class="next-banner">
+        <div class="next-dot"></div>
+        <span id="nextOverlayText">Next Team</span>
+        <div class="next-dot"></div>
+      </div>
+    </div>
+
+    <header>
+      <div class="title-block">
+        <h1>Hellcastle Football</h1>
+        <div class="subtitle">Drive-by-drive cornhole football in the castle</div>
+      </div>
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span>Multiplayer Tournament</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT: Players & Game State -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>Players</span> & Game State</div>
+        </div>
+        <div class="panel-body">
+          <div class="mode-select">
+            <span>Mode:</span>
+            <select id="modeSelect">
+              <option value="1">1 Quarter</option>
+              <option value="4">Full Game (4 Quarters)</option>
+            </select>
+          </div>
+
+          <div class="status-row">
+            <div class="status-pill">
+              <div class="status-label">Quarter</div>
+              <div class="status-value" id="statusQuarter">1 / 1</div>
+            </div>
+            <div class="status-pill">
+              <div class="status-label">Round</div>
+              <div class="status-value" id="statusRound">1 / 4</div>
+            </div>
+            <div class="status-pill">
+              <div class="status-label">Current Player</div>
+              <div class="status-value-strong" id="statusPlayer">—</div>
+            </div>
+            <div class="status-pill">
+              <div class="status-label">Bag</div>
+              <div class="status-value" id="statusBag">0 / 4</div>
+            </div>
+            <div class="status-pill">
+              <div class="status-label">Yard Line</div>
+              <div class="status-value" id="statusYard">Own 25</div>
+            </div>
+          </div>
+
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">
+            Start each half at your own 25. Standard scoring: TD 6, XP 1, 2PT 2, FG 3.
+          </div>
+
+          <div class="players-list" id="playersList"></div>
+
+          <div class="add-player-row">
+            <input type="text" id="playerNameInput" placeholder="Add player name…" />
+            <button id="addPlayerBtn">Add</button>
+          </div>
+
+          <div class="footer-row">
+            <div>Each quarter: <strong>4 rounds</strong> · Each round: <strong>4 bags</strong>. All players share the quarter.</div>
+            <button class="secondary" id="resetBtn">Reset Tournament</button>
+          </div>
+
+          <div class="winner-banner" id="winnerBanner">
+            <span class="winner-crown">🏈</span>
+            <span id="winnerText"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Scoring & Scorecard -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>Hellcastle</span> Football Scoring & Scorecard</div>
+        </div>
+        <div class="panel-body">
+          <div class="score-meta-row">
+            <div>
+              Quarter <strong id="quarterLabel">1</strong> of
+              <strong id="quarterTotalLabel">1</strong> ·
+              Round <strong id="roundLabel">1</strong> of <strong id="roundTotalLabel">4</strong>
+            </div>
+            <div class="bag-counter">
+              Bags: <span id="bagCounter">0</span> / 4
+            </div>
+          </div>
+
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;">
+            Hole scoring: Top = 1 hole (30 yds), Middle = 2 hole (20 yds), Bottom = 3 hole (40 yds), On Board = 10 yds, Miss = 0.
+          </div>
+
+          <div class="play-mode-row">
+            <span>Play Type:</span>
+            <div id="modeNormal" class="mode-pill active" data-mode="normal">Normal</div>
+            <div id="modeTD" class="mode-pill" data-mode="td">TD Attempt (3 hole @ opp 35)</div>
+            <div id="modeFG" class="mode-pill" data-mode="fg">FG Attempt (2 hole @ opp 40)</div>
+            <div id="modePunt" class="mode-pill" data-mode="punt">Punt (last bag)</div>
+            <div id="modeXP" class="mode-pill disabled" data-mode="xp">XP (1 hole)</div>
+            <div id="modeTwo" class="mode-pill disabled" data-mode="two">2PT (2 hole)</div>
+          </div>
+
+          <div class="score-buttons-grid">
+            <button data-result="top" class="score-btn">
+              <span class="score-label">Top Hole</span>
+              <span class="score-points">1 Hole</span>
+            </button>
+            <button data-result="middle" class="score-btn">
+              <span class="score-label">Middle Hole</span>
+              <span class="score-points">2 Hole</span>
+            </button>
+            <button data-result="bottom" class="score-btn">
+              <span class="score-label">Bottom Hole</span>
+              <span class="score-points">3 Hole</span>
+            </button>
+            <button data-result="board" class="score-btn">
+              <span class="score-label">On Board</span>
+              <span class="score-points">Board</span>
+            </button>
+            <button data-result="miss" class="score-btn" style="grid-column: span 2; background: radial-gradient(circle at top, #5b0b0b, #2b0505);">
+              <span class="score-label">Off Board</span>
+              <span class="score-points">Miss</span>
+            </button>
+          </div>
+
+          <div class="controls-row">
+            <button id="nextPlayerBtn">Next Team / Next Quarter</button>
+          </div>
+
+          <div style="margin: 10px 0 6px; font-size: 0.8rem; color: var(--muted);">
+            All players complete the <strong>same quarter</strong> (4 rounds of 4 bags) before advancing to the next quarter.
+          </div>
+
+          <div class="scorecard-table-wrapper">
+            <table>
+              <thead id="scorecardHead"></thead>
+              <tbody id="scorecardBody"></tbody>
+            </table>
+          </div>
+
+          <div class="hellcastle-footer">
+            Hellcastle <span>Football</span> · Local tournament state is saved automatically
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // CONFIG
+    const TOTAL_QUARTERS = 4;
+    const ROUNDS_PER_QUARTER = 4;
+    const BAGS_PER_ROUND = 4;
+    const START_YARD = 25;
+    const STORAGE_KEY = "hellcastle_football_tournament_v1";
+
+    // STATE
+    let players = []; // { id, name, quarterScores: number[4], total, yardLine }
+    let gameModeQuarters = 1; // 1 or 4
+    let currentQuarter = 0; // 0-based
+    let currentRound = 0;   // 0-based
+    let currentPlayerIndex = 0;
+    let currentBagCount = 0;
+    let playMode = "normal"; // normal, td, fg, punt, xp, two
+    let patPending = false;
+    let tournamentFinished = false;
+
+    // DOM
+    const playersListEl = document.getElementById("playersList");
+    const playerNameInput = document.getElementById("playerNameInput");
+    const addPlayerBtn = document.getElementById("addPlayerBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const modeSelectEl = document.getElementById("modeSelect");
+
+    const statusQuarterEl = document.getElementById("statusQuarter");
+    const statusRoundEl = document.getElementById("statusRound");
+    const statusPlayerEl = document.getElementById("statusPlayer");
+    const statusBagEl = document.getElementById("statusBag");
+    const statusYardEl = document.getElementById("statusYard");
+
+    const quarterLabelEl = document.getElementById("quarterLabel");
+    const quarterTotalLabelEl = document.getElementById("quarterTotalLabel");
+    const roundLabelEl = document.getElementById("roundLabel");
+    const roundTotalLabelEl = document.getElementById("roundTotalLabel");
+    const bagCounterEl = document.getElementById("bagCounter");
+
+    const scoreButtons = Array.from(document.querySelectorAll(".score-btn"));
+    const nextPlayerBtn = document.getElementById("nextPlayerBtn");
+
+    const scorecardHeadEl = document.getElementById("scorecardHead");
+    const scorecardBodyEl = document.getElementById("scorecardBody");
+
+    const winnerBannerEl = document.getElementById("winnerBanner");
+    const winnerTextEl = document.getElementById("winnerText");
+
+    const nextOverlayEl = document.getElementById("nextOverlay");
+    const nextOverlayTextEl = document.getElementById("nextOverlayText");
+
+    const modePills = Array.from(document.querySelectorAll(".mode-pill"));
+    const undoBtn = document.createElement("button");
+  undoBtn.id = "undoBtn";
+  undoBtn.className = "secondary";
+  undoBtn.textContent = "Undo";
+
+
+    const modeNormalEl = document.getElementById("modeNormal");
+    const modeTDEl = document.getElementById("modeTD");
+    const modeFGEl = document.getElementById("modeFG");
+    const modePuntEl = document.getElementById("modePunt");
+    const modeXPEl = document.getElementById("modeXP");
+    const modeTwoEl = document.getElementById("modeTwo");
+// Insert UNDO button next to Next Team button
+  document.querySelector(".controls-row").appendChild(undoBtn);
+
+    // SOUND
+    function playNextTeamSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "square";
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.18);
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.32);
+      } catch (e) {}
+    }
+
+    function showNextOverlay(text) {
+      nextOverlayTextEl.textContent = text;
+      nextOverlayEl.classList.add("show");
+      playNextTeamSound();
+      setTimeout(() => {
+        nextOverlayEl.classList.remove("show");
+      }, 700);
+    }
+
+    // STORAGE
+    function saveState() {
+      const data = {
+        players,
+        gameModeQuarters,
+        currentQuarter,
+        currentRound,
+        currentPlayerIndex,
+        currentBagCount,
+        playMode,
+        patPending,
+        tournamentFinished
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (!data || !Array.isArray(data.players)) return;
+        players = data.players;
+        gameModeQuarters = data.gameModeQuarters || 1;
+        currentQuarter = data.currentQuarter || 0;
+        currentRound = data.currentRound || 0;
+        currentPlayerIndex = data.currentPlayerIndex || 0;
+        currentBagCount = data.currentBagCount || 0;
+        playMode = data.playMode || "normal";
+        patPending = !!data.patPending;
+        tournamentFinished = !!data.tournamentFinished;
+      } catch (e) {}
+    }
+
+    // HELPERS
+    function createPlayer(name) {
+      return {
+        id: Date.now() + Math.random().toString(16).slice(2),
+        name: name.trim(),
+        quarterScores: Array(TOTAL_QUARTERS).fill(0),
+        total: 0,
+        yardLine: START_YARD
+      };
+    }
+
+    function recalcTotals() {
+      players.forEach(p => {
+        p.total = p.quarterScores.reduce((a, b) => a + b, 0);
+      });
+    }
+
+    function getSortedPlayers() {
+      return [...players].sort((a, b) => b.total - a.total);
+    }
+
+    function getPlayerPositionMap() {
+      const sorted = getSortedPlayers();
+      const map = new Map();
+      sorted.forEach((p, idx) => {
+        map.set(p.id, idx + 1);
+      });
+      return map;
+    }
+
+    function formatPosition(pos) {
+      if (pos === 1) return "1st";
+      if (pos === 2) return "2nd";
+      if (pos === 3) return "3rd";
+      return pos + "th";
+    }
+
+    function yardLabel(yard) {
+      if (yard >= 100) return "Goal Line";
+      if (yard >= 50) return `Opp ${100 - yard}`;
+      return `Own ${yard}`;
+    }
+
+    function ensureYardLine(player) {
+      if (typeof player.yardLine !== "number") player.yardLine = START_YARD;
+    }
+
+    function resetHalfIfNeeded() {
+      // Start of 1st or 3rd quarter: reset all players to own 25
+      if ((currentQuarter === 0 || currentQuarter === 2) && currentRound === 0 && currentBagCount === 0) {
+        players.forEach(p => { p.yardLine = START_YARD; });
+      }
+    }
+
+    function updateModePills() {
+      modePills.forEach(p => p.classList.remove("active"));
+      modePills.forEach(p => {
+        const m = p.getAttribute("data-mode");
+        if ((m === "xp" || m === "two") && !patPending) {
+          p.classList.add("disabled");
+        } else {
+          p.classList.remove("disabled");
+        }
+      });
+      const active = modePills.find(p => p.getAttribute("data-mode") === playMode);
+      if (active) active.classList.add("active");
+      if ((playMode === "xp" || playMode === "two") && !patPending) {
+        playMode = "normal";
+      }
+    }
+
+    function updateStatus() {
+      statusQuarterEl.textContent = `${currentQuarter + 1} / ${gameModeQuarters}`;
+      statusRoundEl.textContent = `${currentRound + 1} / ${ROUNDS_PER_QUARTER}`;
+      statusBagEl.textContent = `${currentBagCount} / ${BAGS_PER_ROUND}`;
+      quarterLabelEl.textContent = currentQuarter + 1;
+      quarterTotalLabelEl.textContent = gameModeQuarters;
+      roundLabelEl.textContent = currentRound + 1;
+      roundTotalLabelEl.textContent = ROUNDS_PER_QUARTER;
+      bagCounterEl.textContent = currentBagCount;
+
+      const currentPlayer = players[currentPlayerIndex];
+      if (currentPlayer) {
+        ensureYardLine(currentPlayer);
+        statusPlayerEl.textContent = currentPlayer.name;
+        statusYardEl.textContent = yardLabel(currentPlayer.yardLine);
+      } else {
+        statusPlayerEl.textContent = "—";
+        statusYardEl.textContent = "—";
+      }
+
+      const canScore = players.length > 0 && !tournamentFinished;
+      scoreButtons.forEach(btn => {
+        btn.disabled = !canScore || currentBagCount >= BAGS_PER_ROUND;
+      });
+
+      nextPlayerBtn.disabled = !canScore || currentBagCount < BAGS_PER_ROUND;
+
+      if (tournamentFinished) {
+        nextPlayerBtn.textContent = "Tournament Complete";
+      } else if (
+        currentQuarter === gameModeQuarters - 1 &&
+        currentRound === ROUNDS_PER_QUARTER - 1 &&
+        currentPlayerIndex === players.length - 1 &&
+        currentBagCount === BAGS_PER_ROUND
+      ) {
+        nextPlayerBtn.textContent = "Finish Game";
+      } else if (
+        currentRound === ROUNDS_PER_QUARTER - 1 &&
+        currentPlayerIndex === players.length - 1 &&
+        currentBagCount === BAGS_PER_ROUND
+      ) {
+        nextPlayerBtn.textContent = "Next Quarter";
+      } else if (currentPlayerIndex === players.length - 1 && currentBagCount === BAGS_PER_ROUND) {
+        nextPlayerBtn.textContent = "Next Round";
+      } else {
+        nextPlayerBtn.textContent = "Next Team / Lock Round";
+      }
+
+      modeSelectEl.value = String(gameModeQuarters);
+      modeSelectEl.disabled = players.length > 0 || currentQuarter !== 0 || currentRound !== 0 || currentBagCount !== 0;
+
+      updateModePills();
+    }
+
+    function renderPlayersList() {
+      playersListEl.innerHTML = "";
+      const posMap = getPlayerPositionMap();
+      players.forEach((p, idx) => {
+        ensureYardLine(p);
+        const row = document.createElement("div");
+        row.className = "player-row" + (idx === currentPlayerIndex && !tournamentFinished ? " active" : "");
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "player-name";
+        nameDiv.textContent = p.name;
+        const tag = document.createElement("span");
+        tag.textContent = idx === currentPlayerIndex ? "Current" : "Player";
+        nameDiv.appendChild(tag);
+
+        const totalDiv = document.createElement("div");
+        totalDiv.className = "player-total";
+        totalDiv.textContent = p.total;
+
+        const extraDiv = document.createElement("div");
+        extraDiv.className = "player-extra";
+        const pos = posMap.get(p.id);
+        extraDiv.textContent = `${yardLabel(p.yardLine)} · ${pos ? formatPosition(pos) : ""}`;
+
+        row.appendChild(nameDiv);
+        row.appendChild(totalDiv);
+        row.appendChild(extraDiv);
+        playersListEl.appendChild(row);
+      });
+    }
+
+    function renderScorecard() {
+      const headRow = document.createElement("tr");
+      const thPlayer = document.createElement("th");
+      thPlayer.textContent = "Player";
+      headRow.appendChild(thPlayer);
+      for (let q = 0; q < TOTAL_QUARTERS; q++) {
+        const th = document.createElement("th");
+        th.textContent = `Q${q + 1}`;
+        headRow.appendChild(th);
+      }
+      const thTotal = document.createElement("th");
+      thTotal.textContent = "Points";
+      headRow.appendChild(thTotal);
+      scorecardHeadEl.innerHTML = "";
+      scorecardHeadEl.appendChild(headRow);
+
+      scorecardBodyEl.innerHTML = "";
+      if (players.length === 0) return;
+
+      const sorted = getSortedPlayers();
+      const bestTotal = sorted[0].total;
+
+      players.forEach(p => {
+        const tr = document.createElement("tr");
+        if (tournamentFinished && p.total === bestTotal) {
+          tr.classList.add("highlight");
+        }
+
+        const tdName = document.createElement("td");
+        tdName.className = "player-cell";
+        tdName.textContent = p.name;
+        tr.appendChild(tdName);
+
+        for (let q = 0; q < TOTAL_QUARTERS; q++) {
+          const td = document.createElement("td");
+          td.textContent = p.quarterScores[q] || 0;
+          tr.appendChild(td);
+        }
+
+        const tdTotal = document.createElement("td");
+        tdTotal.className = "total-cell";
+        tdTotal.textContent = p.total;
+        tr.appendChild(tdTotal);
+
+        scorecardBodyEl.appendChild(tr);
+      });
+    }
+/* ---------------------------------------------------------
+     🔥 UNDO LOGIC
+     --------------------------------------------------------- */
+  undoBtn.addEventListener("click", () => {
+    if (historyStack.length === 0) return;
+
+    const last = historyStack.pop();
+    const p = players[last.playerIndex];
+
+    currentPlayerIndex = last.playerIndex;
+    currentQuarter = last.quarter;
+    currentRound = last.round;
+    currentBagCount = last.bagBefore;
+    p.yardLine = last.yardBefore;
+    p.quarterScores[last.quarter] = last.quarterScoreBefore;
+    p.total = last.totalBefore;
+
+    recalcTotals();
+    renderPlayersList();
+    renderScorecard();
+    updateStatus();
+    saveState();
+  });
+/* ---------------------------------------------------------
+     🔥 SCORING BUTTON HANDLER — now records history
+     --------------------------------------------------------- */
+  scoreButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const result = btn.getAttribute("data-result");
+      const p = players[currentPlayerIndex];
+
+      // Save history BEFORE applying changes
+      historyStack.push({
+        playerIndex: currentPlayerIndex,
+        quarter: currentQuarter,
+        round: currentRound,
+        bagBefore: currentBagCount,
+        yardBefore: p.yardLine,
+        quarterScoreBefore: p.quarterScores[currentQuarter],
+        totalBefore: p.total
+      });
+
+
+
+
+    function updateWinnerBanner() {
+      if (!tournamentFinished || players.length === 0) {
+        winnerBannerEl.classList.remove("show");
+        winnerTextEl.textContent = "";
+        return;
+      }
+      const sorted = getSortedPlayers();
+      const bestTotal = sorted[0].total;
+      const winners = sorted.filter(p => p.total === bestTotal).map(p => p.name);
+      const names = winners.join(", ");
+      winnerTextEl.textContent = `Hellcastle Football Champion: ${names} (${bestTotal} pts)`;
+      winnerBannerEl.classList.add("show");
+    }
+
+    function renderAll() {
+      recalcTotals();
+      resetHalfIfNeeded();
+      updateStatus();
+      renderPlayersList();
+      renderScorecard();
+      updateWinnerBanner();
+      saveState();
+    }
+
+    // SCORING HELPERS
+    function addPoints(player, pts) {
+      player.quarterScores[currentQuarter] += pts;
+    }
+
+    function handleNormalPlay(player, result) {
+      ensureYardLine(player);
+      let gain = 0;
+      if (result === "board") gain = 10;
+      if (result === "top") gain = 30;
+      if (result === "middle") gain = 20;
+      if (result === "bottom") gain = 40;
+      player.yardLine += gain;
+      if (player.yardLine >= 100) {
+        addPoints(player, 6);
+        patPending = true;
+        player.yardLine = START_YARD;
+      }
+    }
+
+    function handleTDAttempt(player, result) {
+      ensureYardLine(player);
+      if (player.yardLine < 65) {
+        // not in range, treat as normal
+        handleNormalPlay(player, result);
+        return;
+      }
+      if (result === "bottom") {
+        addPoints(player, 6);
+        patPending = true;
+        player.yardLine = START_YARD;
+      }
+      // miss = no gain
+    }
+
+    function handleFGAttempt(player, result) {
+      ensureYardLine(player);
+      if (player.yardLine < 60) {
+        handleNormalPlay(player, result);
+        return;
+      }
+      if (result === "middle") {
+        addPoints(player, 3);
+      }
+      player.yardLine = START_YARD;
+    }
+
+    function handlePunt(player, result) {
+      ensureYardLine(player);
+      const nextIndex = (currentPlayerIndex + 1) % players.length;
+      const nextPlayer = players[nextIndex];
+      let start = 25;
+      if (result === "bottom") start = 10;
+      else if (result === "middle") start = 20;
+      else if (result === "top") start = 15;
+      else if (result === "board") start = 25;
+      else if (result === "miss") start = 30;
+      ensureYardLine(nextPlayer);
+      nextPlayer.yardLine = start;
+      player.yardLine = START_YARD;
+    }
+
+    function handleXP(player, result) {
+      if (!patPending) return;
+      if (result === "top") {
+        addPoints(player, 1);
+      }
+      patPending = false;
+    }
+
+    function handleTwoPoint(player, result) {
+      if (!patPending) return;
+      if (result === "middle") {
+        addPoints(player, 2);
+      }
+      patPending = false;
+    }
+
+    function addPlay(result) {
+      if (tournamentFinished || players.length === 0) return;
+      if (currentBagCount >= BAGS_PER_ROUND) return;
+
+      const player = players[currentPlayerIndex];
+
+      if (playMode === "xp" || playMode === "two") {
+        if (!patPending) {
+          playMode = "normal";
+        }
+      }
+
+      if (playMode === "normal") {
+        handleNormalPlay(player, result);
+      } else if (playMode === "td") {
+        handleTDAttempt(player, result);
+        playMode = "normal";
+      } else if (playMode === "fg") {
+        handleFGAttempt(player, result);
+        playMode = "normal";
+      } else if (playMode === "punt") {
+        handlePunt(player, result);
+        playMode = "normal";
+      } else if (playMode === "xp") {
+        handleXP(player, result);
+        playMode = "normal";
+      } else if (playMode === "two") {
+        handleTwoPoint(player, result);
+        playMode = "normal";
+      }
+
+      currentBagCount++;
+      renderAll();
+    }
+
+    function advancePlayerRoundQuarter() {
+      if (tournamentFinished || players.length === 0) return;
+      if (currentBagCount < BAGS_PER_ROUND) return;
+
+      currentBagCount = 0;
+
+      if (currentPlayerIndex < players.length - 1) {
+        currentPlayerIndex++;
+        showNextOverlay("Next Team");
+      } else {
+        if (currentRound < ROUNDS_PER_QUARTER - 1) {
+          currentRound++;
+          currentPlayerIndex = 0;
+          showNextOverlay("Next Round");
+        } else {
+          if (currentQuarter < gameModeQuarters - 1) {
+            currentQuarter++;
+            currentRound = 0;
+            currentPlayerIndex = 0;
+            showNextOverlay("Next Quarter");
+          } else {
+            tournamentFinished = true;
+          }
+        }
+      }
+
+      renderAll();
+    }
+
+    function resetTournament() {
+      if (!confirm("Reset Hellcastle Football tournament and clear all scores?")) return;
+      players = [];
+      gameModeQuarters = 1;
+      currentQuarter = 0;
+      currentRound = 0;
+      currentPlayerIndex = 0;
+      currentBagCount = 0;
+      playMode = "normal";
+      patPending = false;
+      tournamentFinished = false;
+      localStorage.removeItem(STORAGE_KEY);
+      renderAll();
+    }
+
+    function addPlayerFromInput() {
+      const name = playerNameInput.value.trim();
+      if (!name) return;
+      players.push(createPlayer(name));
+      playerNameInput.value = "";
+      if (players.length === 1) {
+        currentPlayerIndex = 0;
+      }
+      renderAll();
+    }
+
+    function changeModeSelect() {
+      const val = parseInt(modeSelectEl.value, 10);
+      if (players.length > 0 || currentQuarter !== 0 || currentRound !== 0 || currentBagCount !== 0) return;
+      gameModeQuarters = val === 4 ? 4 : 1;
+      currentQuarter = 0;
+      currentRound = 0;
+      renderAll();
+    }
+
+    function setPlayModeFromPill(mode) {
+      if (mode === "xp" || mode === "two") {
+        if (!patPending) return;
+      }
+      playMode = mode;
+      renderAll();
+    }
+
+    // EVENTS
+    addPlayerBtn.addEventListener("click", addPlayerFromInput);
+    playerNameInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") addPlayerFromInput();
+    });
+
+    scoreButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const result = btn.getAttribute("data-result");
+        addPlay(result);
+      });
+    });
+
+    nextPlayerBtn.addEventListener("click", advancePlayerRoundQuarter);
+    resetBtn.addEventListener("click", resetTournament);
+    modeSelectEl.addEventListener("change", changeModeSelect);
+
+    modePills.forEach(p => {
+      p.addEventListener("click", () => {
+        const mode = p.getAttribute("data-mode");
+        setPlayModeFromPill(mode);
+      });
+    });
+
+    // INIT
+    loadState();
+    renderAll();
+  </script>
+</body>
+</html>
