@@ -3,544 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shove a Penny - Dart Tracker</title>
+    <title>Football Darts</title>
     <style>
         :root {
-            --bg-color: #0b0c10;
-            --card-color: #1f2833;
-            --accent-color: #ff9f1c;
-            --text-color: #c5c6c7;
-            --white: #ffffff;
-            --success: #2ec4b6;
+            --primary: #1a472a;
+            --accent: #ffd700;
+            --text: #f0f0f0;
+            --dark: #121212;
+            --panel: #2c3e50;
+            --danger: #d32f2f;
         }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        h1, h2 { margin: 0.5em 0; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Setup */
+        #setup-screen { background: var(--panel); padding: 2rem; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); max-width: 500px; width: 100%; position: relative; z-index: 10; }
+        input { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; font-size: 1rem; width: 80%; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 24px; font-size: 1rem; border-radius: 5px; cursor: pointer; transition: 0.2s; font-weight: bold; margin: 5px; }
+        button:hover { filter: brightness(1.1); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.accent { background: var(--accent); color: #000; }
+        button.danger { background: var(--danger); }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* Game */
+        #game-screen { display: none; width: 100%; max-width: 800px; flex-direction: column; gap: 15px; }
+        
+        .scoreboard { display: flex; justify-content: space-between; background: var(--panel); padding: 15px; border-radius: 8px; border-bottom: 4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .team-score { text-align: center; flex: 1; }
+        .score-display { font-size: 2.5rem; font-weight: bold; color: var(--accent); }
+        .timer-display { font-size: 1.5rem; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 5px; margin: 0 10px; min-width: 90px; text-align: center; color: #fff; border: 1px solid #333; }
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background-color: var(--card-color);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            text-align: center;
-            border: 1px solid #333;
-        }
+        .field-container { background: var(--primary); border-radius: 10px; padding: 10px; position: relative; height: 120px; overflow: hidden; border: 2px solid #fff; display: flex; align-items: center; justify-content: space-between; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .endzone { width: 60px; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; writing-mode: vertical-rl; text-orientation: mixed; color: rgba(255,255,255,0.6); font-weight: bold; z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
+        .field-markers { flex-grow: 1; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; position: relative; }
+        .possession-marker { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; position: absolute; top: 50%; transform: translate(-50%, -50%); transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 0 15px var(--accent); z-index: 10; }
+        .yard-line { height: 40%; width: 1px; background: rgba(255,255,255,0.2); position: relative; display: flex; align-items: center; justify-content: center; }
+        .yard-line::after { content: attr(data-yard); position: absolute; top: -15px; font-size: 0.6rem; color: rgba(255,255,255,0.5); transform: translateX(-50%); }
 
-        .logo-container img {
-            max-width: 250px;
-            height: auto;
-            margin-bottom: 10px;
-            border-radius: 50%;
-        }
+        .controls { background: var(--panel); padding: 15px; border-radius: 8px; display: grid; grid-template-columns: 1fr; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .status-panel { background: #222; padding: 12px; border-radius: 5px; text-align: center; font-style: italic; border-left: 4px solid var(--accent); min-height: 44px; display: flex; align-items: center; justify-content: center; font-weight: 500; }
+        .dart-input-group { display: flex; gap: 10px; }
+        select { flex: 1; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 1rem; }
 
-        h1, h2, h3 {
-            color: var(--accent-color);
-            margin-top: 5px;
-        }
-
-        .setup-screen, .game-screen, .winner-screen {
-            display: none;
-        }
-
-        .active {
-            display: block;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            width: 60%;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background-color: #0b0c10;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        button {
-            background-color: var(--accent-color);
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s ease;
-            margin: 5px;
-        }
-
-        button:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.45;
-            transform: none;
-        }
-
-        .player-list-setup {
-            margin: 15px 0;
-            text-align: left;
-            display: inline-block;
-        }
-
-        /* Game Interface Layout */
-        .turn-indicator {
-            background-color: #151c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 5px solid var(--accent-color);
-        }
-
-        .dart-dots {
-            display: inline-flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .dot {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: #444;
-        }
-
-        .dot.active {
-            background-color: var(--accent-color);
-            box-shadow: 0 0 8px var(--accent-color);
-        }
-
-        /* Scoreboard Grid */
-        .grid-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #151c24;
-        }
-
-        th, td {
-            border: 1px solid #333;
-            padding: 12px 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #0b0c10;
-            color: var(--accent-color);
-        }
-
-        .current-player-col {
-            background-color: rgba(255, 159, 28, 0.1);
-        }
-
-        .closed-cell {
-            color: var(--success);
-            font-weight: bold;
-        }
-
-        .game-actions {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        /* Input Controls */
-        .input-pad {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .input-pad button {
-            background-color: #2c3540;
-            color: white;
-            padding: 15px 5px;
-            font-size: 18px;
-        }
-
-        .input-pad button.bullseye {
-            grid-column: span 2;
-            background-color: #8b0000;
-        }
-
-        .input-pad button.miss {
-            grid-column: span 2;
-            background-color: #444;
-        }
-
-        .multiplier-select {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .mult-btn {
-            flex: 1;
-            background-color: #444;
-            color: white;
-        }
-
-        .mult-btn.selected {
-            background-color: var(--accent-color);
-            color: black;
-        }
-
-        .shove-alert {
-            background-color: #4a154b;
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            display: none;
-            font-weight: bold;
-            animation: flash 0.5s alternate infinite;
-        }
-
-        @keyframes flash {
-            from { opacity: 0.8; }
-            to { opacity: 1; }
-        }
+        .game-info { display: flex; justify-content: space-around; background: #222; padding: 10px; border-radius: 5px; font-size: 0.9rem; flex-wrap: wrap; gap: 10px; border: 1px solid #444; }
+        .highlight { color: var(--accent); font-weight: bold; }
+        
+        .hidden { display: none !important; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--panel); padding: 25px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px; border: 1px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="logo-container">
-        <img src="R7qT56q5.jpg" alt="Shove a Penny Logo">
-    </div>
-
-    <div id="setup-screen" class="setup-screen active">
-        <h2>Game Setup</h2>
-        <div>
-            <input type="text" id="player-name-input" placeholder="Enter Player Name" autocomplete="off">
-            <button onclick="addPlayer()">Add Player</button>
-        </div>
-        <div class="player-list-setup">
-            <h3>Players Joined:</h3>
-            <ol id="player-list-ol"></ol>
-        </div>
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen">
+        <h1>Football Darts</h1>
+        <p>Enter Team Names to Start</p>
+        <input type="text" id="teamLeftName" placeholder="Left Team Name" value="Home">
+        <input type="text" id="teamRightName" placeholder="Right Team Name" value="Away">
         <br>
-        <button id="start-game-btn" onclick="startGame()" style="font-size: 20px; padding: 15px 30px; display:none;">Start Game</button>
+        <button onclick="startGame()">Kickoff</button>
+        <p style="font-size: 0.8rem; color: #aaa; margin-top: 15px; line-height: 1.4;">
+            <strong>Rules:</strong> 20 min game. 4 quarters.<br>
+            Left Team attacks Left Endzone. Right Team attacks Right Endzone.<br>
+            Hit segments to advance. Bullseye = 50 yard line.<br>
+            Touchdown = 6pts. Extra Point options available.
+        </p>
     </div>
 
-    <div id="game-screen" class="game-screen">
-        <div class="turn-indicator">
-            <h2 id="current-player-display">Player's Turn</h2>
-            <div>Dart: 
-                <div class="dart-dots">
-                    <div id="dot1" class="dot active"></div>
-                    <div id="dot2" class="dot active"></div>
-                    <div id="dot3" class="dot active"></div>
-                </div>
+    <!-- GAME SCREEN -->
+    <div id="game-screen">
+        <!-- Scoreboard -->
+        <div class="scoreboard">
+            <div class="team-score">
+                <div id="scoreLeftName">Home</div>
+                <div class="score-display" id="scoreLeft">0</div>
             </div>
-            <div id="shove-alert" class="shove-alert"></div>
+            <div class="timer-display" id="gameTimer">20:00</div>
+            <div class="team-score">
+                <div id="scoreRightName">Away</div>
+                <div class="score-display" id="scoreRight">0</div>
+            </div>
         </div>
 
-        <div class="multiplier-select">
-            <button id="m1" class="mult-btn selected" onclick="setMultiplier(1)">Single</button>
-            <button id="m2" class="mult-btn" onclick="setMultiplier(2)">Double</button>
-            <button id="m3" class="mult-btn" onclick="setMultiplier(3)">Triple</button>
+        <!-- Field Visualization -->
+        <div class="field-container">
+            <div class="endzone" id="endzoneLeft">LEFT<br>ENDZONE</div>
+            <div class="field-markers" id="fieldMarkers">
+                <!-- Generated by JS -->
+            </div>
+            <div class="endzone" id="endzoneRight">RIGHT<br>ENDZONE</div>
+            <div class="possession-marker" id="ballMarker" style="left: 50%;"></div>
         </div>
 
-        <div class="input-pad" id="hit-buttons-container">
+        <!-- Game Info -->
+        <div class="game-info">
+            <span>Quarter: <span id="quarterDisplay" class="highlight">1</span></span>
+            <span>Down: <span id="downDisplay" class="highlight">1</span></span>
+            <span>To Go: <span id="toGoDisplay" class="highlight">10</span></span>
+            <span>Ball On: <span id="ballOnDisplay" class="highlight">50</span></span>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="status-panel" id="statusPanel">
+                Select your throw result to proceed.
             </div>
 
-        <h3>Scoreboard</h3>
-        <p style="font-size: 13px; color: #888;">(Target closes at 3 hits. Extra hits shove to the next open player!)</p>
-        <div class="grid-container">
-            <table id="scoreboard-table">
-                </table>
-        </div>
-        
-        <div class="game-actions">
-            <button id="undo-score-btn" onclick="undoLastScore()" style="background-color: #2ec4b6; color: black;" disabled>Undo Score</button>
-            <button onclick="resetGame()" style="background-color: #444; color: white;">Restart Game</button>
+            <!-- XP Buttons -->
+            <div id="xpButtons" class="hidden" style="grid-column: span 1; display: flex; flex-direction: column; gap: 5px;">
+                <p style="margin:0; font-size:0.9rem; text-align:center; color:var(--accent);">TOUCHDOWN!</p>
+                <button class="accent" onclick="handleExtraPoint('kick')">Kick XP (Hit Any 20)</button>
+                <button onclick="handleExtraPoint('2pt')">Go for 2 (Hit T20)</button>
+                <button onclick="handleExtraPoint('no')">No Conversion</button>
+            </div>
+
+            <!-- 4th Down Buttons -->
+            <div id="fgButtons" class="hidden" style="grid-column: span 1; display: flex; flex-direction: column; gap: 5px;">
+                <p style="margin:0; font-size:0.9rem; text-align:center; color:var(--accent);">4TH DOWN DECISION</p>
+                <button class="accent" onclick="attemptFG()">Kick Field Goal</button>
+                <button onclick="goForIt()">Go for it (1 Throw)</button>
+                <button onclick="punt()">Punt (Turnover)</button>
+            </div>
+
+            <!-- Main Throw Input -->
+            <div class="dart-input-group">
+                <select id="segmentSelect">
+                    <option value="" disabled selected>Hit Segment...</option>
+                    <option value="D20">Double 20 (Endzone)</option>
+                    <option value="S20">Single 20</option>
+                    <option value="T20">Triple 20</option>
+                    <option value="S1">Single 1</option>
+                    <option value="T1">Triple 1</option>
+                    <option value="D1">Double 1</option>
+                    <option value="BULL">Bullseye (50)</option>
+                    <option value="S5">Single 5</option>
+                    <option value="T5">Triple 5</option>
+                    <option value="S10">Single 10</option>
+                    <option value="T10">Triple 10</option>
+                    <option value="D10">Double 10</option>
+                    <option value="S13">Single 13</option>
+                    <option value="T13">Triple 13</option>
+                    <option value="D13">Double 13</option>
+                    <option value="S11">Single 11</option>
+                    <option value="T11">Triple 11</option>
+                    <option value="D11">Double 11</option>
+                    <option value="S8">Single 8</option>
+                    <option value="T8">Triple 8</option>
+                    <option value="D8">Double 8</option>
+                    <option value="S6">Single 6</option>
+                    <option value="T6">Triple 6</option>
+                    <option value="D6">Double 6</option>
+                    <option value="MISS">Miss / Bust</option>
+                </select>
+                <button id="throwBtn" onclick="processThrow()">Throw</button>
+            </div>
         </div>
     </div>
 
-    <div id="winner-screen" class="winner-screen">
-        <h1 style="font-size: 45px; color: var(--success);">🏆 Winner! 🏆</h1>
-        <h2 id="winner-name-display" style="font-size: 32px; color: white;">Player</h2>
-        <p>Has successfully shoved all their pennies and closed all targets!</p>
-        <h3>Final Scoreboard</h3>
-        <div class="grid-container">
-            <table id="final-scoreboard-table">
-                </table>
+    <!-- MODAL FOR GAME OVER -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over</h2>
+            <p id="winnerText"></p>
+            <button onclick="location.reload()">New Game</button>
         </div>
-        <br>
-        <button onclick="undoLastScore()" style="background-color: #2ec4b6; color: black; font-size: 20px; padding: 15px 30px;">Undo Last Score</button>
-        <button onclick="resetGame()" style="font-size: 20px; padding: 15px 30px;">Play Again</button>
     </div>
-</div>
 
-<script>
-    // Game Rules Config
-    const TARGETS = [20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 'B'];
-    const MAX_HITS = 3;
+    <script>
+        // --- GAME STATE ---
+        const state = {
+            teams: { left: "Home", right: "Away" },
+            scores: { left: 0, right: 0 },
+            possession: 'left', 
+            ballPosition: 50, 
+            quarter: 1,
+            timeRemaining: 1200, 
+            down: 1,
+            yardsToGo: 10,
+            targetLine: 60, 
+            
+            waitingForConversion: false,
+            waitingFor4thDown: false,
+            isGfot: false, 
+            timerInterval: null,
+            gameActive: false,
+            lastScoringPlay: null
+        };
 
-    let players = [];
-    let currentPlayerIndex = 0;
-    let currentDart = 1;
-    let selectedMultiplier = 1;
-    let history = [];
-    let shoveMessage = '';
-
-    function addPlayer() {
-        const input = document.getElementById('player-name-input');
-        const name = input.value.trim();
-
-        if (!name) return;
-
-        players.push({
-            name,
-            scores: Object.fromEntries(TARGETS.map(target => [target, 0]))
-        });
-
-        input.value = '';
-        renderSetupPlayers();
-        document.getElementById('start-game-btn').style.display = players.length >= 2 ? 'inline-block' : 'none';
-        input.focus();
-    }
-
-    function renderSetupPlayers() {
-        const list = document.getElementById('player-list-ol');
-        list.innerHTML = players.map(player => `<li>${escapeHtml(player.name)}</li>`).join('');
-    }
-
-    function startGame() {
-        if (players.length < 2) return;
-
-        currentPlayerIndex = 0;
-        currentDart = 1;
-        selectedMultiplier = 1;
-        history = [];
-
-        document.getElementById('setup-screen').classList.remove('active');
-        document.getElementById('winner-screen').classList.remove('active');
-        document.getElementById('game-screen').classList.add('active');
-
-        buildHitButtons();
-        setMultiplier(1);
-        updateGameView();
-    }
-
-    function buildHitButtons() {
-        const container = document.getElementById('hit-buttons-container');
-        container.innerHTML = TARGETS.map(target => {
-            const className = target === 'B' ? ' class="bullseye"' : '';
-            const label = target === 'B' ? 'Bull' : target;
-            return `<button${className} onclick="recordHit('${target}')">${label}</button>`;
-        }).join('') + '<button class="miss" onclick="recordMiss()">Miss</button>';
-    }
-
-    function setMultiplier(multiplier) {
-        selectedMultiplier = multiplier;
-        [1, 2, 3].forEach(value => {
-            document.getElementById(`m${value}`).classList.toggle('selected', value === multiplier);
-        });
-    }
-
-    function recordHit(target) {
-        shoveMessage = '';
-        saveHistory();
-        applyHits(currentPlayerIndex, target, selectedMultiplier);
-        completeDart();
-    }
-
-    function recordMiss() {
-        shoveMessage = '';
-        saveHistory();
-        completeDart();
-    }
-
-    function applyHits(playerIndex, target, hits) {
-        const player = players[playerIndex];
-        const currentHits = player.scores[target];
-        const room = MAX_HITS - currentHits;
-        const keptHits = Math.min(room, hits);
-        const extraHits = hits - keptHits;
-
-        player.scores[target] += keptHits;
-
-        if (extraHits > 0) {
-            shoveHits(playerIndex, target, extraHits);
-        }
-    }
-
-    function shoveHits(fromPlayerIndex, target, hits) {
-        const alert = document.getElementById('shove-alert');
-        const shovedTo = [];
-        let remaining = hits;
-
-        for (let offset = 1; offset < players.length && remaining > 0; offset++) {
-            const nextIndex = (fromPlayerIndex + offset) % players.length;
-            const nextPlayer = players[nextIndex];
-            const room = MAX_HITS - nextPlayer.scores[target];
-
-            if (room <= 0) continue;
-
-            const given = Math.min(room, remaining);
-            nextPlayer.scores[target] += given;
-            remaining -= given;
-            shovedTo.push(`${given} to ${nextPlayer.name}`);
+        // --- INITIALIZATION ---
+        function initField() {
+            const container = document.getElementById('fieldMarkers');
+            container.innerHTML = '';
+            for (let i = 10; i < 100; i += 10) {
+                const line = document.createElement('div');
+                line.className = 'yard-line';
+                line.style.left = i + '%';
+                line.setAttribute('data-yard', i);
+                container.appendChild(line);
+            }
+            const mid = document.createElement('div');
+            mid.className = 'yard-line';
+            mid.style.left = '50%';
+            mid.setAttribute('data-yard', '50');
+            mid.style.background = 'rgba(255,215,0,0.5)';
+            mid.style.height = '60%';
+            container.appendChild(mid);
         }
 
-        if (shovedTo.length) {
-            shoveMessage = `Shoved ${target}: ${shovedTo.join(', ')}`;
+        function startGame() {
+            const leftName = document.getElementById('teamLeftName').value || "Home";
+            const rightName = document.getElementById('teamRightName').value || "Away";
+            
+            state.teams.left = leftName;
+            state.teams.right = rightName;
+
+            document.getElementById('scoreLeftName').textContent = leftName;
+            document.getElementById('scoreRightName').textContent = rightName;
+
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+
+            initField();
+            updateUI();
+            startTimer();
+            state.gameActive = true;
         }
-    }
 
-    function completeDart() {
-        if (hasWon(players[currentPlayerIndex])) {
-            showWinner(players[currentPlayerIndex]);
-            return;
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                if (!state.gameActive) return;
+                state.timeRemaining--;
+                updateTimerDisplay();
+                if (state.timeRemaining <= 0) {
+                    endGame();
+                }
+            }, 1000);
         }
 
-        if (currentDart >= 3) {
-            currentDart = 1;
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-        } else {
-            currentDart++;
-        }
-
-        setMultiplier(1);
-        updateGameView();
-    }
-
-    function undoLastScore() {
-        const previous = history.pop();
-        if (!previous) return;
-
-        players = previous.players;
-        currentPlayerIndex = previous.currentPlayerIndex;
-        currentDart = previous.currentDart;
-        selectedMultiplier = previous.selectedMultiplier;
-        shoveMessage = '';
-
-        document.getElementById('winner-screen').classList.remove('active');
-        document.getElementById('setup-screen').classList.remove('active');
-        document.getElementById('game-screen').classList.add('active');
-        updateGameView();
-    }
-
-    function saveHistory() {
-        history.push({
-            players: clonePlayers(players),
-            currentPlayerIndex,
-            currentDart,
-            selectedMultiplier
-        });
-    }
-
-    function clonePlayers(playerList) {
-        return playerList.map(player => ({
-            name: player.name,
-            scores: { ...player.scores }
-        }));
-    }
-
-    function updateGameView() {
-        document.getElementById('current-player-display').textContent = `${players[currentPlayerIndex].name}'s Turn`;
-        const alert = document.getElementById('shove-alert');
-        alert.textContent = shoveMessage;
-        alert.style.display = shoveMessage ? 'block' : 'none';
-        document.getElementById('undo-score-btn').disabled = history.length === 0;
-
-        [1, 2, 3].forEach(value => {
-            document.getElementById(`dot${value}`).classList.toggle('active', value >= currentDart);
-        });
-
-        setMultiplier(selectedMultiplier);
-        renderScoreboard('scoreboard-table');
-    }
-
-    function renderScoreboard(tableId) {
-        const table = document.getElementById(tableId);
-        const header = [
-            '<tr><th>Target</th>',
-            ...players.map((player, index) => `<th class="${index === currentPlayerIndex ? 'current-player-col' : ''}">${escapeHtml(player.name)}</th>`),
-            '</tr>'
-        ].join('');
-
-        const rows = TARGETS.map(target => {
-            const label = target === 'B' ? 'Bull' : target;
-            const cells = players.map((player, index) => {
-                const hits = player.scores[target];
-                const marks = hits >= MAX_HITS ? 'Closed' : '●'.repeat(hits);
-                const classes = [
-                    hits >= MAX_HITS ? 'closed-cell' : '',
-                    index === currentPlayerIndex ? 'current-player-col' : ''
-                ].filter(Boolean).join(' ');
-
-                return `<td class="${classes}">${marks || '-'}</td>`;
-            }).join('');
-
-            return `<tr><th>${label}</th>${cells}</tr>`;
-        }).join('');
-
-        table.innerHTML = header + rows;
-    }
-
-    function hasWon(player) {
-        return TARGETS.every(target => player.scores[target] >= MAX_HITS);
-    }
-
-    function showWinner(player) {
-        document.getElementById('game-screen').classList.remove('active');
-        document.getElementById('winner-screen').classList.add('active');
-        document.getElementById('winner-name-display').textContent = player.name;
-        renderScoreboard('final-scoreboard-table');
-    }
-
-    function resetGame() {
-        players = [];
-        currentPlayerIndex = 0;
-        currentDart = 1;
-        selectedMultiplier = 1;
-        history = [];
-        shoveMessage = '';
-
-        document.getElementById('game-screen').classList.remove('active');
-        document.getElementById('winner-screen').classList.remove('active');
-        document.getElementById('setup-screen').classList.add('active');
-        document.getElementById('player-name-input').value = '';
-        document.getElementById('player-list-ol').innerHTML = '';
-        document.getElementById('start-game-btn').style.display = 'none';
-    }
-
-    function escapeHtml(value) {
-        const div = document.createElement('div');
-        div.textContent = value;
-        return div.innerHTML;
-    }
-
-    document.getElementById('player-name-input').addEventListener('keydown', event => {
-        if (event.key === 'Enter') {
-            addPlayer();
-        }
-    });
-</script>
-</body>
-</html>
+        function updateTimerDisplay() {
+            const m = Math.floor(state.timeRemaining / 60);
+            const s = state.timeRemaining % 60;
+            document.getElementById('gameTimer').textContent = `${m}:${s 
