@@ -1,235 +1,443 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Darts</title>
-    <style>
-        :root {
-            --primary: #1a472a;
-            --accent: #ffd700;
-            --text: #f0f0f0;
-            --dark: #121212;
-            --panel: #2c3e50;
-            --danger: #d32f2f;
-            --pause: #3498db;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        h1, h2 { margin: 0.5em 0; text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* Setup */
-        #setup-screen { background: var(--panel); padding: 2rem; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); max-width: 500px; width: 100%; position: relative; z-index: 10; }
-        input { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; font-size: 1rem; width: 80%; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 24px; font-size: 1rem; border-radius: 5px; cursor: pointer; transition: 0.2s; font-weight: bold; margin: 5px; }
-        button:hover { filter: brightness(1.1); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        button.accent { background: var(--accent); color: #000; }
-        button.danger { background: var(--danger); }
-        button.pause-btn { background: var(--pause); }
-
-        /* Game */
-        #game-screen { display: none; width: 100%; max-width: 800px; flex-direction: column; gap: 15px; }
-        
-        .scoreboard { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 15px; border-radius: 8px; border-bottom: 4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .team-score { text-align: center; flex: 1; }
-        .score-display { font-size: 2.5rem; font-weight: bold; color: var(--accent); }
-        
-        .timer-container { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .timer-display { font-size: 1.5rem; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 5px; min-width: 90px; text-align: center; color: #fff; border: 1px solid #333; }
-        .pause-btn { padding: 5px 10px; font-size: 0.8rem; background: var(--pause); }
-        .pause-btn.paused { background: var(--danger); }
-
-        .field-container { background: var(--primary); border-radius: 10px; padding: 10px; position: relative; height: 120px; overflow: hidden; border: 2px solid #fff; display: flex; align-items: center; justify-content: space-between; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .endzone { width: 60px; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; writing-mode: vertical-rl; text-orientation: mixed; color: rgba(255,255,255,0.6); font-weight: bold; z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
-        .field-markers { flex-grow: 1; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; position: relative; }
-        .possession-marker { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; position: absolute; top: 50%; transform: translate(-50%, -50%); transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 0 15px var(--accent); z-index: 10; }
-        .yard-line { height: 40%; width: 1px; background: rgba(255,255,255,0.2); position: relative; display: flex; align-items: center; justify-content: center; }
-        .yard-line::after { content: attr(data-yard); position: absolute; top: -15px; font-size: 0.6rem; color: rgba(255,255,255,0.5); transform: translateX(-50%); }
-
-        .controls { background: var(--panel); padding: 15px; border-radius: 8px; display: grid; grid-template-columns: 1fr; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .status-panel { background: #222; padding: 12px; border-radius: 5px; text-align: center; font-style: italic; border-left: 4px solid var(--accent); min-height: 44px; display: flex; align-items: center; justify-content: center; font-weight: 500; }
-        .dart-input-group { display: flex; gap: 10px; }
-        select { flex: 1; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 1rem; }
-
-        .game-info { display: flex; justify-content: space-around; background: #222; padding: 10px; border-radius: 5px; font-size: 0.9rem; flex-wrap: wrap; gap: 10px; border: 1px solid #444; }
-        .highlight { color: var(--accent); font-weight: bold; }
-        
-        .hidden { display: none !important; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--panel); padding: 25px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px; border: 1px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DartKeep – Public Leaderboard</title>
+  <style>
+    :root{
+      --bg:#0b0f17; --card:#121a2a; --muted:#94a3b8; --text:#e5e7eb;
+      --accent:#60a5fa; --accent2:#34d399; --danger:#fb7185; --line:rgba(148,163,184,.18);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    body{ margin:0; font-family:var(--sans); background:linear-gradient(180deg,#070a10,#0b0f17 30%,#0b0f17); color:var(--text); }
+    header{ padding:18px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(11,15,23,.9); backdrop-filter: blur(8px); }
+    h1{ margin:0; font-size:18px; letter-spacing:.2px; }
+    .sub{ margin-top:4px; color:var(--muted); font-size:13px; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:16px; }
+    .row{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+    .controls{ flex:1 1 520px; }
+    .stats{ flex:1 1 320px; display:flex; gap:12px; flex-wrap:wrap; }
+    .pill{ display:inline-flex; gap:8px; align-items:center; border:1px solid var(--line); border-radius:999px; padding:8px 10px; background:rgba(255,255,255,.02); }
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input, select{
+      width:100%; box-sizing:border-box; padding:10px 11px; border-radius:10px;
+      border:1px solid var(--line); background:#0a1220; color:var(--text);
+      outline:none;
+    }
+    input::placeholder{ color:#64748b; }
+    button{
+      padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(96,165,250,.22), rgba(96,165,250,.10));
+      color:var(--text); cursor:pointer; font-weight:600;
+    }
+    button.secondary{
+      background:rgba(255,255,255,.04);
+      font-weight:600;
+    }
+    button:disabled{ opacity:.6; cursor:not-allowed; }
+    .grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    table{ width:100%; border-collapse:collapse; font-size:14px; }
+    th, td{ padding:10px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:middle; }
+    th{ font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+    tr:hover td{ background:rgba(255,255,255,.02); }
+    .rank{ width:56px; font-family:var(--mono); color:#cbd5e1; }
+    .name{ font-weight:700; }
+    .mono{ font-family:var(--mono); }
+    .muted{ color:var(--muted); }
+    .ok{ color:var(--accent2); }
+    .err{ color:var(--danger); }
+    .kpi{ min-width:160px; flex:1 1 160px; }
+    .kpi .v{ font-size:18px; font-weight:800; margin-top:2px; }
+    .kpi .k{ font-size:12px; color:var(--muted); }
+    .foot{ margin-top:12px; font-size:12px; color:var(--muted); line-height:1.5; }
+    .badge{
+      display:inline-block; padding:2px 8px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.03); color:#cbd5e1; font-size:12px;
+    }
+    @media (max-width:760px){
+      th:nth-child(6), td:nth-child(6){ display:none; } /* hide Points Scored on very small screens */
+    }
+  </style>
 </head>
+
 <body>
+  <header>
+    <div class="wrap">
+      <h1 id="title">DartKeep – Public Leaderboard</h1>
+      <div class="sub" id="subtitle">Enter a share token to load a live leaderboard.</div>
+    </div>
+  </header>
 
-    <!-- SETUP SCREEN -->
-    <div id="setup-screen">
-        <h1>Football Darts</h1>
-        <p>Enter Team Names to Start</p>
-        <input type="text" id="teamLeftName" placeholder="Left Team Name" value="Home">
-        <input type="text" id="teamRightName" placeholder="Right Team Name" value="Away">
-        <br>
-        <button onclick="startGame()">Kickoff</button>
-        <p style="font-size: 0.8rem; color: #aaa; margin-top: 15px; line-height: 1.4;">
-            <strong>Rules:</strong> 20 min game. 4 quarters.<br>
-            Left Team attacks Left Endzone. Right Team attacks Right Endzone.<br>
-            Hit segments to advance. Bullseye = 50 yard line.<br>
-            Touchdown = 6pts. Extra Point options available.
-        </p>
+  <main class="wrap">
+    <div class="row">
+      <div class="card controls">
+        <div class="row">
+          <div style="flex: 2 1 360px;">
+            <label for="token">Share token</label>
+            <input id="token" placeholder="Paste token from /share/{token} or just the token" />
+          </div>
+
+          <div style="flex: 1 1 220px;">
+            <label for="endpoint">Leaderboard API endpoint</label>
+            <input id="endpoint" placeholder="https://YOUR-PROJECT.functions.supabase.co/public-leaderboard" />
+          </div>
+
+          <div style="flex: 0 0 auto; display:flex; gap:10px;">
+            <button id="loadBtn">Load</button>
+            <button id="autoBtn" class="secondary" title="Toggle auto-refresh">Auto: Off</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <div style="flex: 1 1 220px;">
+            <label for="limit">Limit</label>
+            <select id="limit">
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100" selected>100</option>
+              <option value="200">200</option>
+            </select>
+          </div>
+
+          <div style="flex: 1 1 220px;">
+            <label for="filter">Search player</label>
+            <input id="filter" placeholder="Type a name…" />
+          </div>
+
+          <div style="flex: 1 1 220px;">
+            <label for="sort">Sort</label>
+            <select id="sort">
+              <option value="elo_desc" selected>Elo (desc)</option>
+              <option value="winpct_desc">Win% (desc)</option>
+              <option value="ppr_desc">PPR (desc) – x01</option>
+              <option value="first9_desc">First 9 (desc) – x01</option>
+              <option value="avgppg_desc">Avg points/game (desc)</option>
+              <option value="points_desc">Points scored (desc)</option>
+              <option value="name_asc">Name (A→Z)</option>
+            </select>
+          </div>
+
+          <div style="flex: 0 0 auto; display:flex; align-items:flex-end; gap:10px;">
+            <button id="copyLinkBtn" class="secondary" title="Copy a shareable URL for this viewer">Copy viewer link</button>
+          </div>
+        </div>
+
+        <div class="foot">
+          This page expects your backend to return JSON like:
+          <span class="badge">org</span> + <span class="badge">scope</span> + <span class="badge">rows</span>.
+          It’s “live” because it always reads current <span class="badge">ratings</span>.
+        </div>
+      </div>
+
+      <div class="card stats">
+        <div class="kpi">
+          <div class="k">Organization</div>
+          <div class="v" id="kpiOrg">—</div>
+        </div>
+        <div class="kpi">
+          <div class="k">Game type</div>
+          <div class="v" id="kpiGame">—</div>
+        </div>
+        <div class="kpi">
+          <div class="k">Last updated</div>
+          <div class="v" id="kpiTime">—</div>
+        </div>
+        <div class="kpi">
+          <div class="k">Rows</div>
+          <div class="v" id="kpiRows">—</div>
+        </div>
+      </div>
     </div>
 
-    <!-- GAME SCREEN -->
-    <div id="game-screen">
-        <!-- Scoreboard -->
-        <div class="scoreboard">
-            <div class="team-score">
-                <div id="scoreLeftName">Home</div>
-                <div class="score-display" id="scoreLeft">0</div>
-            </div>
-            
-            <div class="timer-container">
-                <div class="timer-display" id="gameTimer">20:00</div>
-                <button class="pause-btn" id="pauseBtn" onclick="togglePause()">Pause</button>
-            </div>
+    <div class="grid">
+      <div class="card">
+        <div id="status" class="muted">Idle.</div>
+      </div>
 
-            <div class="team-score">
-                <div id="scoreRightName">Away</div>
-                <div class="score-display" id="scoreRight">0</div>
-            </div>
-        </div>
-
-        <!-- Field Visualization -->
-        <div class="field-container">
-            <div class="endzone" id="endzoneLeft">LEFT<br>ENDZONE</div>
-            <div class="field-markers" id="fieldMarkers">
-                <!-- Generated by JS -->
-            </div>
-            <div class="endzone" id="endzoneRight">RIGHT<br>ENDZONE</div>
-            <div class="possession-marker" id="ballMarker" style="left: 50%;"></div>
-        </div>
-
-        <!-- Game Info -->
-        <div class="game-info">
-            <span>Quarter: <span id="quarterDisplay" class="highlight">1</span></span>
-            <span>Down: <span id="downDisplay" class="highlight">1</span></span>
-            <span>To Go: <span id="toGoDisplay" class="highlight">10</span></span>
-            <span>Ball On: <span id="ballOnDisplay" class="highlight">50</span></span>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <div class="status-panel" id="statusPanel">
-                Select your throw result to proceed.
-            </div>
-
-            <!-- XP Buttons -->
-            <div id="xpButtons" class="hidden" style="grid-column: span 1; display: flex; flex-direction: column; gap: 5px;">
-                <p style="margin:0; font-size:0.9rem; text-align:center; color:var(--accent);">TOUCHDOWN!</p>
-                <button class="accent" onclick="handleExtraPoint('kick')">Kick XP (Hit Any 20)</button>
-                <button onclick="handleExtraPoint('2pt')">Go for 2 (Hit T20)</button>
-                <button onclick="handleExtraPoint('no')">No Conversion</button>
-            </div>
-
-            <!-- 4th Down Buttons -->
-            <div id="fgButtons" class="hidden" style="grid-column: span 1; display: flex; flex-direction: column; gap: 5px;">
-                <p style="margin:0; font-size:0.9rem; text-align:center; color:var(--accent);">4TH DOWN DECISION</p>
-                <button class="accent" onclick="attemptFG()">Kick Field Goal</button>
-                <button onclick="goForIt()">Go for it (1 Throw)</button>
-                <button onclick="punt()">Punt (Turnover)</button>
-            </div>
-
-            <!-- Main Throw Input -->
-            <div class="dart-input-group">
-                <select id="segmentSelect">
-                    <option value="" disabled selected>Hit Segment...</option>
-                    <option value="D20">Double 20 (Endzone)</option>
-                    <option value="S20">Single 20</option>
-                    <option value="T20">Triple 20</option>
-                    <option value="S1">Single 1</option>
-                    <option value="T1">Triple 1</option>
-                    <option value="D1">Double 1</option>
-                    <option value="BULL">Bullseye (50)</option>
-                    <option value="S5">Single 5</option>
-                    <option value="T5">Triple 5</option>
-                    <option value="S10">Single 10</option>
-                    <option value="T10">Triple 10</option>
-                    <option value="D10">Double 10</option>
-                    <option value="S13">Single 13</option>
-                    <option value="T13">Triple 13</option>
-                    <option value="D13">Double 13</option>
-                    <option value="S11">Single 11</option>
-                    <option value="T11">Triple 11</option>
-                    <option value="D11">Double 11</option>
-                    <option value="S8">Single 8</option>
-                    <option value="T8">Triple 8</option>
-                    <option value="D8">Double 8</option>
-                    <option value="S6">Single 6</option>
-                    <option value="T6">Triple 6</option>
-                    <option value="D6">Double 6</option>
-                    <option value="MISS">Miss / Bust</option>
-                </select>
-                <button id="throwBtn" onclick="processThrow()">Throw</button>
-            </div>
-        </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th class="rank">Rank</th>
+              <th>Player</th>
+              <th class="mono">Elo</th>
+              <th class="mono">W-L-T</th>
+              <th class="mono">Games</th>
+              <th class="mono">Points</th>
+              <th class="mono">Avg / Game</th>
+              <th class="mono">PPR</th>
+              <th class="mono">First 9</th>
+              <th class="mono">Win%</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="10" class="muted">No data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </main>
 
-    <!-- MODAL FOR GAME OVER -->
-    <div id="gameOverModal" class="modal">
-        <div class="modal-content">
-            <h2>Game Over</h2>
-            <p id="winnerText"></p>
-            <button onclick="location.reload()">New Game</button>
-        </div>
-    </div>
+  <script>
+    /**
+     * This HTML file is frontend-only.
+     * It calls your public endpoint:
+     *   GET {endpoint}?token=...&limit=...
+     *
+     * Expected row fields (per your spec):
+     * - rank
+     * - player_id
+     * - display_name
+     * - elo
+     * - wins, losses, ties
+     * - games_played
+     * - points_scored
+     * - avg_points_per_game
+     * - ppr (x01 only, may be null)
+     * - first9_avg (x01 only, may be null)
+     * - points_percentage (win% with ties as 0.5) or compute it here
+     */
 
-    <script>
-        // --- GAME STATE ---
-        const state = {
-            teams: { left: "Home", right: "Away" },
-            scores: { left: 0, right: 0 },
-            possession: 'left', 
-            ballPosition: 50, 
-            quarter: 1,
-            timeRemaining: 1200, 
-            down: 1,
-            yardsToGo: 10,
-            targetLine: 60, 
-            
-            waitingForConversion: false,
-            waitingFor4thDown: false,
-            isGfot: false, 
-            timerInterval: null,
-            gameActive: false,
-            isPaused: false,
-            lastScoringPlay: null
-        };
+    const $ = (id) => document.getElementById(id);
 
-        // --- INITIALIZATION ---
-        function initField() {
-            const container = document.getElementById('fieldMarkers');
-            container.innerHTML = '';
-            for (let i = 10; i < 100; i += 10) {
-                const line = document.createElement('div');
-                line.className = 'yard-line';
-                line.style.left = i + '%';
-                line.setAttribute('data-yard', i);
-                container.appendChild(line);
-            }
-            const mid = document.createElement('div');
-            mid.className = 'yard-line';
-            mid.style.left = '50%';
-            mid.setAttribute('data-yard', '50');
-            mid.style.background = 'rgba(255,215,0,0.5)';
-            mid.style.height = '60%';
-            container.appendChild(mid);
+    const state = {
+      data: null,
+      auto: false,
+      timer: null
+    };
+
+    function parseToken(input) {
+      if (!input) return "";
+      // Allow pasting full URLs like https://.../share/{token}
+      const trimmed = input.trim();
+      const match = trimmed.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}/);
+      return match ? match[0] : trimmed;
+    }
+
+    function fmt(n, digits=1) {
+      if (n === null || n === undefined || Number.isNaN(n)) return "—";
+      return Number(n).toFixed(digits);
+    }
+
+    function fmtInt(n) {
+      if (n === null || n === undefined || Number.isNaN(n)) return "—";
+      return Math.round(Number(n)).toString();
+    }
+
+    function setStatus(msg, kind="muted") {
+      const el = $("status");
+      el.className = kind;
+      el.textContent = msg;
+    }
+
+    function setKPIs(payload) {
+      $("kpiOrg").textContent = payload?.org?.name ?? "—";
+      $("kpiGame").textContent = payload?.scope?.game_type ?? "—";
+      $("kpiTime").textContent = payload?.scope?.generated_at
+        ? new Date(payload.scope.generated_at).toLocaleString()
+        : "—";
+      $("kpiRows").textContent = payload?.rows ? payload.rows.length : "—";
+      $("title").textContent = payload?.org?.name
+        ? `DartKeep – ${payload.org.name} Leaderboard`
+        : "DartKeep – Public Leaderboard";
+      $("subtitle").textContent = payload?.scope?.game_type
+        ? `Live leaderboard (${payload.scope.game_type}).`
+        : "Enter a share token to load a live leaderboard.";
+    }
+
+    function computeWinPct(row) {
+      const w = Number(row.wins ?? 0);
+      const l = Number(row.losses ?? 0);
+      const t = Number(row.ties ?? 0);
+      const gp = Number(row.games_played ?? (w + l + t));
+      if (!gp) return null;
+      return (w + 0.5 * t) / gp;
+    }
+
+    function sortRows(rows, mode) {
+      const copy = [...rows];
+      const by = {
+        elo_desc: (a,b) => Number(b.elo||0) - Number(a.elo||0),
+        winpct_desc: (a,b) => (computeWinPct(b) ?? -1) - (computeWinPct(a) ?? -1),
+        ppr_desc: (a,b) => (Number(b.ppr ?? -1) - Number(a.ppr ?? -1)),
+        first9_desc: (a,b) => (Number(b.first9_avg ?? -1) - Number(a.first9_avg ?? -1)),
+        avgppg_desc: (a,b) => (Number(b.avg_points_per_game ?? -1) - Number(a.avg_points_per_game ?? -1)),
+        points_desc: (a,b) => (Number(b.points_scored ?? 0) - Number(a.points_scored ?? 0)),
+        name_asc: (a,b) => String(a.display_name||"").localeCompare(String(b.display_name||""))
+      }[mode] || ((a,b)=>0);
+
+      copy.sort((a,b) => {
+        const r = by(a,b);
+        if (r !== 0) return r;
+        // stable-ish tie breakers
+        return String(a.display_name||"").localeCompare(String(b.display_name||""));
+      });
+
+      // Re-rank visually if you choose non-elo sorts
+      return copy.map((r, idx) => ({ ...r, _viewRank: idx + 1 }));
+    }
+
+    function renderTable(payload) {
+      const tbody = $("tbody");
+      const filter = $("filter").value.trim().toLowerCase();
+      const sortMode = $("sort").value;
+
+      if (!payload || !payload.rows || payload.rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="muted">No rows.</td></tr>`;
+        return;
+      }
+
+      let rows = payload.rows;
+
+      if (filter) {
+        rows = rows.filter(r => String(r.display_name || "").toLowerCase().includes(filter));
+      }
+
+      rows = sortRows(rows, sortMode);
+
+      tbody.innerHTML = rows.map((r) => {
+        const gp = Number(r.games_played ?? (Number(r.wins||0)+Number(r.losses||0)+Number(r.ties||0)));
+        const winPct = r.points_percentage ?? computeWinPct(r);
+        const viewRank = r._viewRank ?? r.rank ?? "—";
+
+        return `
+          <tr>
+            <td class="rank mono">${viewRank}</td>
+            <td class="name">${escapeHtml(r.display_name ?? "—")}</td>
+            <td class="mono">${fmt(r.elo, 1)}</td>
+            <td class="mono">${fmtInt(r.wins)}-${fmtInt(r.losses)}-${fmtInt(r.ties)}</td>
+            <td class="mono">${fmtInt(gp)}</td>
+            <td class="mono">${fmtInt(r.points_scored)}</td>
+            <td class="mono">${fmt(r.avg_points_per_game, 2)}</td>
+            <td class="mono">${fmt(r.ppr, 2)}</td>
+            <td class="mono">${fmt(r.first9_avg, 2)}</td>
+            <td class="mono">${winPct === null ? "—" : (winPct*100).toFixed(1) + "%"}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function loadLeaderboard() {
+      const endpoint = $("endpoint").value.trim();
+      const token = parseToken($("token").value);
+      const limit = $("limit").value;
+
+      if (!endpoint) {
+        setStatus("Missing endpoint. Paste your public leaderboard API endpoint.", "err");
+        return;
+      }
+      if (!token) {
+        setStatus("Missing token. Paste the share token (UUID).", "err");
+        return;
+      }
+
+      $("loadBtn").disabled = true;
+      setStatus("Loading…", "muted");
+
+      try {
+        const url = new URL(endpoint);
+        url.searchParams.set("token", token);
+        url.searchParams.set("limit", limit);
+
+        const res = await fetch(url.toString(), { method: "GET" });
+        const text = await res.text();
+
+        let payload;
+        try { payload = JSON.parse(text); } catch { payload = { error: "Non-JSON response", raw: text }; }
+
+        if (!res.ok) {
+          setKPIs(null);
+          state.data = null;
+          $("tbody").innerHTML = `<tr><td colspan="10" class="err">Error: ${escapeHtml(payload.error || ("HTTP " + res.status))}</td></tr>`;
+          setStatus(`Error (${res.status}): ${payload.error || "Request failed"}`, "err");
+          return;
         }
 
-        function startGame() {
-            const leftName = document.getElementById('teamLeftName').value || "Home";
-            const rightName = document.getElementById('teamRightName').value || "Away";
-            
-            state.teams.left = leftName;
-            state.teams.right = rightName;
+        state.data = payload;
+        setKPIs(payload);
+        renderTable(payload);
+        setStatus(`Loaded ${payload.rows?.length ?? 0} rows.`, "ok");
+      } catch (e) {
+        setStatus("Network error: " + (e?.message || String(e)), "err");
+      } finally {
+        $("loadBtn").disabled = false;
+      }
+    }
 
-            document.getElementById('scoreLeftName').textContent = leftName;
-            document.getElementById('scoreRightName').textContent
+    function toggleAuto() {
+      state.auto = !state.auto;
+      $("autoBtn").textContent = state.auto ? "Auto: On" : "Auto: Off";
+
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+      if (state.auto) {
+        state.timer = setInterval(loadLeaderboard, 15000); // refresh every 15s
+      }
+    }
+
+    function copyViewerLink() {
+      const token = parseToken($("token").value);
+      const endpoint = $("endpoint").value.trim();
+      const limit = $("limit").value;
+
+      const url = new URL(location.href);
+      if (token) url.searchParams.set("token", token);
+      if (endpoint) url.searchParams.set("endpoint", endpoint);
+      url.searchParams.set("limit", limit);
+
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        setStatus("Copied viewer link to clipboard.", "ok");
+      }).catch(() => {
+        setStatus("Could not copy. (Clipboard permission?)", "err");
+      });
+    }
+
+    function applyFromQueryString() {
+      const url = new URL(location.href);
+      const token = url.searchParams.get("token");
+      const endpoint = url.searchParams.get("endpoint");
+      const limit = url.searchParams.get("limit");
+
+      if (endpoint) $("endpoint").value = endpoint;
+      if (token) $("token").value = token;
+      if (limit) $("limit").value = limit;
+    }
+
+    // Wire up
+    $("loadBtn").addEventListener("click", loadLeaderboard);
+    $("autoBtn").addEventListener("click", toggleAuto);
+    $("copyLinkBtn").addEventListener("click", copyViewerLink);
+    $("filter").addEventListener("input", () => renderTable(state.data));
+    $("sort").addEventListener("change", () => renderTable(state.data));
+    $("limit").addEventListener("change", () => {
+      // if we already have data loaded, reload with new limit
+      if (state.data) loadLeaderboard();
+    });
+
+    // Enter-to-load
+    $("token").addEventListener("keydown", (e) => { if (e.key === "Enter") loadLeaderboard(); });
+    $("endpoint").addEventListener("keydown", (e) => { if (e.key === "Enter") loadLeaderboard(); });
+
+    applyFromQueryString();
+  </script>
+</body>
+</html>
