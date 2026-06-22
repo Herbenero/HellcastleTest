@@ -668,17 +668,11 @@
       <div class="scoreboard-wrap">
         <table style="min-width:860px;">
           <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Player</th>
-              <th>Elo</th>
-              <th>W</th>
-              <th>L</th>
-              <th>Win %</th>
-              <th>MPR</th>
-              <th>Games</th>
-            </tr>
-          </thead>
+  <tr id="scoreboardHeaderRow">
+    <th>Target</th>
+  </tr>
+</thead>
+
           <tbody id="leaderboardBody"></tbody>
         </table>
       </div>
@@ -1089,12 +1083,54 @@
       return true;
     }
 
-    function renderScoreboard() {
-      els.scoreboardBody.innerHTML = "";
-      if (!state.players.length) {
-        els.scoreboardBody.innerHTML = `<tr><td colspan="25"><div class="empty">No active game. Add players and start a new game.</div></td></tr>`;
-        return;
-      }
+   function renderScoreboard() {
+  const headerRow = els.scoreboardHeaderRow;
+  // build header: first column is "Target", then a column for each player (name)
+  headerRow.innerHTML = "<th>Target</th>";
+  state.players.forEach(player => {
+    const th = document.createElement("th");
+    th.innerHTML = `<strong>${escapeHtml(player.name)}</strong>`;
+    headerRow.appendChild(th);
+  });
+
+  els.scoreboardBody.innerHTML = "";
+  if (!state.players.length) {
+    const colspan = 1;
+    els.scoreboardBody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty">No active game. Add players and start a new game.</div></td></tr>`;
+    return;
+  }
+
+  // one row per target
+  TARGETS.forEach(target => {
+    const tr = document.createElement("tr");
+    // first cell = target label
+    let rowHtml = `<td><strong>${escapeHtml(target)}</strong></td>`;
+    // player cells for this target
+    state.players.forEach(player => {
+      const marks = player.marks[target];
+      const main = [0,1,2].map(i => `<span class="mark ${i < Math.min(marks,3) ? "filled" : ""}"></span>`).join("");
+      let extra = "";
+      if (marks > 3) extra = Array.from({length: marks - 3}).map(() => `<span class="mark extra"></span>`).join("");
+      rowHtml += `<td><div class="marks">${main}${extra}</div></td>`;
+    });
+    tr.innerHTML = rowHtml;
+    els.scoreboardBody.appendChild(tr);
+  });
+
+  // Add summary rows (Score, Closed, MPR) — one summary row per metric, with one cell per player
+  const scoreRow = document.createElement("tr");
+  scoreRow.innerHTML = `<td><strong>Score</strong></td>` + state.players.map(p => `<td><strong>${p.score}</strong></td>`).join("");
+  els.scoreboardBody.appendChild(scoreRow);
+
+  const closedRow = document.createElement("tr");
+  closedRow.innerHTML = `<td><strong>Closed</strong></td>` + state.players.map(p => `<td>${closedCount(p)}/${TARGETS.length}</td>`).join("");
+  els.scoreboardBody.appendChild(closedRow);
+
+  const mprRow = document.createElement("tr");
+  mprRow.innerHTML = `<td><strong>MPR</strong></td>` + state.players.map(p => `<td>${p.dartsThrown ? (p.totalMarksLanded / (p.dartsThrown / 3)).toFixed(1) : "0.0"}</td>`).join("");
+  els.scoreboardBody.appendChild(mprRow);
+}
+
 
       state.players.forEach((player, idx) => {
         const tr = document.createElement("tr");
