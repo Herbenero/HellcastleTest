@@ -496,7 +496,7 @@
   <div class="app">
     <section class="topbar">
       <div class="hero reveal">
-        <div class="eyebrow">Randomized Cricket Variant</div>
+        <div class="eyebrow">Randomized Cricket</div>
         <h1>Cricket · Random</h1>
         <p>
           Play cricket with targets 1–20 and Bull. Each round surfaces 6 random available targets. If a displayed target
@@ -637,15 +637,12 @@
           <div class="scoreboard-wrap">
             <table aria-label="Cricket Random scoreboard">
               <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
-                  <th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>Bull</th>
-                  <th>Score</th>
-                  <th>Closed</th>
-                  <th>MPR</th>
-                </tr>
-              </thead>
+  <tr id="mainScoreboardHeaderRow">
+    <th>Target</th>
+  </tr>
+</thead>
+
+
               <tbody id="scoreboardBody"></tbody>
             </table>
           </div>
@@ -813,6 +810,8 @@
       historyWinner: document.getElementById("historyWinner"),
       saveHistoryGameBtn: document.getElementById("saveHistoryGameBtn"),
       allGamesList: document.getElementById("allGamesList")
+      mainScoreboardHeaderRow: document.getElementById("mainScoreboardHeaderRow"),
+
     };
 
     function createPlayerInput(value = "") {
@@ -1084,8 +1083,10 @@
     }
 
    function renderScoreboard() {
-  const headerRow = els.scoreboardHeaderRow;
-  // build header: first column is "Target", then a column for each player (name)
+  const headerRow = els.mainScoreboardHeaderRow;
+  const tbody = els.scoreboardBody;
+
+  // Build header: first column is "Target", then a column for each player (name)
   headerRow.innerHTML = "<th>Target</th>";
   state.players.forEach(player => {
     const th = document.createElement("th");
@@ -1093,43 +1094,43 @@
     headerRow.appendChild(th);
   });
 
-  els.scoreboardBody.innerHTML = "";
+  tbody.innerHTML = "";
   if (!state.players.length) {
-    const colspan = 1;
-    els.scoreboardBody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty">No active game. Add players and start a new game.</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="1"><div class="empty">No active game. Add players and start a new game.</div></td></tr>`;
     return;
   }
 
-  // one row per target
+  // One row per target
   TARGETS.forEach(target => {
     const tr = document.createElement("tr");
-    // first cell = target label
     let rowHtml = `<td><strong>${escapeHtml(target)}</strong></td>`;
-    // player cells for this target
+
     state.players.forEach(player => {
-      const marks = player.marks[target];
+      const marks = Number((player.marks && player.marks[target]) || 0);
       const main = [0,1,2].map(i => `<span class="mark ${i < Math.min(marks,3) ? "filled" : ""}"></span>`).join("");
       let extra = "";
       if (marks > 3) extra = Array.from({length: marks - 3}).map(() => `<span class="mark extra"></span>`).join("");
       rowHtml += `<td><div class="marks">${main}${extra}</div></td>`;
     });
+
     tr.innerHTML = rowHtml;
-    els.scoreboardBody.appendChild(tr);
+    tbody.appendChild(tr);
   });
 
-  // Add summary rows (Score, Closed, MPR) — one summary row per metric, with one cell per player
+  // Add summary rows (Score, Closed, MPR)
   const scoreRow = document.createElement("tr");
   scoreRow.innerHTML = `<td><strong>Score</strong></td>` + state.players.map(p => `<td><strong>${p.score}</strong></td>`).join("");
-  els.scoreboardBody.appendChild(scoreRow);
+  tbody.appendChild(scoreRow);
 
   const closedRow = document.createElement("tr");
   closedRow.innerHTML = `<td><strong>Closed</strong></td>` + state.players.map(p => `<td>${closedCount(p)}/${TARGETS.length}</td>`).join("");
-  els.scoreboardBody.appendChild(closedRow);
+  tbody.appendChild(closedRow);
 
   const mprRow = document.createElement("tr");
   mprRow.innerHTML = `<td><strong>MPR</strong></td>` + state.players.map(p => `<td>${p.dartsThrown ? (p.totalMarksLanded / (p.dartsThrown / 3)).toFixed(1) : "0.0"}</td>`).join("");
-  els.scoreboardBody.appendChild(mprRow);
+  tbody.appendChild(mprRow);
 }
+
 
 
       state.players.forEach((player, idx) => {
