@@ -2,1613 +2,1887 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cricket · Random</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Football Darts</title>
+  <meta name="description" content="Football Darts webapp with field progression, downs, possessions, scoring, punt, field goal, 2-point conversion, scoreboard, leaderboard, history calendar, local storage, and final game submission." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root{
-      --bg:#f5f1e8;
-      --bg-2:#efe7da;
-      --panel:#fbf8f2cc;
-      --panel-solid:#fbf8f2;
-      --ink:#151515;
-      --muted:#665f57;
-      --line:rgba(21,21,21,.12);
-      --line-strong:rgba(21,21,21,.2);
-      --accent:#d84f2a;
-      --accent-2:#0f7b6c;
-      --gold:#b88722;
-      --danger:#bb2f42;
-      --shadow:0 18px 50px rgba(34,24,15,.12);
+      --bg:#0a1a12;
+      --bg-2:#10261a;
+      --panel:rgba(15,39,26,.84);
+      --panel-2:rgba(19,48,31,.92);
+      --line:rgba(255,255,255,.09);
+      --text:#eef7f0;
+      --muted:#9fb7a7;
+      --accent:#f28b18;
+      --accent-2:#8dd17e;
+      --field:#2b7b46;
+      --field-2:#1d5932;
+      --red:#e65d5d;
+      --gold:#f5cf63;
+      --white:#f8fbf8;
+      --shadow:0 24px 70px rgba(0,0,0,.32);
       --radius:24px;
       --radius-sm:16px;
       --max:1480px;
     }
 
     *{box-sizing:border-box}
-    html,body{
-      margin:0;padding:0;
-      background:
-        radial-gradient(circle at top left, rgba(216,79,42,.08), transparent 24%),
-        radial-gradient(circle at 100% 0%, rgba(15,123,108,.08), transparent 24%),
-        linear-gradient(180deg, #f6f1e7, #f3ecdf 40%, #efe7da 100%);
-      color:var(--ink);
-      font-family:"Manrope", sans-serif;
-      min-height:100%;
-    }
-    body{overflow-x:hidden}
-
-    h1,h2,h3,h4{
+    html{scroll-behavior:smooth}
+    body{
       margin:0;
-      line-height:.95;
-      font-family:"Anton", sans-serif;
-      letter-spacing:.02em;
-      font-weight:400;
+      font-family:'Inter',sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(242,139,24,.13), transparent 22%),
+        radial-gradient(circle at top right, rgba(141,209,126,.14), transparent 20%),
+        linear-gradient(180deg, #08140e 0%, #0d1e15 100%);
+      min-height:100vh;
     }
 
-    button,input,select{font:inherit}
-    .app{
-      width:min(var(--max), calc(100% - 24px));
-      margin:18px auto 40px;
-    }
-
-    .reveal{
-      opacity:0;
-      transform:translateY(18px);
-      animation:rise .75s ease forwards;
-    }
-    .reveal:nth-child(2){animation-delay:.08s}
-    .reveal:nth-child(3){animation-delay:.16s}
-    .reveal:nth-child(4){animation-delay:.24s}
-    .reveal:nth-child(5){animation-delay:.32s}
-    @keyframes rise{to{opacity:1;transform:none}}
-
-    .topbar{
-      display:grid;
-      grid-template-columns:1.35fr .85fr;
-      gap:18px;
-      margin-bottom:18px;
-    }
-
-    .hero,.summary,.panel,.modal-card{
-      position:relative;
-      background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.35));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      backdrop-filter:blur(8px);
-    }
-
-    .hero::before,.summary::before,.panel::before,.modal-card::before{
+    body::before{
       content:"";
-      position:absolute;
+      position:fixed;
       inset:0;
       pointer-events:none;
+      opacity:.06;
       background:
-        linear-gradient(90deg, transparent 0 96%, rgba(21,21,21,.03) 96% 100%),
-        linear-gradient(transparent 0 96%, rgba(21,21,21,.03) 96% 100%);
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
       background-size:28px 28px;
-      mask-image:linear-gradient(180deg, rgba(0,0,0,.7), transparent 78%);
-      opacity:.45;
+      mask-image:linear-gradient(180deg, rgba(0,0,0,.95), rgba(0,0,0,.25));
     }
+
+    .wrap{width:min(var(--max), calc(100% - 28px)); margin:0 auto;}
+
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:blur(14px);
+      background:rgba(8,20,14,.72);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:18px; padding:14px 0;
+    }
+
+    .brand{display:flex; flex-direction:column; gap:2px;}
+    .eyebrow{
+      font-family:'Bebas Neue', cursive;
+      letter-spacing:.18em; text-transform:uppercase; font-size:.82rem; color:var(--accent);
+    }
+    .title{
+      margin:0;
+      font-family:'Bebas Neue', cursive;
+      letter-spacing:.05em;
+      line-height:.92;
+      font-size:clamp(2rem, 5vw, 4.4rem);
+      text-transform:uppercase;
+    }
+    .subtitle{
+      color:var(--muted);
+      max-width:72ch;
+      font-size:.95rem;
+    }
+
+    .top-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+
+    button,input{font:inherit}
+
+    .btn{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--text);
+      padding:12px 16px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:800;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+    }
+    .btn:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.18); box-shadow:0 16px 34px rgba(0,0,0,.24);}
+    .btn:active{transform:translateY(0) scale(.98)}
+    .btn.primary{background:linear-gradient(135deg, var(--accent), #d66f00); border-color:transparent; color:#fff;}
+    .btn.secondary{background:linear-gradient(135deg, rgba(141,209,126,.2), rgba(141,209,126,.08));}
+    .btn.warn{background:linear-gradient(135deg, rgba(230,93,93,.22), rgba(230,93,93,.1));}
+    .btn.good{background:linear-gradient(135deg, rgba(242,139,24,.22), rgba(242,139,24,.1));}
+    .btn.ghost{background:transparent; box-shadow:none;}
+
+    main{padding:30px 0 80px;}
 
     .hero{
-      padding:28px;
-      min-height:210px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      background:
-        radial-gradient(circle at 85% 15%, rgba(216,79,42,.12), transparent 20%),
-        linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.38));
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      font-size:.8rem;
-      font-weight:800;
-      color:var(--accent-2);
-    }
-    .eyebrow::before{
-      content:"";
-      width:10px;height:10px;border-radius:50%;
-      background:var(--accent-2);
-    }
-    .hero h1{
-      font-size:clamp(3.4rem, 8vw, 7rem);
-      margin-top:8px;
-    }
-    .hero p{
-      max-width:72ch;
-      margin:0;
-      color:var(--muted);
-      font-size:1rem;
-    }
-
-    .summary{
-      padding:20px;
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
+      grid-template-columns:1.05fr .95fr;
+      gap:20px;
+      margin-bottom:20px;
     }
-    .metric{
+
+    .panel{
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px 14px;
-      background:rgba(255,255,255,.35);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
     }
-    .metric-label{
-      color:var(--muted);
+
+    .panel::after{
+      content:"";
+      position:absolute;
+      right:-90px;
+      bottom:-90px;
+      width:250px;
+      height:250px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(242,139,24,.12), transparent 70%);
+      pointer-events:none;
+    }
+
+    .setup{padding:26px; display:flex; flex-direction:column; gap:18px;}
+    .section-title{
+      margin:0;
+      font-family:'Bebas Neue', cursive;
+      letter-spacing:.05em;
+      font-size:clamp(1.5rem, 3vw, 2.2rem);
       text-transform:uppercase;
-      font-size:.78rem;
-      letter-spacing:.09em;
-      margin-bottom:8px;
-      font-weight:800;
     }
-    .metric-value{
-      font-size:clamp(1.25rem, 3vw, 2rem);
-      font-weight:800;
-    }
+    .muted{color:var(--muted)}
 
-    .main-grid{
+    .setup-grid{
       display:grid;
-      grid-template-columns:380px minmax(0,1fr);
-      gap:18px;
+      grid-template-columns:1fr auto;
+      gap:16px;
+      align-items:start;
     }
-    .stack{display:grid;gap:18px}
-    .panel{padding:18px}
 
-    .panel-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:12px;
-      margin-bottom:16px;
-    }
-    .panel-header h2{font-size:2rem}
-    .sub{color:var(--muted);font-size:.92rem}
-
-    .player-inputs,.control-grid,.history-list{display:grid;gap:12px}
+    .player-list{display:flex; flex-direction:column; gap:10px;}
     .player-row{
       display:grid;
       grid-template-columns:1fr auto;
       gap:10px;
     }
 
-    input[type="text"],input[type="date"],input[type="number"],select{
+    .input,.date-input{
       width:100%;
-      background:#fffdfa;
-      color:var(--ink);
-      border:1px solid var(--line-strong);
-      border-radius:14px;
-      padding:13px 14px;
-      outline:none;
-      transition:.2s ease;
-    }
-    input:focus,select:focus{
-      border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(216,79,42,.12);
-    }
-
-    .btn{
-      border:1px solid var(--line-strong);
-      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.62));
-      color:var(--ink);
-      border-radius:14px;
-      padding:12px 14px;
-      cursor:pointer;
-      font-weight:800;
-      transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
-    }
-    .btn:hover{
-      transform:translateY(-2px);
-      border-color:rgba(21,21,21,.3);
-      box-shadow:0 10px 24px rgba(34,24,15,.12);
-    }
-    .btn:active{transform:translateY(0) scale(.98)}
-    .btn.accent{
-      background:linear-gradient(180deg, rgba(216,79,42,.18), rgba(216,79,42,.08));
-      border-color:rgba(216,79,42,.4);
-    }
-    .btn.green{
-      background:linear-gradient(180deg, rgba(15,123,108,.16), rgba(15,123,108,.08));
-      border-color:rgba(15,123,108,.36);
-    }
-    .btn.gold{
-      background:linear-gradient(180deg, rgba(184,135,34,.16), rgba(184,135,34,.08));
-      border-color:rgba(184,135,34,.34);
-    }
-    .btn.danger{
-      background:linear-gradient(180deg, rgba(187,47,66,.15), rgba(187,47,66,.06));
-      border-color:rgba(187,47,66,.3);
-    }
-    .btn.small{padding:9px 10px;font-size:.9rem}
-    .button-row{display:flex;flex-wrap:wrap;gap:10px}
-
-    .round-targets{
-      display:grid;
-      grid-template-columns:repeat(6, minmax(0,1fr));
-      gap:10px;
-      margin-bottom:14px;
-    }
-    .round-pill{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:64px;
-      border-radius:18px;
+      background:rgba(0,0,0,.18);
       border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.42));
+      color:var(--text);
+      padding:14px 16px;
+      border-radius:14px;
+      outline:none;
+      transition:border-color .18s ease, box-shadow .18s ease;
+    }
+    .input:focus,.date-input:focus{
+      border-color:rgba(242,139,24,.5);
+      box-shadow:0 0 0 4px rgba(242,139,24,.08);
+    }
+
+    .setup-side{display:flex; flex-direction:column; gap:12px; min-width:190px;}
+
+    .facts{
+      padding:26px;
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+      align-content:start;
+    }
+
+    .fact{
+      padding:18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .fact .k{
+      color:var(--accent);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      font-size:.78rem;
       font-weight:800;
-      font-size:1.15rem;
+    }
+
+    .fact .v{
+      margin-top:8px;
+      font-size:1.75rem;
+      font-weight:800;
+    }
+
+    .game-layout{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .scoreboard{padding:22px;}
+    .scoreboard-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .badges{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+    .badge{
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:.86rem;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    .badge.highlight{
+      background:linear-gradient(135deg, rgba(242,139,24,.22), rgba(141,209,126,.12));
+      border-color:rgba(242,139,24,.24);
+      color:#ffe3b8;
+    }
+
+    .field-panel{
+      margin-bottom:18px;
+      padding:18px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.06);
+      background:
+        linear-gradient(180deg, rgba(43,123,70,.9), rgba(29,89,50,.9));
       position:relative;
       overflow:hidden;
     }
-    .round-pill.hit{
-      border-color:rgba(15,123,108,.4);
-      background:linear-gradient(180deg, rgba(15,123,108,.16), rgba(15,123,108,.06));
-      color:var(--accent-2);
-    }
-    .round-pill::after{
-      content:attr(data-state);
+
+    .field-panel::before{
+      content:"";
       position:absolute;
-      bottom:8px;
-      right:10px;
-      font-size:.68rem;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+      inset:0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.08) 0 2%, transparent 2% 10%, rgba(255,255,255,.08) 10% 12%, transparent 12% 20%, rgba(255,255,255,.08) 20% 22%, transparent 22% 30%, rgba(255,255,255,.08) 30% 32%, transparent 32% 40%, rgba(255,255,255,.10) 49.4% 50.6%, transparent 50.6% 60%, rgba(255,255,255,.08) 60% 62%, transparent 62% 70%, rgba(255,255,255,.08) 70% 72%, transparent 72% 80%, rgba(255,255,255,.08) 80% 82%, transparent 82% 90%, rgba(255,255,255,.08) 90% 92%, transparent 92% 100%);
+      opacity:.45;
+      pointer-events:none;
+    }
+
+    .field-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:repeat(11, 1fr);
+      gap:8px;
+      align-items:center;
+    }
+
+    .field-cell{
+      min-height:62px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:8px 4px;
+      font-weight:800;
+      font-size:.88rem;
+      color:#eef8ef;
+    }
+    .field-cell.active{
+      background:linear-gradient(180deg, rgba(242,139,24,.32), rgba(255,255,255,.05));
+      box-shadow:0 14px 26px rgba(0,0,0,.18);
+      border-color:rgba(242,139,24,.38);
+      transform:translateY(-2px);
+    }
+    .field-cell.endzone{
+      background:linear-gradient(180deg, rgba(18,34,24,.5), rgba(255,255,255,.04));
+      color:#d8efe0;
+    }
+
+    .clockbar{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:12px;
+      align-items:center;
+    }
+
+    .clock-track{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .clock-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--accent), var(--gold));
+      transition:width .4s ease;
+    }
+
+    table{width:100%; border-collapse:collapse;}
+    th,td{
+      text-align:left;
+      padding:12px 10px;
+      border-bottom:1px solid var(--line);
+      vertical-align:middle;
+    }
+    th{
       color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:.8rem;
+      font-weight:700;
+    }
+    .active-row{background:linear-gradient(90deg, rgba(242,139,24,.12), transparent 78%);}
+    .score-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:56px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      font-weight:800;
     }
 
-    .target-grid{
-      display:grid;
-      grid-template-columns:repeat(5, minmax(0,1fr));
-      gap:10px;
-    }
-    .multiplier-grid{
-      display:grid;
-      grid-template-columns:repeat(5, minmax(0,1fr));
-      gap:10px;
-    }
-    .action-grid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:10px;
-    }
-    .target-btn{min-height:56px}
-    .target-btn.active{
-      border-color:var(--accent);
-      box-shadow:0 0 0 2px rgba(216,79,42,.12) inset;
-      background:linear-gradient(180deg, rgba(216,79,42,.18), rgba(216,79,42,.08));
-    }
-    .target-btn.disabled{
-      opacity:.42;
-      filter:grayscale(.2);
+    .turn-panel{
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
     }
 
-    .status-box{
-      display:grid;
-      gap:10px;
-      padding:14px;
+    .turn-top{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+
+    .current-player{
+      margin:0;
+      font-family:'Bebas Neue', cursive;
+      letter-spacing:.05em;
+      line-height:.92;
+      font-size:clamp(2rem, 4vw, 3rem);
+    }
+
+    .turn-meta{display:flex; gap:10px; flex-wrap:wrap;}
+    .tag{
+      padding:10px 12px;
+      border-radius:999px;
       border:1px solid var(--line);
-      border-radius:18px;
-      background:rgba(255,255,255,.35);
+      background:rgba(255,255,255,.04);
+      font-size:.88rem;
+      font-weight:700;
     }
-    .status-line{
+
+    .dart-strip{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .dart-box{
+      min-height:84px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+    }
+
+    .dart-box .n{
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:.75rem;
+    }
+
+    .dart-box .v{
+      font-weight:800;
+      font-size:1.05rem;
+    }
+
+    .selection{display:grid; gap:14px;}
+    .multiplier-row,.action-row{display:flex; flex-wrap:wrap; gap:10px;}
+
+    .pill-btn{
+      border-radius:14px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:800;
+      transition:.18s ease;
+    }
+    .pill-btn:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.2);}
+    .pill-btn.active{
+      background:linear-gradient(135deg, var(--accent), #d66f00);
+      border-color:transparent;
+      color:white;
+    }
+
+    .number-grid{
+      display:grid;
+      grid-template-columns:repeat(7, minmax(0,1fr));
+      gap:10px;
+    }
+
+    .num-btn{
+      padding:14px 0;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      color:var(--text);
+      font-weight:800;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .num-btn:hover{transform:translateY(-2px) scale(1.01); border-color:rgba(242,139,24,.24);}
+    .num-btn.target{
+      background:linear-gradient(180deg, rgba(141,209,126,.24), rgba(255,255,255,.03));
+      border-color:rgba(141,209,126,.3);
+      color:#e6f8e3;
+      box-shadow:0 12px 24px rgba(0,0,0,.16);
+    }
+    .num-btn.accent{
+      background:linear-gradient(180deg, rgba(242,139,24,.24), rgba(255,255,255,.03));
+      border-color:rgba(242,139,24,.3);
+    }
+
+    .history-log{
+      border-top:1px solid var(--line);
+      padding-top:14px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:4px;
+    }
+
+    .log-item{
       display:flex;
       justify-content:space-between;
       gap:12px;
+      padding-bottom:8px;
+      border-bottom:1px dashed rgba(255,255,255,.06);
       color:var(--muted);
-      font-size:.94rem;
+      font-size:.95rem;
     }
-    .status-line strong{color:var(--ink)}
 
-    .winner-banner{
-      display:none;
+    .calendar-layout{
+      display:grid;
+      grid-template-columns:.95fr 1.05fr;
+      gap:20px;
+      margin-top:20px;
+    }
+
+    .calendar-panel,.leader-panel{padding:22px;}
+
+    .calendar-controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
       align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      padding:16px 18px;
-      border-radius:18px;
-      border:1px solid rgba(184,135,34,.3);
-      background:linear-gradient(180deg, rgba(184,135,34,.14), rgba(184,135,34,.06));
+      margin:14px 0 18px;
     }
-    .winner-banner.show{display:flex}
-    .winner-banner h3{font-size:1.85rem}
-    .winner-banner p{margin:0;color:var(--muted)}
 
-    .scoreboard-wrap{
-      overflow:auto;
-      border-radius:20px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.36);
-    }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:1400px;
-    }
-    thead th{
-      position:sticky;
-      top:0;
-      background:linear-gradient(180deg, rgba(247,243,236,.98), rgba(241,233,221,.98));
-      z-index:1;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      font-size:.76rem;
-    }
-    th,td{
-      padding:12px 10px;
-      border-bottom:1px solid rgba(21,21,21,.07);
-      text-align:center;
-      vertical-align:middle;
-    }
-    th:first-child,td:first-child{
-      position:sticky;
-      left:0;
-      background:linear-gradient(180deg, rgba(247,243,236,.98), rgba(241,233,221,.98));
-      z-index:2;
-      text-align:left;
-      min-width:180px;
-    }
-    tbody tr:nth-child(even) td{background:rgba(255,255,255,.18)}
-    .player-turn{outline:2px solid rgba(216,79,42,.28);outline-offset:-2px}
-
-    .player-name{
+    .game-list{
       display:flex;
       flex-direction:column;
-      gap:3px;
-    }
-    .mini{font-size:.8rem;color:var(--muted)}
-
-    .marks{
-      display:flex;
-      justify-content:center;
-      gap:5px;
-      min-width:82px;
-    }
-    .mark{
-      width:16px;height:16px;border-radius:999px;
-      border:1px solid var(--line-strong);
-      background:rgba(21,21,21,.03);
-    }
-    .mark.filled{
-      background:linear-gradient(180deg, rgba(15,123,108,.92), rgba(15,123,108,.5));
-      border-color:rgba(15,123,108,.75);
-      box-shadow:0 0 12px rgba(15,123,108,.18);
-    }
-    .mark.extra{
-      background:linear-gradient(180deg, rgba(216,79,42,.92), rgba(216,79,42,.5));
-      border-color:rgba(216,79,42,.75);
-      box-shadow:0 0 12px rgba(216,79,42,.18);
+      gap:10px;
+      max-height:470px;
+      overflow:auto;
+      padding-right:4px;
     }
 
-    .history-item{
+    .game-item{
+      padding:16px;
+      border-radius:18px;
       border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px;
-      background:rgba(255,255,255,.28);
-      display:grid;
-      gap:8px;
-    }
-    .history-top{
+      background:rgba(255,255,255,.03);
       display:flex;
       justify-content:space-between;
       gap:12px;
       align-items:flex-start;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:6px 10px;
-      color:var(--muted);
-      font-size:.8rem;
-      background:rgba(255,255,255,.35);
-      width:max-content;
-    }
-    .empty{
-      color:var(--muted);
-      border:1px dashed var(--line-strong);
-      border-radius:16px;
-      padding:16px;
-      text-align:center;
+
+    .game-item h4{margin:0 0 6px; font-size:1rem;}
+    .mini{color:var(--muted); font-size:.88rem;}
+    .leaderboard-table td:first-child{font-weight:800;}
+    .rank{
+      font-family:'Bebas Neue', cursive;
+      font-size:1.18rem;
+      color:var(--gold);
+      letter-spacing:.04em;
     }
 
     .modal{
       position:fixed;
       inset:0;
+      z-index:100;
       display:none;
       align-items:center;
       justify-content:center;
       padding:20px;
-      background:rgba(27,20,14,.28);
-      backdrop-filter:blur(10px);
-      z-index:50;
+      background:rgba(0,0,0,.6);
+      backdrop-filter:blur(8px);
     }
-    .modal.show{display:flex}
+    .modal.open{display:flex;}
+
     .modal-card{
-      width:min(1120px, 100%);
-      max-height:88vh;
+      width:min(980px, 100%);
+      max-height:90vh;
       overflow:auto;
-      padding:22px;
+      border-radius:26px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #13291c, #0d1d14);
+      box-shadow:var(--shadow);
+      padding:24px;
     }
-    .modal-top{
+
+    .modal-head{
       display:flex;
       justify-content:space-between;
-      align-items:flex-end;
-      gap:16px;
-      margin-bottom:16px;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
     }
 
-    .calendar-grid{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:14px;
-      align-items:start;
-    }
-    .calendar-form{
-      display:grid;
-      gap:12px;
-      padding:14px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.28);
-    }
-    .field-grid{
+    .final-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-    .footer-note{
-      color:var(--muted);
-      font-size:.84rem;
-      margin-top:4px;
+      gap:18px;
     }
 
-    @media (max-width:1180px){
-      .topbar,.main-grid,.calendar-grid{grid-template-columns:1fr}
-      .summary{grid-template-columns:repeat(4,1fr)}
+    .final-box{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
     }
+
+    .empty{
+      color:var(--muted);
+      border:1px dashed var(--line);
+      border-radius:16px;
+      padding:18px;
+      text-align:center;
+    }
+
+    .reveal{
+      opacity:0;
+      transform:translateY(18px);
+      transition:opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible{opacity:1; transform:translateY(0);}
+
+    .stagger > *{
+      opacity:0;
+      transform:translateY(14px);
+      animation:rise .6s ease forwards;
+    }
+    .stagger > *:nth-child(1){animation-delay:.05s}
+    .stagger > *:nth-child(2){animation-delay:.12s}
+    .stagger > *:nth-child(3){animation-delay:.19s}
+    .stagger > *:nth-child(4){animation-delay:.26s}
+    .stagger > *:nth-child(5){animation-delay:.33s}
+
+    @keyframes rise{to{opacity:1; transform:translateY(0);}}
+
+    @media (max-width:1100px){
+      .hero,.game-layout,.calendar-layout,.final-grid{grid-template-columns:1fr;}
+    }
+
     @media (max-width:760px){
-      .app{width:min(100% - 14px, var(--max))}
-      .hero,.panel{padding:14px}
-      .summary{grid-template-columns:1fr 1fr}
-      .round-targets{grid-template-columns:repeat(3, minmax(0,1fr))}
-      .target-grid{grid-template-columns:repeat(4, minmax(0,1fr))}
-      .multiplier-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
-      .action-grid,.field-grid{grid-template-columns:1fr}
-      .winner-banner{flex-direction:column;align-items:flex-start}
+      .topbar-inner{flex-direction:column; align-items:flex-start;}
+      .top-actions{width:100%; justify-content:flex-start;}
+      .setup-grid{grid-template-columns:1fr;}
+      .player-row{grid-template-columns:1fr;}
+      .number-grid{grid-template-columns:repeat(4, minmax(0,1fr));}
+      .field-grid{grid-template-columns:repeat(4, 1fr);}
+      .clockbar{grid-template-columns:1fr; align-items:start;}
+      th:nth-child(4), td:nth-child(4){display:none;}
+    }
+
+    @media (max-width:520px){
+      .facts{grid-template-columns:1fr}
+      .dart-strip{grid-template-columns:1fr}
+      .number-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <section class="topbar">
-      <div class="hero reveal">
-        <div class="eyebrow">Randomized Cricket Variant</div>
-        <h1>Cricket · Random</h1>
-        <p>
-          Play cricket with targets 1–20 and Bull. Each round surfaces 6 random available targets. If a displayed target
-          is not hit during the round, it gets rerolled from the remaining untouched targets until every target has been hit
-          at least once. Win by closing all targets and finishing with the most points.
-        </p>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <div class="eyebrow">Darts Webapp</div>
+        <h1 class="title">Football Darts</h1>
+        <div class="subtitle">Work the field by hitting ordered board regions, score touchdowns, then choose extra point or 2-point conversion. Four downs per possession. On 4th down, attempt a field goal or punt. Game ends after 20 minutes; highest points wins.</div>
       </div>
-
-      <div class="summary reveal">
-        <div class="metric">
-          <div class="metric-label">Round Counter</div>
-          <div class="metric-value" id="metricRound">1</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Current Player</div>
-          <div class="metric-value" id="metricPlayer">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Darts This Turn</div>
-          <div class="metric-value" id="metricDarts">0 / 3</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Saved Games</div>
-          <div class="metric-value" id="metricGamesSaved">0</div>
-        </div>
+      <div class="top-actions">
+        <button class="btn secondary" id="leaderboardBtn">Leaderboard</button>
+        <button class="btn ghost" id="showHistoryBtn">Played Games</button>
+        <button class="btn warn" id="newGameBtnTop">New Game</button>
       </div>
-    </section>
+    </div>
+  </header>
 
-    <section class="main-grid">
-      <aside class="stack">
-        <div class="panel reveal">
-          <div class="panel-header">
+  <main class="wrap">
+    <section class="hero">
+      <section class="panel setup reveal">
+        <div class="stagger">
+          <div>
+            <p class="eyebrow">Game Setup</p>
+            <h2 class="section-title">Teams and game controls</h2>
+            <p class="muted">Enter two or more teams or players. Team 1 starts on its side of the field and moves across by completing the required zone order. Each round is a down. Every possession lasts up to 4 downs unless a touchdown or turnover occurs first.</p>
+          </div>
+
+          <div class="setup-grid">
             <div>
-              <h2>Players</h2>
-              <div class="sub">Add any number of players and launch a new random cricket match.</div>
-            </div>
-          </div>
-
-          <div class="player-inputs" id="playerInputs"></div>
-
-          <div class="button-row">
-            <button class="btn small" id="addPlayerBtn" type="button">+ Add Player</button>
-            <button class="btn accent" id="startGameBtn" type="button">New Game</button>
-          </div>
-
-          <div class="footer-note">
-            Scoring rule: extra marks beyond 3 only score if at least one opponent still has that target open.
-          </div>
-        </div>
-
-        <div class="panel reveal">
-          <div class="panel-header">
-            <div>
-              <h2>Round Targets</h2>
-              <div class="sub">Only the active 6 round targets can be selected.</div>
-            </div>
-          </div>
-
-          <div class="round-targets" id="roundTargets"></div>
-
-          <div class="footer-note">
-            At the end of each full round, any displayed targets not hit are rerandomized from the remaining never-hit targets until all targets have been seen at least once.
-          </div>
-        </div>
-
-        <div class="panel reveal">
-          <div class="panel-header">
-            <div>
-              <h2>Throw Controls</h2>
-              <div class="sub">Choose a live target, then Single, Double, or Triple.</div>
-            </div>
-          </div>
-
-          <div class="control-grid">
-            <div>
-              <div class="sub" style="margin-bottom:8px;">All Targets</div>
-              <div class="target-grid" id="targetGrid"></div>
-            </div>
-
-            <div>
-              <div class="sub" style="margin-bottom:8px;">Multiplier</div>
-              <div class="multiplier-grid">
-                <button class="btn green target-btn mult-btn" data-mult="1" type="button">Single</button>
-                <button class="btn green target-btn mult-btn" data-mult="2" type="button">Double</button>
-                <button class="btn green target-btn mult-btn" data-mult="3" type="button">Triple</button>
-                <button class="btn target-btn" id="missBtn" type="button">Miss</button>
-                <button class="btn danger target-btn" id="undoBtn" type="button">Undo</button>
+              <div id="playerList" class="player-list"></div>
+              <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                <button class="btn secondary" id="addPlayerBtn">Add Team</button>
+                <button class="btn primary" id="startGameBtn">Start New Live Game</button>
               </div>
             </div>
-
-            <div class="status-box">
-              <div class="status-line"><span>Selected target</span><strong id="selectedTargetLabel">None</strong></div>
-              <div class="status-line"><span>Current turn</span><strong id="currentTurnLabel">—</strong></div>
-              <div class="status-line"><span>Turn darts</span><strong id="currentTurnDartsLabel">0 / 3</strong></div>
-              <div class="status-line"><span>Last action</span><strong id="lastActionLabel">—</strong></div>
-              <div class="status-line"><span>Targets seen</span><strong id="targetsSeenLabel">0 / 21</strong></div>
-            </div>
-
-            <div class="action-grid">
-              <button class="btn gold" id="leaderboardBtn" type="button">Leaderboard</button>
-              <button class="btn" id="calendarBtn" type="button">Game History / Calendar</button>
-              <button class="btn danger" id="resetCurrentBtn" type="button">Reset Current</button>
+            <div class="setup-side">
+              <label for="playedDate" class="eyebrow" style="font-size:.72rem;">Played date</label>
+              <input id="playedDate" class="date-input" type="date" />
+              <button class="btn ghost" id="todayBtn">Use Today</button>
+              <div class="muted" style="font-size:.9rem;">Used when saving the completed game to history.</div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="panel reveal">
-          <div class="panel-header">
-            <div>
-              <h2>Recent Games</h2>
-              <div class="sub">Persistent local history.</div>
-            </div>
-          </div>
-          <div class="history-list" id="recentGames"></div>
+      <aside class="panel facts reveal">
+        <div class="fact">
+          <div class="k">Game Clock</div>
+          <div class="v">20:00</div>
+        </div>
+        <div class="fact">
+          <div class="k">Downs / Possession</div>
+          <div class="v">4</div>
+        </div>
+        <div class="fact">
+          <div class="k">Touchdown</div>
+          <div class="v">6 Points</div>
+        </div>
+        <div class="fact">
+          <div class="k">Storage</div>
+          <div class="v">Local</div>
         </div>
       </aside>
+    </section>
 
-      <main class="stack">
-        <div class="winner-banner reveal" id="winnerBanner">
+    <section class="game-layout">
+      <section class="panel scoreboard reveal">
+        <div class="scoreboard-head">
           <div>
-            <h3 id="winnerTitle">Game Complete</h3>
-            <p id="winnerText">Final scoreboard is shown below. Review it before submitting the game.</p>
+            <p class="eyebrow">Live Match</p>
+            <h2 class="section-title">Scoreboard</h2>
           </div>
-          <div class="button-row">
-            <button class="btn accent" id="saveFinishedGameBtn" type="button">Submit Game</button>
-            <button class="btn" id="newGameQuickBtn" type="button">New Game</button>
+          <div class="badges">
+            <div class="badge" id="possessionBadge">Possession: —</div>
+            <div class="badge" id="downBadge">Down 1</div>
+            <div class="badge highlight" id="clockBadge">20:00</div>
           </div>
         </div>
 
-        <div class="panel reveal">
-          <div class="panel-header">
-            <div>
-              <h2>Scoreboard</h2>
-              <div class="sub">Targets 1–20 + Bull. Close all targets and lead on points to win.</div>
+        <div class="field-panel">
+          <div class="field-grid" id="fieldGrid"></div>
+          <div class="clockbar">
+            <div class="clock-track"><div class="clock-fill" id="clockFill"></div></div>
+            <button class="btn secondary" id="startClockBtn">Start Clock</button>
+            <button class="btn ghost" id="pauseClockBtn">Pause Clock</button>
+          </div>
+        </div>
+
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Score</th>
+                <th>Possession</th>
+                <th>Field Zone</th>
+                <th>Down</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="scoreboardBody"></tbody>
+          </table>
+        </div>
+
+        <div class="history-log">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+            <h3 class="section-title" style="font-size:1.05rem;">Play Log</h3>
+            <div class="muted" id="logSummary">No darts thrown yet.</div>
+          </div>
+          <div id="turnLog"></div>
+        </div>
+      </section>
+
+      <section class="panel turn-panel reveal">
+        <div class="turn-top">
+          <div>
+            <p class="eyebrow">At the line</p>
+            <h2 class="current-player" id="currentPlayerName">No game active</h2>
+            <div class="muted" id="currentPlayerSub">Start a game to begin.</div>
+          </div>
+          <div class="turn-meta">
+            <div class="tag" id="selectedMultiplierTag">Selected: Outer Single</div>
+            <div class="tag" id="zoneTag">Target Zone: —</div>
+            <div class="tag" id="dartsLeftTag">Darts Left: 3</div>
+          </div>
+        </div>
+
+        <div class="dart-strip">
+          <div class="dart-box">
+            <div class="n">Dart 1</div>
+            <div class="v" id="dartDisplay1">—</div>
+          </div>
+          <div class="dart-box">
+            <div class="n">Dart 2</div>
+            <div class="v" id="dartDisplay2">—</div>
+          </div>
+          <div class="n">Dart 3</div>
+          <div class="dart-box">
+            <div class="v" id="dartDisplay3">—</div>
+          </div>
+        </div>
+
+        <div class="selection">
+          <div>
+            <p class="eyebrow" style="font-size:.72rem;">Segment</p>
+            <div class="multiplier-row" id="multiplierRow">
+              <button class="pill-btn" data-multiplier="inner_single">Inner Single</button>
+              <button class="pill-btn active" data-multiplier="outer_single">Outer Single</button>
+              <button class="pill-btn" data-multiplier="2">Double</button>
+              <button class="pill-btn" data-multiplier="3">Triple</button>
             </div>
           </div>
 
-          <div class="scoreboard-wrap">
-            <table aria-label="Cricket Random scoreboard">
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
-                  <th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>Bull</th>
-                  <th>Score</th>
-                  <th>Closed</th>
-                  <th>MPR</th>
-                </tr>
-              </thead>
-              <tbody id="scoreboardBody"></tbody>
-            </table>
+          <div>
+            <p class="eyebrow" style="font-size:.72rem;">Targets</p>
+            <div class="number-grid" id="numberGrid"></div>
+          </div>
+
+          <div>
+            <p class="eyebrow" style="font-size:.72rem;">Actions</p>
+            <div class="action-row">
+              <button class="btn ghost" id="missBtn">Miss</button>
+              <button class="btn secondary" id="undoBtn">Undo</button>
+              <button class="btn good" id="fgBtn">FG</button>
+              <button class="btn primary" id="twoPtBtn">2Pt</button>
+              <button class="btn secondary" id="puntBtn">Punt</button>
+              <button class="btn warn" id="forceNewGameBtn">New Game</button>
+            </div>
           </div>
         </div>
-      </main>
+      </section>
     </section>
+
+    <section class="calendar-layout">
+      <section class="panel calendar-panel reveal">
+        <p class="eyebrow">Calendar</p>
+        <h2 class="section-title">Previously Played Games</h2>
+        <div class="calendar-controls">
+          <input type="date" id="historyDateFilter" class="date-input" style="max-width:240px;" />
+          <button class="btn secondary" id="filterHistoryBtn">Filter Date</button>
+          <button class="btn ghost" id="clearHistoryFilterBtn">Clear Filter</button>
+        </div>
+        <div id="historyList" class="game-list"></div>
+      </section>
+
+      <section class="panel leader-panel reveal">
+        <p class="eyebrow">Rankings</p>
+        <h2 class="section-title">Leaderboard</h2>
+        <div style="overflow:auto;">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>W</th>
+                <th>L</th>
+                <th>Win %</th>
+                <th>Elo</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal" id="finalModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Game Complete</p>
+          <h2 class="section-title">Final Scoreboard</h2>
+        </div>
+        <button class="btn ghost" id="closeFinalModal">Close</button>
+      </div>
+      <div id="finalContent"></div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
+        <button class="btn primary" id="submitFinishedGameBtn">Submit Game</button>
+        <button class="btn warn" id="discardFinishedGameBtn">Discard</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal" id="leaderboardModal" aria-hidden="true">
     <div class="modal-card">
-      <div class="modal-top">
+      <div class="modal-head">
         <div>
-          <div class="eyebrow">Persistent Rankings</div>
-          <h2 style="font-size:3rem;">Leaderboard</h2>
-          <div class="sub">Ranked by Elo. Tracks wins, losses, win percentage, and marks per round.</div>
+          <p class="eyebrow">Player Ratings</p>
+          <h2 class="section-title">Leaderboard Details</h2>
         </div>
-        <button class="btn" id="closeLeaderboardBtn" type="button">Close</button>
+        <button class="btn ghost" id="closeLeaderboardModal">Close</button>
       </div>
-
-      <div class="scoreboard-wrap">
-        <table style="min-width:860px;">
+      <div style="overflow:auto;">
+        <table class="leaderboard-table">
           <thead>
             <tr>
               <th>Rank</th>
               <th>Player</th>
-              <th>Elo</th>
-              <th>W</th>
-              <th>L</th>
+              <th>Wins</th>
+              <th>Losses</th>
               <th>Win %</th>
-              <th>MPR</th>
-              <th>Games</th>
+              <th>Elo</th>
             </tr>
           </thead>
-  <tr id="scoreboardHeaderRow">
-    <th>Target</th>
-  </tr>
-</thead>
-
-          <tbody id="leaderboardBody"></tbody>
+          <tbody id="leaderboardModalBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <div class="modal" id="calendarModal" aria-hidden="true">
-    <div class="modal-card">
-      <div class="modal-top">
-        <div>
-          <div class="eyebrow">Backfill Results</div>
-          <h2 style="font-size:3rem;">Game History / Calendar</h2>
-          <div class="sub">Store earlier matches and keep your leaderboard in sync.</div>
-        </div>
-        <button class="btn" id="closeCalendarBtn" type="button">Close</button>
-      </div>
-
-      <div class="calendar-grid">
-        <div class="calendar-form">
-          <div class="field-grid">
-            <div>
-              <label class="sub" for="historyDate">Game date</label>
-              <input id="historyDate" type="date" />
-            </div>
-            <div>
-              <label class="sub" for="historyPlayers">Players (comma separated)</label>
-              <input id="historyPlayers" type="text" placeholder="Alex, Jamie, Sam" />
-            </div>
-          </div>
-
-          <div class="field-grid">
-            <div>
-              <label class="sub" for="historyScores">Scores (same order)</label>
-              <input id="historyScores" type="text" placeholder="110, 95, 80" />
-            </div>
-            <div>
-              <label class="sub" for="historyMarks">Marks per player (same order)</label>
-              <input id="historyMarks" type="text" placeholder="63, 54, 47" />
-            </div>
-          </div>
-
-          <div class="field-grid">
-            <div>
-              <label class="sub" for="historyRounds">Rounds played</label>
-              <input id="historyRounds" type="number" min="1" value="10" />
-            </div>
-            <div>
-              <label class="sub" for="historyWinner">Winner name</label>
-              <input id="historyWinner" type="text" placeholder="Alex" />
-            </div>
-          </div>
-
-          <div class="button-row">
-            <button class="btn accent" id="saveHistoryGameBtn" type="button">Save Historical Game</button>
-          </div>
-
-          <div class="footer-note">
-            Historical entries affect local game history, Elo, and average marks per round.
-          </div>
-        </div>
-
-        <div class="panel" style="padding:14px;">
-          <div class="panel-header">
-            <div>
-              <h2 style="font-size:2rem;">All Saved Games</h2>
-              <div class="sub">Chronological archive on this device.</div>
-            </div>
-          </div>
-          <div class="history-list" id="allGamesList"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
-    const TARGETS = Array.from({length:20}, (_,i)=>String(i+1)).concat("Bull");
     const STORAGE_KEYS = {
-      games: "cricket_random_games_v1",
-      leaderboard: "cricket_random_leaderboard_v1",
-      current: "cricket_random_current_v1"
+      activeGame: 'football_darts_active_v1',
+      history: 'football_darts_history_v1',
+      leaderboard: 'football_darts_leaderboard_v1'
     };
+
+    const FIELD_ZONES = [
+      { key:'A_DOUBLE', label:'Double 14/11/8', numbers:[14,11,8], segment:'2' },
+      { key:'A_OUTER',  label:'Outer Single 14/11/8', numbers:[14,11,8], segment:'outer_single' },
+      { key:'A_TRIPLE', label:'Triple 14/11/8', numbers:[14,11,8], segment:'3' },
+      { key:'A_INNER',  label:'Inner Single 14/11/8', numbers:[14,11,8], segment:'inner_single' },
+      { key:'BULL',     label:'Bull', numbers:[25], segment:'bull_any' },
+      { key:'B_INNER',  label:'Inner Single 13/6/10', numbers:[13,6,10], segment:'inner_single' },
+      { key:'B_TRIPLE', label:'Triple 13/6/10', numbers:[13,6,10], segment:'3' },
+      { key:'B_OUTER',  label:'Outer Single 13/6/10', numbers:[13,6,10], segment:'outer_single' },
+      { key:'B_DOUBLE', label:'Double 13/6/10', numbers:[13,6,10], segment:'2' },
+      { key:'TD',       label:'Touchdown', numbers:[], segment:'td' }
+    ];
 
     const state = {
-      players: [],
-      currentPlayerIndex: 0,
-      dartsInTurn: 0,
-      totalDarts: 0,
-      round: 1,
-      selectedTarget: null,
-      gameOver: false,
-      winnerNames: [],
-      savedGamePending: false,
-      roundTargets: [],
-      roundHitSet: [],
-      seenTargets: [],
-      lastAction: "—"
+      activeGame: null,
+      finishedGamePending: null,
+      selectedMultiplier: 'outer_single',
+      historyFilter: '',
+      history: [],
+      leaderboard: {},
+      snapshots: [],
+      clockInterval: null
     };
 
-    const undoStack = [];
+    const $ = (id) => document.getElementById(id);
 
-    const els = {
-      playerInputs: document.getElementById("playerInputs"),
-      addPlayerBtn: document.getElementById("addPlayerBtn"),
-      startGameBtn: document.getElementById("startGameBtn"),
-      targetGrid: document.getElementById("targetGrid"),
-      roundTargets: document.getElementById("roundTargets"),
-      scoreboardBody: document.getElementById("scoreboardBody"),
-      selectedTargetLabel: document.getElementById("selectedTargetLabel"),
-      currentTurnLabel: document.getElementById("currentTurnLabel"),
-      currentTurnDartsLabel: document.getElementById("currentTurnDartsLabel"),
-      lastActionLabel: document.getElementById("lastActionLabel"),
-      targetsSeenLabel: document.getElementById("targetsSeenLabel"),
-      metricRound: document.getElementById("metricRound"),
-      metricPlayer: document.getElementById("metricPlayer"),
-      metricDarts: document.getElementById("metricDarts"),
-      metricGamesSaved: document.getElementById("metricGamesSaved"),
-      missBtn: document.getElementById("missBtn"),
-      undoBtn: document.getElementById("undoBtn"),
-      leaderboardBtn: document.getElementById("leaderboardBtn"),
-      calendarBtn: document.getElementById("calendarBtn"),
-      resetCurrentBtn: document.getElementById("resetCurrentBtn"),
-      recentGames: document.getElementById("recentGames"),
-      winnerBanner: document.getElementById("winnerBanner"),
-      winnerTitle: document.getElementById("winnerTitle"),
-      winnerText: document.getElementById("winnerText"),
-      saveFinishedGameBtn: document.getElementById("saveFinishedGameBtn"),
-      newGameQuickBtn: document.getElementById("newGameQuickBtn"),
-      leaderboardModal: document.getElementById("leaderboardModal"),
-      closeLeaderboardBtn: document.getElementById("closeLeaderboardBtn"),
-      leaderboardBody: document.getElementById("leaderboardBody"),
-      calendarModal: document.getElementById("calendarModal"),
-      closeCalendarBtn: document.getElementById("closeCalendarBtn"),
-      historyDate: document.getElementById("historyDate"),
-      historyPlayers: document.getElementById("historyPlayers"),
-      historyScores: document.getElementById("historyScores"),
-      historyMarks: document.getElementById("historyMarks"),
-      historyRounds: document.getElementById("historyRounds"),
-      historyWinner: document.getElementById("historyWinner"),
-      saveHistoryGameBtn: document.getElementById("saveHistoryGameBtn"),
-      allGamesList: document.getElementById("allGamesList")
-    };
+    function todayStr() {
+      const d = new Date();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${d.getFullYear()}-${m}-${day}`;
+    }
 
-    function createPlayerInput(value = "") {
-      const row = document.createElement("div");
-      row.className = "player-row";
+    function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+    function escapeHtml(str=''){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
+    }
+
+    function loadStorage(){
+      state.history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '[]');
+      state.leaderboard = JSON.parse(localStorage.getItem(STORAGE_KEYS.leaderboard) || '{}');
+      state.activeGame = JSON.parse(localStorage.getItem(STORAGE_KEYS.activeGame) || 'null');
+    }
+
+    function saveStorage(){
+      localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
+      localStorage.setItem(STORAGE_KEYS.leaderboard, JSON.stringify(state.leaderboard));
+      localStorage.setItem(STORAGE_KEYS.activeGame, JSON.stringify(state.activeGame));
+    }
+
+    function createPlayerInput(value=''){
+      const row = document.createElement('div');
+      row.className = 'player-row';
       row.innerHTML = `
-        <input type="text" class="player-name-input" placeholder="Player name" value="${escapeHtml(value)}" />
-        <button class="btn small danger remove-player" type="button">Remove</button>
+        <input class="input player-input" type="text" maxlength="24" placeholder="Team or player name" value="${escapeHtml(value)}" />
+        <button class="btn ghost remove-player-btn" type="button">Remove</button>
       `;
-      row.querySelector(".remove-player").addEventListener("click", () => {
-        if (els.playerInputs.children.length > 2) row.remove();
+      row.querySelector('.remove-player-btn').addEventListener('click', () => {
+        if ($('playerList').children.length > 2) row.remove();
       });
-      els.playerInputs.appendChild(row);
+      $('playerList').appendChild(row);
     }
 
-    function initPlayerInputs() {
-      els.playerInputs.innerHTML = "";
-      createPlayerInput("Player 1");
-      createPlayerInput("Player 2");
+    function initPlayerInputs(){
+      $('playerList').innerHTML = '';
+      createPlayerInput('');
+      createPlayerInput('');
     }
 
-    function buildTargetButtons() {
-      els.targetGrid.innerHTML = "";
-      TARGETS.forEach(target => {
-        const btn = document.createElement("button");
-        btn.className = "btn target-btn";
-        btn.type = "button";
-        btn.dataset.target = target;
-        btn.textContent = target;
-        btn.addEventListener("click", () => {
-          if (!state.roundTargets.includes(target)) return;
-          state.selectedTarget = target;
-          renderTargetButtons();
-        });
-        els.targetGrid.appendChild(btn);
-      });
-    }
-
-    function renderTargetButtons() {
-      [...els.targetGrid.querySelectorAll(".target-btn")].forEach(btn => {
-        const t = btn.dataset.target;
-        const activeInRound = state.roundTargets.includes(t);
-        btn.classList.toggle("active", state.selectedTarget === t);
-        btn.classList.toggle("disabled", state.players.length && !activeInRound);
-        btn.disabled = !!state.players.length && !activeInRound;
-      });
-      els.selectedTargetLabel.textContent = state.selectedTarget || "None";
-    }
-
-    function renderRoundTargets() {
-      els.roundTargets.innerHTML = "";
-      if (!state.roundTargets.length) {
-        els.roundTargets.innerHTML = `<div class="empty" style="grid-column:1/-1;">No active game.</div>`;
-        return;
-      }
-      state.roundTargets.forEach(target => {
-        const div = document.createElement("div");
-        const hit = state.roundHitSet.includes(target);
-        div.className = `round-pill ${hit ? "hit" : ""}`;
-        div.dataset.state = hit ? "hit" : "live";
-        div.textContent = target;
-        els.roundTargets.appendChild(div);
-      });
-    }
-
-    function freshPlayer(name) {
-      const marks = {};
-      TARGETS.forEach(t => marks[t] = 0);
-      return {
-        name,
-        marks,
-        score: 0,
-        dartsThrown: 0,
-        totalMarksLanded: 0
-      };
-    }
-
-    function getPlayerNamesFromInputs() {
-      return [...document.querySelectorAll(".player-name-input")]
+    function getSetupNames(){
+      return [...document.querySelectorAll('.player-input')]
         .map(i => i.value.trim())
         .filter(Boolean);
     }
 
-    function randomSample(arr, count) {
-      const copy = arr.slice();
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy.slice(0, count);
+    function uniqueNames(names){
+      return new Set(names.map(n => n.toLowerCase())).size === names.length;
     }
 
-    function initializeRoundTargets() {
-      state.roundTargets = randomSample(TARGETS, Math.min(6, TARGETS.length));
-      state.roundHitSet = [];
-      state.roundTargets.forEach(t => {
-        if (!state.seenTargets.includes(t)) state.seenTargets.push(t);
-      });
-    }
-
-    function rerollUnhitRoundTargets() {
-      const unhit = state.roundTargets.filter(t => !state.roundHitSet.includes(t));
-      const hit = state.roundTargets.filter(t => state.roundHitSet.includes(t));
-
-      const unseen = TARGETS.filter(t => !state.seenTargets.includes(t) && !hit.includes(t));
-      let replacementPool = unseen.slice();
-
-      if (!replacementPool.length) {
-        state.roundTargets = hit.concat(unhit).slice(0, 6);
-        state.roundHitSet = [];
-        return;
-      }
-
-      const replacements = randomSample(replacementPool, Math.min(unhit.length, replacementPool.length));
-      replacements.forEach(t => {
-        if (!state.seenTargets.includes(t)) state.seenTargets.push(t);
-      });
-
-      const nextTargets = hit.concat(replacements);
-
-      if (nextTargets.length < 6) {
-        const fillerPool = TARGETS.filter(t => !nextTargets.includes(t));
-        nextTargets.push(...randomSample(fillerPool, 6 - nextTargets.length));
-      }
-
-      state.roundTargets = nextTargets.slice(0, 6);
-      state.roundHitSet = [];
-      if (state.selectedTarget && !state.roundTargets.includes(state.selectedTarget)) state.selectedTarget = null;
-    }
-
-    function startGame(names) {
-      if (!names || names.length < 2) {
-        alert("Please enter at least 2 player names.");
-        return;
-      }
-      const unique = [...new Set(names)];
-      if (unique.length < 2) {
-        alert("Please enter at least 2 unique player names.");
-        return;
-      }
-
-      state.players = unique.map(freshPlayer);
-      state.currentPlayerIndex = 0;
-      state.dartsInTurn = 0;
-      state.totalDarts = 0;
-      state.round = 1;
-      state.selectedTarget = null;
-      state.gameOver = false;
-      state.winnerNames = [];
-      state.savedGamePending = false;
-      state.seenTargets = [];
-      state.lastAction = "New game started";
-      undoStack.length = 0;
-      initializeRoundTargets();
-      els.winnerBanner.classList.remove("show");
-      renderAll();
-      persistCurrentGame();
-    }
-
-    function currentPlayer() {
-      return state.players[state.currentPlayerIndex];
-    }
-
-    function isClosed(player) {
-      return TARGETS.every(t => player.marks[t] >= 3);
-    }
-
-    function closedCount(player) {
-      return TARGETS.filter(t => player.marks[t] >= 3).length;
-    }
-
-    function activeOpponentsOpen(target, playerIndex) {
-      return state.players.some((p, idx) => idx !== playerIndex && p.marks[target] < 3);
-    }
-
-    function applyThrow(target, multiplier) {
-      if (state.gameOver) return;
-      if (!state.players.length) {
-        alert("Start a game first.");
-        return;
-      }
-      if (target !== "MISS" && !state.roundTargets.includes(target)) {
-        alert("That target is not active this round.");
-        return;
-      }
-
-      const snapshot = getSerializableCurrentState();
-      const player = currentPlayer();
-
-      if (target === "MISS") {
-        player.dartsThrown += 1;
-        advanceDart("Miss");
-        pushUndoSnapshot(snapshot);
-        return;
-      }
-
-      const hits = Number(multiplier);
-      const value = target === "Bull" ? 25 : Number(target);
-      const current = player.marks[target];
-      const newTotal = current + hits;
-      let scoringHits = 0;
-
-      if (current < 3) {
-        const applied = Math.min(3 - current, hits);
-        player.marks[target] += applied;
-        player.totalMarksLanded += applied;
-        if (!state.roundHitSet.includes(target)) state.roundHitSet.push(target);
-        if (newTotal > 3) scoringHits = newTotal - 3;
-      } else {
-        scoringHits = hits;
-      }
-
-      let points = 0;
-      if (scoringHits > 0) {
-        player.totalMarksLanded += scoringHits;
-        if (!state.roundHitSet.includes(target)) state.roundHitSet.push(target);
-        if (activeOpponentsOpen(target, state.currentPlayerIndex)) {
-          points = scoringHits * value;
-          player.score += points;
-        }
-      }
-
-      player.dartsThrown += 1;
-      advanceDart(`${multiplier}x ${target}${points ? ` (+${points})` : ""}`);
-      pushUndoSnapshot(snapshot);
-    }
-
-    function advanceDart(label) {
-      state.dartsInTurn += 1;
-      state.totalDarts += 1;
-      state.lastAction = label;
-
-      checkWinner();
-
-      if (!state.gameOver && state.dartsInTurn >= 3) {
-        state.dartsInTurn = 0;
-        state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
-
-        if (state.currentPlayerIndex === 0) {
-          state.round += 1;
-          rerollUnhitRoundTargets();
-        }
-      }
-
-      renderAll();
-      persistCurrentGame();
-    }
-
-    function checkWinner() {
-      const closedPlayers = state.players.filter(isClosed);
-      if (!closedPlayers.length) return false;
-
-      const topScore = Math.max(...state.players.map(p => p.score));
-      const eligible = closedPlayers.filter(p => p.score === topScore);
-      if (!eligible.length) return false;
-
-      state.gameOver = true;
-      state.winnerNames = eligible.map(p => p.name);
-      state.savedGamePending = true;
-      els.winnerTitle.textContent = state.winnerNames.length > 1
-        ? "Tie Game"
-        : `${state.winnerNames[0]} Wins`;
-      els.winnerText.textContent = state.winnerNames.length > 1
-        ? `${state.winnerNames.join(", ")} closed all targets and finished tied for top score. Review the final scoreboard before submitting.`
-        : `${state.winnerNames[0]} closed all targets and finished with the highest score. Review the final scoreboard before submitting.`;
-      els.winnerBanner.classList.add("show");
-      clearPersistedCurrentGame();
-      return true;
-    }
-
-    function renderScoreboard() {
-      els.scoreboardBody.innerHTML = "";
-      if (!state.players.length) {
-        els.scoreboardBody.innerHTML = `<tr><td colspan="25"><div class="empty">No active game. Add players and start a new game.</div></td></tr>`;
-        return;
-      }
-   function renderScoreboard() {
-  const headerRow = els.scoreboardHeaderRow;
-  // build header: first column is "Target", then a column for each player (name)
-  headerRow.innerHTML = "<th>Target</th>";
-  state.players.forEach(player => {
-    const th = document.createElement("th");
-    th.innerHTML = `<strong>${escapeHtml(player.name)}</strong>`;
-    headerRow.appendChild(th);
-  });
-
-  els.scoreboardBody.innerHTML = "";
-  if (!state.players.length) {
-    const colspan = 1;
-    els.scoreboardBody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty">No active game. Add players and start a new game.</div></td></tr>`;
-    return;
-  }
-
-  // one row per target
-  TARGETS.forEach(target => {
-    const tr = document.createElement("tr");
-    // first cell = target label
-    let rowHtml = `<td><strong>${escapeHtml(target)}</strong></td>`;
-    // player cells for this target
-    state.players.forEach(player => {
-      const marks = player.marks[target];
-      const main = [0,1,2].map(i => `<span class="mark ${i < Math.min(marks,3) ? "filled" : ""}"></span>`).join("");
-      let extra = "";
-      if (marks > 3) extra = Array.from({length: marks - 3}).map(() => `<span class="mark extra"></span>`).join("");
-      rowHtml += `<td><div class="marks">${main}${extra}</div></td>`;
-    });
-    tr.innerHTML = rowHtml;
-    els.scoreboardBody.appendChild(tr);
-  });
-
-  // Add summary rows (Score, Closed, MPR) — one summary row per metric, with one cell per player
-  const scoreRow = document.createElement("tr");
-  scoreRow.innerHTML = `<td><strong>Score</strong></td>` + state.players.map(p => `<td><strong>${p.score}</strong></td>`).join("");
-  els.scoreboardBody.appendChild(scoreRow);
-
-  const closedRow = document.createElement("tr");
-  closedRow.innerHTML = `<td><strong>Closed</strong></td>` + state.players.map(p => `<td>${closedCount(p)}/${TARGETS.length}</td>`).join("");
-  els.scoreboardBody.appendChild(closedRow);
-
-  const mprRow = document.createElement("tr");
-  mprRow.innerHTML = `<td><strong>MPR</strong></td>` + state.players.map(p => `<td>${p.dartsThrown ? (p.totalMarksLanded / (p.dartsThrown / 3)).toFixed(1) : "0.0"}</td>`).join("");
-  els.scoreboardBody.appendChild(mprRow);
-}
-
-
-      state.players.forEach((player, idx) => {
-        const tr = document.createElement("tr");
-        if (!state.gameOver && idx === state.currentPlayerIndex) tr.classList.add("player-turn");
-
-        let cells = "";
-        TARGETS.forEach(target => {
-          const marks = player.marks[target];
-          const main = [0,1,2].map(i => `<span class="mark ${i < Math.min(marks,3) ? "filled" : ""}"></span>`).join("");
-          let extra = "";
-          if (marks > 3) {
-            extra = Array.from({length: marks - 3}).map(() => `<span class="mark extra"></span>`).join("");
-          }
-          cells += `<td><div class="marks">${main}${extra}</div></td>`;
-        });
-
-        const mpr = player.dartsThrown ? (player.totalMarksLanded / (player.dartsThrown / 3)).toFixed(1) : "0.0";
-
-        tr.innerHTML = `
-          <td>
-            <div class="player-name">
-              <strong>${escapeHtml(player.name)}</strong>
-              <span class="mini">${state.gameOver ? (state.winnerNames.includes(player.name) ? "Winner" : "Finished") : (idx === state.currentPlayerIndex ? "Throwing now" : "Waiting")} · ${player.dartsThrown} darts</span>
-            </div>
-          </td>
-          ${cells}
-          <td><strong>${player.score}</strong></td>
-          <td>${closedCount(player)}/${TARGETS.length}</td>
-          <td>${mpr}</td>
-        `;
-        els.scoreboardBody.appendChild(tr);
-      });
-    }
-
-    function renderStatus() {
-      els.metricRound.textContent = state.round;
-      els.metricPlayer.textContent = state.players.length ? currentPlayer().name : "—";
-      els.metricDarts.textContent = `${state.dartsInTurn} / 3`;
-      els.metricGamesSaved.textContent = loadGames().length;
-      els.currentTurnLabel.textContent = state.players.length ? currentPlayer().name : "—";
-      els.currentTurnDartsLabel.textContent = `${state.dartsInTurn} / 3`;
-      els.lastActionLabel.textContent = state.lastAction;
-      els.targetsSeenLabel.textContent = `${state.seenTargets.length} / ${TARGETS.length}`;
-    }
-
-    function renderRecentGames() {
-      const games = loadGames().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
-      els.recentGames.innerHTML = "";
-      if (!games.length) {
-        els.recentGames.innerHTML = `<div class="empty">No saved games yet.</div>`;
-        return;
-      }
-
-      games.slice(0,6).forEach(game => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-        div.innerHTML = `
-          <div class="history-top">
-            <div>
-              <strong>${escapeHtml(game.winnerLabel)}</strong>
-              <div class="mini">${formatDate(game.date)}</div>
-            </div>
-            <span class="pill">${game.players.length} players · ${game.rounds} rounds</span>
-          </div>
-          <div class="mini">${game.players.map((p,i)=>`${escapeHtml(p)} (${game.scores[i] ?? 0})`).join(" · ")}</div>
-        `;
-        els.recentGames.appendChild(div);
-      });
-    }
-
-    function renderAllGamesList() {
-      const games = loadGames().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
-      els.allGamesList.innerHTML = "";
-      if (!games.length) {
-        els.allGamesList.innerHTML = `<div class="empty">No saved games found.</div>`;
-        return;
-      }
-      games.forEach(game => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-        div.innerHTML = `
-          <div class="history-top">
-            <div>
-              <strong>${escapeHtml(game.winnerLabel)}</strong>
-              <div class="mini">${formatDate(game.date)}</div>
-            </div>
-            <span class="pill">${game.players.length} players</span>
-          </div>
-          <div class="mini">${game.players.map((p,i)=>`${escapeHtml(p)}: ${game.scores[i] ?? 0}`).join(" · ")}</div>
-        `;
-        els.allGamesList.appendChild(div);
-      });
-    }
-
-    function renderLeaderboard() {
-      const board = loadLeaderboard().sort((a,b) => b.elo - a.elo || b.winPct - a.winPct || b.mpr - a.mpr);
-      els.leaderboardBody.innerHTML = "";
-
-      if (!board.length) {
-        els.leaderboardBody.innerHTML = `<tr><td colspan="8"><div class="empty">No leaderboard data yet.</div></td></tr>`;
-        return;
-      }
-
-      board.forEach((entry, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td><strong>${escapeHtml(entry.name)}</strong></td>
-          <td>${entry.elo.toFixed(0)}</td>
-          <td>${entry.wins}</td>
-          <td>${entry.losses}</td>
-          <td>${entry.winPct.toFixed(1)}%</td>
-          <td>${entry.mpr.toFixed(1)}</td>
-          <td>${entry.games}</td>
-        `;
-        els.leaderboardBody.appendChild(tr);
-      });
-    }
-
-    function renderAll() {
-      renderRoundTargets();
-      renderTargetButtons();
-      renderScoreboard();
-      renderStatus();
-      renderRecentGames();
-    }
-
-    function saveCurrentFinishedGame() {
-      if (!state.gameOver || !state.savedGamePending || !state.players.length) {
-        alert("There is no finished game waiting to submit.");
-        return;
-      }
-
-      const game = {
-        id: cryptoRandomId(),
-        date: new Date().toISOString().slice(0,10),
-        createdAt: new Date().toISOString(),
-        players: state.players.map(p => p.name),
-        scores: state.players.map(p => p.score),
-        marks: state.players.map(p => p.totalMarksLanded),
-        darts: state.players.map(p => p.dartsThrown),
-        rounds: state.round,
-        winners: state.winnerNames.slice(),
-        winnerLabel: state.winnerNames.length > 1 ? `Tie — ${state.winnerNames.join(", ")}` : `Winner — ${state.winnerNames[0]}`,
-        resultType: state.winnerNames.length > 1 ? "tie" : "winner"
+    function createNewGame(names){
+      return {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        date: $('playedDate').value || todayStr(),
+        createdAt: Date.now(),
+        durationSeconds: 20 * 60,
+        remainingSeconds: 20 * 60,
+        clockRunning: false,
+        currentTeamIndex: 0,
+        currentDartIndex: 0,
+        currentDown: 1,
+        possessionCount: 1,
+        currentZoneIndex: 0,
+        postTdState: null, // null | 'xp' | '2pt'
+        status: 'active',
+        winner: null,
+        players: names.map((name, idx) => ({
+          name,
+          score: 0,
+          possessions: 0,
+          downsUsed: 0,
+          touchdowns: 0,
+          fieldGoals: 0,
+          conversions: 0,
+          punts: 0,
+          currentPosition: 0,
+          roundsPlayed: 0,
+          orientation: idx % 2 === 0 ? 'LTR' : 'RTL'
+        })),
+        turnLog: []
       };
-
-      appendSavedGame(game);
-      updateLeaderboardFromGame(game);
-      state.savedGamePending = false;
-      renderAll();
-      renderLeaderboard();
-      renderAllGamesList();
-      alert("Game submitted.");
     }
 
-    function saveHistoricalGame() {
-      const date = els.historyDate.value;
-      const players = els.historyPlayers.value.split(",").map(s => s.trim()).filter(Boolean);
-      const scores = els.historyScores.value.split(",").map(s => Number(s.trim()));
-      const marks = els.historyMarks.value.split(",").map(s => Number(s.trim()));
-      const rounds = Math.max(1, Number(els.historyRounds.value || 1));
-      const winner = els.historyWinner.value.trim();
-
-      if (!date || players.length < 2 || !winner) {
-        alert("Please enter a date, at least 2 players, and a winner.");
+    function startGame(){
+      const names = getSetupNames();
+      if (names.length < 2) {
+        alert('Please enter at least 2 team names.');
         return;
       }
-      if (!players.includes(winner)) {
-        alert("Winner must match one of the entered players.");
+      if (!uniqueNames(names)) {
+        alert('Team names must be unique.');
         return;
       }
-      if (scores.length !== players.length || scores.some(Number.isNaN)) {
-        alert("Scores must match the player list.");
-        return;
-      }
-      if (marks.length !== players.length || marks.some(Number.isNaN)) {
-        alert("Marks must match the player list.");
-        return;
-      }
-
-      const game = {
-        id: cryptoRandomId(),
-        date,
-        createdAt: new Date().toISOString(),
-        players,
-        scores,
-        marks,
-        darts: players.map(() => rounds * 3),
-        rounds,
-        winners: [winner],
-        winnerLabel: `Winner — ${winner}`,
-        resultType: "winner"
-      };
-
-      appendSavedGame(game);
-      updateLeaderboardFromGame(game);
-      renderAll();
-      renderLeaderboard();
-      renderAllGamesList();
-      els.historyPlayers.value = "";
-      els.historyScores.value = "";
-      els.historyMarks.value = "";
-      els.historyRounds.value = 10;
-      els.historyWinner.value = "";
-      alert("Historical game saved.");
-    }
-
-    function updateLeaderboardFromGame(game) {
-      let board = loadLeaderboard();
-      const map = new Map(board.map(e => [e.name, e]));
-
-      game.players.forEach((name, idx) => {
-        if (!map.has(name)) {
-          map.set(name, {
-            name,
-            wins: 0,
-            losses: 0,
-            games: 0,
-            elo: 1000,
-            totalMarks: 0,
-            totalRounds: 0,
-            mpr: 0,
-            winPct: 0
-          });
-        }
-        const entry = map.get(name);
-        entry.games += 1;
-        entry.totalMarks += Number(game.marks[idx] || 0);
-        entry.totalRounds += Number(game.rounds || 0);
-      });
-
-      const winners = new Set(game.winners);
-      game.players.forEach(name => {
-        const entry = map.get(name);
-        if (game.resultType === "tie") {
-          if (winners.has(name)) entry.wins += 0.5;
-          else entry.losses += 1;
-        } else {
-          if (winners.has(name)) entry.wins += 1;
-          else entry.losses += 1;
-        }
-      });
-
-      const K = 24;
-      for (let i = 0; i < game.players.length; i++) {
-        for (let j = i + 1; j < game.players.length; j++) {
-          const a = map.get(game.players[i]);
-          const b = map.get(game.players[j]);
-
-          const expectedA = 1 / (1 + Math.pow(10, (b.elo - a.elo) / 400));
-          const expectedB = 1 - expectedA;
-
-          let scoreA = 0.5, scoreB = 0.5;
-          const aWin = winners.has(game.players[i]);
-          const bWin = winners.has(game.players[j]);
-
-          if (game.resultType === "winner") {
-            if (aWin && !bWin) { scoreA = 1; scoreB = 0; }
-            else if (!aWin && bWin) { scoreA = 0; scoreB = 1; }
-          } else {
-            if (aWin && bWin) { scoreA = 0.5; scoreB = 0.5; }
-            else if (aWin && !bWin) { scoreA = 1; scoreB = 0; }
-            else if (!aWin && bWin) { scoreA = 0; scoreB = 1; }
-          }
-
-          a.elo += K * (scoreA - expectedA);
-          b.elo += K * (scoreB - expectedB);
-        }
-      }
-
-      board = [...map.values()].map(entry => {
-        entry.winPct = entry.games ? (entry.wins / entry.games) * 100 : 0;
-        entry.mpr = entry.totalRounds ? (entry.totalMarks / entry.totalRounds) : 0;
-        return entry;
-      });
-
-      saveLeaderboard(board);
-    }
-
-    function appendSavedGame(game) {
-      const games = loadGames();
-      games.push(game);
-      localStorage.setItem(STORAGE_KEYS.games, JSON.stringify(games));
-    }
-
-    function loadGames() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.games)) || []; }
-      catch { return []; }
-    }
-
-    function loadLeaderboard() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.leaderboard)) || []; }
-      catch { return []; }
-    }
-
-    function saveLeaderboard(board) {
-      localStorage.setItem(STORAGE_KEYS.leaderboard, JSON.stringify(board));
-    }
-
-    function getSerializableCurrentState() {
-      return JSON.parse(JSON.stringify({
-        players: state.players,
-        currentPlayerIndex: state.currentPlayerIndex,
-        dartsInTurn: state.dartsInTurn,
-        totalDarts: state.totalDarts,
-        round: state.round,
-        selectedTarget: state.selectedTarget,
-        gameOver: state.gameOver,
-        winnerNames: state.winnerNames,
-        savedGamePending: state.savedGamePending,
-        roundTargets: state.roundTargets,
-        roundHitSet: state.roundHitSet,
-        seenTargets: state.seenTargets,
-        lastAction: state.lastAction
-      }));
-    }
-
-    function restoreSerializableCurrentState(obj) {
-      state.players = JSON.parse(JSON.stringify(obj.players || []));
-      state.currentPlayerIndex = obj.currentPlayerIndex || 0;
-      state.dartsInTurn = obj.dartsInTurn || 0;
-      state.totalDarts = obj.totalDarts || 0;
-      state.round = obj.round || 1;
-      state.selectedTarget = obj.selectedTarget || null;
-      state.gameOver = !!obj.gameOver;
-      state.winnerNames = obj.winnerNames || [];
-      state.savedGamePending = !!obj.savedGamePending;
-      state.roundTargets = obj.roundTargets || [];
-      state.roundHitSet = obj.roundHitSet || [];
-      state.seenTargets = obj.seenTargets || [];
-      state.lastAction = obj.lastAction || "—";
-      if (state.gameOver) els.winnerBanner.classList.add("show");
-    }
-
-    function pushUndoSnapshot(snapshot) {
-      undoStack.push(snapshot);
-      if (undoStack.length > 500) undoStack.shift();
-    }
-
-    function undoLast() {
-      if (!undoStack.length) return;
-      const prev = undoStack.pop();
-      restoreSerializableCurrentState(prev);
-      els.winnerBanner.classList.toggle("show", state.gameOver);
-      renderAll();
-      persistCurrentGame();
-    }
-
-    function persistCurrentGame() {
-      if (!state.players.length || state.gameOver) return;
-      localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(getSerializableCurrentState()));
-    }
-
-    function loadPersistedCurrentGame() {
-      try {
-        const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS.current));
-        if (raw && raw.players && raw.players.length) {
-          restoreSerializableCurrentState(raw);
-          renderAll();
-        }
-      } catch {}
-    }
-
-    function clearPersistedCurrentGame() {
-      localStorage.removeItem(STORAGE_KEYS.current);
-    }
-
-    function resetCurrentGame() {
-      if (!confirm("Reset the current unsaved game?")) return;
-      state.players = [];
-      state.currentPlayerIndex = 0;
-      state.dartsInTurn = 0;
-      state.totalDarts = 0;
-      state.round = 1;
-      state.selectedTarget = null;
-      state.gameOver = false;
-      state.winnerNames = [];
-      state.savedGamePending = false;
-      state.roundTargets = [];
-      state.roundHitSet = [];
-      state.seenTargets = [];
-      state.lastAction = "—";
-      undoStack.length = 0;
-      els.winnerBanner.classList.remove("show");
-      clearPersistedCurrentGame();
+      state.activeGame = createNewGame(names);
+      state.finishedGamePending = null;
+      state.snapshots = [clone(state.activeGame)];
+      stopClock();
+      saveStorage();
       renderAll();
     }
 
-    function openModal(modal) {
-      modal.classList.add("show");
-      modal.setAttribute("aria-hidden","false");
-    }
-    function closeModal(modal) {
-      modal.classList.remove("show");
-      modal.setAttribute("aria-hidden","true");
+    function snapshot(){
+      if (state.activeGame) state.snapshots.push(clone(state.activeGame));
     }
 
-    function formatDate(dateStr) {
-      const d = new Date(dateStr + "T00:00:00");
-      if (Number.isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric"});
+    function getCurrentTeam(){
+      if (!state.activeGame) return null;
+      return state.activeGame.players[state.activeGame.currentTeamIndex];
     }
 
-    function cryptoRandomId() {
-      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-      return "id-" + Math.random().toString(36).slice(2) + Date.now();
+    function zoneForTeam(team){
+      if (!state.activeGame) return null;
+      const index = team.currentPosition;
+      return FIELD_ZONES[Math.min(index, FIELD_ZONES.length - 1)];
     }
 
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, s => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[s]));
+    function formatClock(seconds){
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
 
-    els.addPlayerBtn.addEventListener("click", () => createPlayerInput(""));
-    els.startGameBtn.addEventListener("click", () => startGame(getPlayerNamesFromInputs()));
-
-    document.querySelectorAll(".mult-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        if (!state.selectedTarget) {
-          alert("Select an active round target first.");
+    function startClock(){
+      const game = state.activeGame;
+      if (!game || game.status !== 'active' || game.clockRunning) return;
+      game.clockRunning = true;
+      saveStorage();
+      renderClock();
+      state.clockInterval = setInterval(() => {
+        if (!state.activeGame || state.activeGame.status !== 'active') {
+          stopClock();
           return;
         }
-        applyThrow(state.selectedTarget, Number(btn.dataset.mult));
+        state.activeGame.remainingSeconds = Math.max(0, state.activeGame.remainingSeconds - 1);
+        if (state.activeGame.remainingSeconds <= 0) {
+          stopClock();
+          finalizeByClock();
+        }
+        saveStorage();
+        renderClock();
+      }, 1000);
+    }
+
+    function stopClock(){
+      if (state.clockInterval) clearInterval(state.clockInterval);
+      state.clockInterval = null;
+      if (state.activeGame) {
+        state.activeGame.clockRunning = false;
+        saveStorage();
+      }
+      renderClock();
+    }
+
+    function finalizeByClock(){
+      const game = state.activeGame;
+      if (!game) return;
+      const top = Math.max(...game.players.map(p => p.score));
+      const leaders = game.players.filter(p => p.score === top);
+      if (leaders.length === 1) {
+        game.winner = leaders[0].name;
+      } else {
+        game.winner = leaders.map(x => x.name).join(' / ');
+      }
+      game.status = 'finished-pending';
+      state.finishedGamePending = clone(game);
+      openFinalModal();
+      saveStorage();
+      renderAll();
+    }
+
+    function multiplierLabel(mult){
+      if (mult === 'inner_single') return 'Inner Single';
+      if (mult === 'outer_single') return 'Outer Single';
+      if (mult === '2') return 'Double';
+      if (mult === '3') return 'Triple';
+      return 'Segment';
+    }
+
+    function buildNumberGrid(){
+      const grid = $('numberGrid');
+      grid.innerHTML = '';
+      const nums = Array.from({length:20}, (_,i)=>i+1);
+      nums.push(25);
+      nums.forEach(n => {
+        const btn = document.createElement('button');
+        btn.className = 'num-btn';
+        btn.type = 'button';
+        btn.textContent = n === 25 ? 'Bull' : n;
+        btn.dataset.value = n;
+        btn.addEventListener('click', () => throwDart(n, state.selectedMultiplier, false));
+        grid.appendChild(btn);
       });
-    });
+    }
 
-    els.missBtn.addEventListener("click", () => applyThrow("MISS", 0));
-    els.undoBtn.addEventListener("click", undoLast);
-    els.resetCurrentBtn.addEventListener("click", resetCurrentGame);
+    function segmentMatches(zone, base, segment){
+      if (!zone) return false;
+      if (zone.segment === 'bull_any') return base === 25;
+      return zone.numbers.includes(base) && String(zone.segment) === String(segment);
+    }
 
-    els.saveFinishedGameBtn.addEventListener("click", saveCurrentFinishedGame);
-    els.newGameQuickBtn.addEventListener("click", () => startGame(getPlayerNamesFromInputs()));
+    function throwDart(base, segment, isMiss=false){
+      const game = state.activeGame;
+      if (!game || game.status !== 'active') return;
+      const team = getCurrentTeam();
+      if (!team) return;
+      if (game.postTdState) return;
+      if (game.currentDartIndex >= 3) return;
 
-    els.leaderboardBtn.addEventListener("click", () => {
+      snapshot();
+
+      const zone = zoneForTeam(team);
+      const dartOrder = game.currentDartIndex + 1;
+      let label = isMiss ? 'Miss' : `${multiplierLabel(segment)} ${base === 25 ? 'Bull' : base}`;
+      let text = `${team.name} dart ${dartOrder}: ${label}`;
+
+      if (isMiss || base === 0) {
+        game.turnLog.unshift({ down: game.currentDown, player: team.name, text: `${text} — no advance.`, timestamp: Date.now() });
+        game.currentDartIndex++;
+        nextDartOrDown();
+        return;
+      }
+
+      if (segmentMatches(zone, base, segment)) {
+        team.currentPosition = Math.min(team.currentPosition + 1, FIELD_ZONES.length - 1);
+        const nextZone = zoneForTeam(team);
+        text += team.currentPosition >= 9
+          ? ' — Touchdown scored!'
+          : ` — advanced to ${nextZone.label}.`;
+
+        if (team.currentPosition >= 9) {
+          team.score += 6;
+          team.touchdowns += 1;
+          game.postTdState = 'choose';
+          game.turnLog.unshift({ down: game.currentDown, player: team.name, text, timestamp: Date.now() });
+          renderAll();
+          saveStorage();
+          return;
+        }
+      } else {
+        text += ` — no advance. Need ${zone.label}.`;
+      }
+
+      game.turnLog.unshift({ down: game.currentDown, player: team.name, text, timestamp: Date.now() });
+      game.currentDartIndex++;
+      nextDartOrDown();
+    }
+
+    function nextDartOrDown(){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      if (!game || !team) return;
+
+      if (game.currentDartIndex < 3) {
+        saveStorage();
+        renderAll();
+        return;
+      }
+
+      team.roundsPlayed += 1;
+      team.downsUsed += 1;
+      game.currentDartIndex = 0;
+
+      if (game.currentDown < 4) {
+        game.currentDown += 1;
+      } else {
+        game.turnLog.unshift({
+          down: game.currentDown,
+          player: team.name,
+          text: `${team.name} turned it over on downs.`,
+          timestamp: Date.now()
+        });
+        switchPossession(false);
+      }
+
+      saveStorage();
+      renderAll();
+    }
+
+    function switchPossession(resetField = true){
+      const game = state.activeGame;
+      if (!game) return;
+      const prev = getCurrentTeam();
+      if (prev && resetField) prev.currentPosition = 0;
+
+      game.currentTeamIndex = (game.currentTeamIndex + 1) % game.players.length;
+      const next = getCurrentTeam();
+      next.possessions += 1;
+      game.currentDown = 1;
+      game.currentDartIndex = 0;
+      game.postTdState = null;
+      game.possessionCount += 1;
+      renderAll();
+      saveStorage();
+    }
+
+    function attemptFG(){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      if (!game || !team || game.status !== 'active') return;
+      if (game.currentDown !== 4 || game.postTdState) {
+        alert('Field goal is only available on 4th down before a touchdown.');
+        return;
+      }
+      game.turnLog.unshift({
+        down: game.currentDown,
+        player: team.name,
+        text: `${team.name} selected Field Goal. Hit 20, 3, or Bull with your next dart to score 3.`,
+        timestamp: Date.now()
+      });
+      game.postTdState = 'fg';
+      renderAll();
+      saveStorage();
+    }
+
+    function resolveFG(base){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      const success = [20,3,25].includes(base);
+      game.turnLog.unshift({
+        down: game.currentDown,
+        player: team.name,
+        text: success
+          ? `${team.name} made the field goal for 3 points.`
+          : `${team.name} missed the field goal attempt.`,
+        timestamp: Date.now()
+      });
+      if (success) {
+        team.score += 3;
+        team.fieldGoals += 1;
+      }
+      switchPossession(true);
+    }
+
+    function attempt2Pt(){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      if (!game || !team) return;
+      if (game.postTdState !== 'choose') {
+        alert('2Pt is only available immediately after a touchdown.');
+        return;
+      }
+      game.postTdState = '2pt';
+      game.turnLog.unshift({
+        down: game.currentDown,
+        player: team.name,
+        text: `${team.name} is going for 2. Hit Bull to convert.`,
+        timestamp: Date.now()
+      });
+      renderAll();
+      saveStorage();
+    }
+
+    function autoXP(){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      if (!game || !team) return;
+      if (game.postTdState !== 'choose') {
+        alert('Extra point is only available immediately after a touchdown.');
+        return;
+      }
+      game.postTdState = 'xp';
+      game.turnLog.unshift({
+        down: game.currentDown,
+        player: team.name,
+        text: `${team.name} is attempting the extra point. Hit a 20 or 3.`,
+        timestamp: Date.now()
+      });
+      renderAll();
+      saveStorage();
+    }
+
+    function resolvePostTd(base){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      if (game.postTdState === 'xp') {
+        const success = [20,3].includes(base);
+        game.turnLog.unshift({
+          down: game.currentDown,
+          player: team.name,
+          text: success
+            ? `${team.name} made the extra point.`
+            : `${team.name} missed the extra point.`,
+          timestamp: Date.now()
+        });
+        if (success) team.score += 1;
+        switchPossession(true);
+      } else if (game.postTdState === '2pt') {
+        const success = base === 25;
+        game.turnLog.unshift({
+          down: game.currentDown,
+          player: team.name,
+          text: success
+            ? `${team.name} converted the 2-point try.`
+            : `${team.name} failed the 2-point try.`,
+          timestamp: Date.now()
+        });
+        if (success) team.score += 2;
+        if (success) team.conversions += 1;
+        switchPossession(true);
+      }
+    }
+
+    function attemptPunt(){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      if (!game || !team || game.currentDown !== 4 || game.postTdState) {
+        alert('Punt is only available on 4th down before a touchdown.');
+        return;
+      }
+      game.postTdState = 'punt';
+      game.turnLog.unshift({
+        down: game.currentDown,
+        player: team.name,
+        text: `${team.name} selected Punt. Throw within the field integrity to flip field position.`,
+        timestamp: Date.now()
+      });
+      renderAll();
+      saveStorage();
+    }
+
+    function resolvePunt(base, segment){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+      const validPuntNumbers = [14,11,8,13,6,10,25];
+      const inBounds = validPuntNumbers.includes(base);
+      const nextIndex = (game.currentTeamIndex + 1) % game.players.length;
+      const receiving = game.players[nextIndex];
+
+      if (inBounds) {
+        let landing = 0;
+        if ([14,11,8].includes(base)) landing = 2;
+        else if (base === 25) landing = 4;
+        else if ([13,6,10].includes(base)) landing = 6;
+        receiving.currentPosition = Math.max(0, Math.min(8, landing));
+        game.turnLog.unshift({
+          down: game.currentDown,
+          player: team.name,
+          text: `${team.name} punted in bounds. ${receiving.name} takes over at ${FIELD_ZONES[receiving.currentPosition].label}.`,
+          timestamp: Date.now()
+        });
+      } else {
+        receiving.currentPosition = team.currentPosition;
+        game.turnLog.unshift({
+          down: game.currentDown,
+          player: team.name,
+          text: `${team.name} punted out of bounds. ${receiving.name} takes over where the punt started.`,
+          timestamp: Date.now()
+        });
+      }
+      team.punts += 1;
+      game.currentTeamIndex = nextIndex;
+      game.currentDown = 1;
+      game.currentDartIndex = 0;
+      game.postTdState = null;
+      game.possessionCount += 1;
+      saveStorage();
+      renderAll();
+    }
+
+    function handleSpecialThrow(base, segment, isMiss){
+      const game = state.activeGame;
+      if (!game) return false;
+      if (game.postTdState === 'fg') {
+        resolveFG(isMiss ? 0 : base);
+        return true;
+      }
+      if (game.postTdState === 'xp' || game.postTdState === '2pt') {
+        resolvePostTd(isMiss ? 0 : base);
+        return true;
+      }
+      if (game.postTdState === 'punt') {
+        resolvePunt(isMiss ? 0 : base, segment);
+        return true;
+      }
+      return false;
+    }
+
+    function throwWrapper(base, segment, isMiss=false){
+      if (handleSpecialThrow(base, segment, isMiss)) return;
+      throwDart(base, segment, isMiss);
+    }
+
+    function undoLast(){
+      if (state.snapshots.length > 1) {
+        state.snapshots.pop();
+        state.activeGame = clone(state.snapshots[state.snapshots.length - 1]);
+        saveStorage();
+        renderAll();
+      }
+    }
+
+    function ensureLeader(name){
+      if (!state.leaderboard[name]) {
+        state.leaderboard[name] = { name, wins:0, losses:0, elo:1000 };
+      }
+      return state.leaderboard[name];
+    }
+
+    function expectedScore(ra, rb){
+      return 1 / (1 + Math.pow(10, (rb - ra) / 400));
+    }
+
+    function updateLeaderboardFromGame(game){
+      const winners = game.winner.split(' / ');
+      const K = 24;
+
+      game.players.forEach(p => {
+        const lp = ensureLeader(p.name);
+        if (winners.includes(p.name) && winners.length === 1) lp.wins += 1;
+        else if (!winners.includes(p.name)) lp.losses += 1;
+      });
+
+      if (winners.length === 1) {
+        const winner = ensureLeader(winners[0]);
+        game.players.forEach(p => {
+          if (p.name === winners[0]) return;
+          const loser = ensureLeader(p.name);
+          const ew = expectedScore(winner.elo, loser.elo);
+          const el = expectedScore(loser.elo, winner.elo);
+          winner.elo = Math.round(winner.elo + K * (1 - ew));
+          loser.elo = Math.round(loser.elo + K * (0 - el));
+        });
+      }
+    }
+
+    function submitFinishedGame(){
+      if (!state.finishedGamePending) return;
+      const game = clone(state.finishedGamePending);
+      game.status = 'final';
+      state.history.unshift(game);
+      updateLeaderboardFromGame(game);
+      state.activeGame = null;
+      state.finishedGamePending = null;
+      state.snapshots = [];
+      stopClock();
+      closeModal($('finalModal'));
+      saveStorage();
+      renderAll();
+    }
+
+    function discardFinishedGame(){
+      state.activeGame = null;
+      state.finishedGamePending = null;
+      state.snapshots = [];
+      stopClock();
+      closeModal($('finalModal'));
+      saveStorage();
+      renderAll();
+    }
+
+    function getSortedLeaderboard(){
+      return Object.values(state.leaderboard)
+        .map(p => {
+          const games = p.wins + p.losses;
+          return { ...p, winPct: games ? (p.wins / games) * 100 : 0 };
+        })
+        .sort((a,b) => b.elo - a.elo || b.winPct - a.winPct || b.wins - a.wins);
+    }
+
+    function renderField(){
+      const grid = $('fieldGrid');
+      grid.innerHTML = '';
+      const game = state.activeGame;
+
+      const cells = [
+        'End Zone',
+        'D 14/11/8',
+        'OS 14/11/8',
+        'T 14/11/8',
+        'IS 14/11/8',
+        'Bull',
+        'IS 13/6/10',
+        'T 13/6/10',
+        'OS 13/6/10',
+        'D 13/6/10',
+        'End Zone'
+      ];
+
+      cells.forEach((label, idx) => {
+        const cell = document.createElement('div');
+        cell.className = 'field-cell' + ((idx === 0 || idx === 10) ? ' endzone' : '');
+        if (game) {
+          const team = getCurrentTeam();
+          const pos = team ? team.currentPosition + 1 : -1;
+          if (idx === pos) cell.classList.add('active');
+          if (team && team.currentPosition >= 9 && idx === 10) cell.classList.add('active');
+        }
+        cell.textContent = label;
+        grid.appendChild(cell);
+      });
+    }
+
+    function renderClock(){
+      const game = state.activeGame;
+      const total = game ? game.durationSeconds : 20*60;
+      const remain = game ? game.remainingSeconds : 20*60;
+      $('clockBadge').textContent = formatClock(remain);
+      $('clockFill').style.width = `${((total - remain) / total) * 100}%`;
+      $('startClockBtn').textContent = game && game.clockRunning ? 'Clock Running' : 'Start Clock';
+    }
+
+    function renderScoreboard(){
+      const body = $('scoreboardBody');
+      body.innerHTML = '';
+      const game = state.activeGame;
+
+      if (!game) {
+        body.innerHTML = `<tr><td colspan="6"><div class="empty">No active game. Add teams and start a live game.</div></td></tr>`;
+        $('possessionBadge').textContent = 'Possession: —';
+        $('downBadge').textContent = 'Down 1';
+        renderField();
+        renderClock();
+        return;
+      }
+
+      const team = getCurrentTeam();
+      $('possessionBadge').textContent = `Possession: ${team ? team.name : '—'}`;
+      $('downBadge').textContent = `Down ${game.currentDown}`;
+      renderField();
+      renderClock();
+
+      game.players.forEach((p, idx) => {
+        const tr = document.createElement('tr');
+        if (idx === game.currentTeamIndex && game.status === 'active') tr.className = 'active-row';
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(p.name)}</strong></td>
+          <td><span class="score-pill">${p.score}</span></td>
+          <td>${idx === game.currentTeamIndex ? 'Yes' : 'No'}</td>
+          <td>${escapeHtml(FIELD_ZONES[Math.min(p.currentPosition, 8)].label)}</td>
+          <td>${idx === game.currentTeamIndex ? game.currentDown : '—'}</td>
+          <td>${game.winner === p.name ? '<span style="color:var(--accent-2);font-weight:800;">Winner</span>' : 'Live'}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderTurnPanel(){
+      const game = state.activeGame;
+      const team = getCurrentTeam();
+
+      if (!game || !team) {
+        $('currentPlayerName').textContent = 'No game active';
+        $('currentPlayerSub').textContent = 'Start a game to begin.';
+        $('selectedMultiplierTag').textContent = `Selected: ${multiplierLabel(state.selectedMultiplier)}`;
+        $('zoneTag').textContent = 'Target Zone: —';
+        $('dartsLeftTag').textContent = 'Darts Left: 3';
+        ['1','2','3'].forEach(n => $(`dartDisplay${n}`).textContent = '—');
+        updateNumberGridHighlight();
+        return;
+      }
+
+      const zone = zoneForTeam(team);
+      $('currentPlayerName').textContent = team.name;
+      if (game.postTdState === 'choose') {
+        $('currentPlayerSub').textContent = 'Touchdown scored. Choose FG for extra point or 2Pt for a bull conversion.';
+      } else if (game.postTdState === 'fg') {
+        $('currentPlayerSub').textContent = 'Field goal attempt active. Hit 20, 3, or Bull.';
+      } else if (game.postTdState === 'xp') {
+        $('currentPlayerSub').textContent = 'Extra point attempt active. Hit 20 or 3.';
+      } else if (game.postTdState === '2pt') {
+        $('currentPlayerSub').textContent = '2-point conversion active. Hit Bull.';
+      } else if (game.postTdState === 'punt') {
+        $('currentPlayerSub').textContent = 'Punt active. Throw within field integrity to flip field position.';
+      } else {
+        $('currentPlayerSub').textContent = `Advance by hitting ${zone.label}. On 4th down, you may choose FG or Punt.`;
+      }
+
+      $('selectedMultiplierTag').textContent = `Selected: ${multiplierLabel(state.selectedMultiplier)}`;
+      $('zoneTag').textContent = `Target Zone: ${game.postTdState ? game.postTdState.toUpperCase() : zone.label}`;
+      $('dartsLeftTag').textContent = `Darts Left: ${3 - game.currentDartIndex}`;
+
+      const darts = game.turnLog
+        .filter(x => x.player === team.name && x.down === game.currentDown)
+        .slice(0,3)
+        .reverse();
+
+      for (let i = 0; i < 3; i++) {
+        $(`dartDisplay${i+1}`).textContent = darts[i] ? darts[i].text.split(': ')[1]?.split(' — ')[0] || 'Thrown' : '—';
+      }
+
+      updateNumberGridHighlight();
+    }
+
+    function updateNumberGridHighlight(){
+      const game = state.activeGame;
+      const children = [...$('numberGrid').children];
+      children.forEach(btn => btn.classList.remove('target','accent'));
+      if (!game) return;
+
+      if (game.postTdState === 'fg') {
+        children.forEach(btn => {
+          const val = Number(btn.dataset.value);
+          if ([20,3,25].includes(val)) btn.classList.add('accent');
+        });
+        return;
+      }
+
+      if (game.postTdState === 'xp') {
+        children.forEach(btn => {
+          const val = Number(btn.dataset.value);
+          if ([20,3].includes(val)) btn.classList.add('accent');
+        });
+        return;
+      }
+
+      if (game.postTdState === '2pt') {
+        children.forEach(btn => {
+          if (Number(btn.dataset.value) === 25) btn.classList.add('accent');
+        });
+        return;
+      }
+
+      const team = getCurrentTeam();
+      if (!team) return;
+      const zone = zoneForTeam(team);
+      children.forEach(btn => {
+        const val = Number(btn.dataset.value);
+        if (zone.segment === 'bull_any') {
+          if (val === 25) btn.classList.add('target');
+        } else if (zone.numbers.includes(val)) {
+          btn.classList.add('target');
+        }
+      });
+    }
+
+    function renderTurnLog(){
+      const game = state.activeGame;
+      $('turnLog').innerHTML = '';
+      if (!game || !game.turnLog.length) {
+        $('logSummary').textContent = 'No darts thrown yet.';
+        $('turnLog').innerHTML = `<div class="empty">Every dart and special action will be logged here.</div>`;
+        return;
+      }
+
+      $('logSummary').textContent = `${game.turnLog.length} logged event${game.turnLog.length === 1 ? '' : 's'}`;
+      game.turnLog.slice(0, 12).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `<span>Down ${item.down} · <strong>${escapeHtml(item.player)}</strong> · ${escapeHtml(item.text)}</span><span>${new Date(item.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>`;
+        $('turnLog').appendChild(div);
+      });
+    }
+
+    function renderHistory(){
+      const wrap = $('historyList');
+      wrap.innerHTML = '';
+      let games = [...state.history];
+      if (state.historyFilter) games = games.filter(g => g.date === state.historyFilter);
+
+      if (!games.length) {
+        wrap.innerHTML = `<div class="empty">No saved games for this view yet.</div>`;
+        return;
+      }
+
+      games.forEach(game => {
+        const item = document.createElement('div');
+        item.className = 'game-item';
+        const line = game.players.map(p => `${p.name}: ${p.score}`).join(' · ');
+        item.innerHTML = `
+          <div>
+            <h4>${escapeHtml(game.winner)} won on ${escapeHtml(game.date)}</h4>
+            <div class="mini">Teams: ${escapeHtml(game.players.map(p => p.name).join(', '))}</div>
+            <div class="mini">Final: ${escapeHtml(line)}</div>
+            <div class="mini">Clock used: ${formatClock(game.durationSeconds - game.remainingSeconds)}</div>
+          </div>
+          <div>
+            <button class="btn ghost view-game-btn">View</button>
+          </div>
+        `;
+        item.querySelector('.view-game-btn').addEventListener('click', () => {
+          alert(
+            `Winner: ${game.winner}\nDate: ${game.date}\nRemaining Clock: ${formatClock(game.remainingSeconds)}\n\n` +
+            game.players.map(p => `${p.name} — Score: ${p.score}, TD: ${p.touchdowns}, FG: ${p.fieldGoals}, 2PT: ${p.conversions}, Punts: ${p.punts}`).join('\n')
+          );
+        });
+        wrap.appendChild(item);
+      });
+    }
+
+    function renderLeaderboard(){
+      const rows = getSortedLeaderboard();
+      const targets = [$('leaderboardBody'), $('leaderboardModalBody')];
+
+      targets.forEach(target => {
+        target.innerHTML = '';
+        if (!rows.length) {
+          target.innerHTML = `<tr><td colspan="6"><div class="empty">No completed games submitted yet.</div></td></tr>`;
+          return;
+        }
+
+        rows.forEach((p, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="rank">#${i+1}</td>
+            <td>${escapeHtml(p.name)}</td>
+            <td>${p.wins}</td>
+            <td>${p.losses}</td>
+            <td>${p.winPct.toFixed(1)}%</td>
+            <td>${p.elo}</td>
+          `;
+          target.appendChild(tr);
+        });
+      });
+    }
+
+    function openFinalModal(){
+      const game = state.finishedGamePending;
+      if (!game) return;
+      const sorted = [...game.players].sort((a,b) => b.score - a.score);
+
+      $('finalContent').innerHTML = `
+        <div class="final-grid">
+          <div class="final-box">
+            <div class="eyebrow">Winner</div>
+            <h3 class="section-title" style="font-size:2rem;">${escapeHtml(game.winner)}</h3>
+            <p class="muted">Highest score after the 20-minute game clock expired.</p>
+            <p class="muted">Played on ${escapeHtml(game.date)} · Time left ${formatClock(game.remainingSeconds)}</p>
+          </div>
+          <div class="final-box">
+            <div class="eyebrow">Scoring Summary</div>
+            <p class="muted">Touchdown = 6. Extra point uses 20 or 3. 2-point conversion uses Bull. On 4th down teams may attempt a field goal or punt.</p>
+          </div>
+        </div>
+        <div class="final-box" style="margin-top:18px;">
+          <div class="eyebrow">Final Scoreboard</div>
+          <div style="overflow:auto; margin-top:10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>Points</th>
+                  <th>TD</th>
+                  <th>FG</th>
+                  <th>2PT</th>
+                  <th>Punts</th>
+                  <th>Possessions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sorted.map(p => `
+                  <tr>
+                    <td>${escapeHtml(p.name)}</td>
+                    <td>${p.score}</td>
+                    <td>${p.touchdowns}</td>
+                    <td>${p.fieldGoals}</td>
+                    <td>${p.conversions}</td>
+                    <td>${p.punts}</td>
+                    <td>${p.possessions}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      openModal($('finalModal'));
+    }
+
+    function openModal(el){
+      el.classList.add('open');
+      el.setAttribute('aria-hidden','false');
+    }
+
+    function closeModal(el){
+      el.classList.remove('open');
+      el.setAttribute('aria-hidden','true');
+    }
+
+    function renderAll(){
+      renderScoreboard();
+      renderTurnPanel();
+      renderTurnLog();
+      renderHistory();
       renderLeaderboard();
-      openModal(els.leaderboardModal);
-    });
-    els.closeLeaderboardBtn.addEventListener("click", () => closeModal(els.leaderboardModal));
+    }
 
-    els.calendarBtn.addEventListener("click", () => {
-      els.historyDate.value = new Date().toISOString().slice(0,10);
-      renderAllGamesList();
-      openModal(els.calendarModal);
-    });
-    els.closeCalendarBtn.addEventListener("click", () => closeModal(els.calendarModal));
-    els.saveHistoryGameBtn.addEventListener("click", saveHistoricalGame);
+    function clearCurrentGameConfirm(){
+      if (confirm('Start a new game? Current active game will be cleared.')) {
+        state.activeGame = null;
+        state.finishedGamePending = null;
+        state.snapshots = [];
+        stopClock();
+        saveStorage();
+        renderAll();
+      }
+    }
 
-    [els.leaderboardModal, els.calendarModal].forEach(modal => {
-      modal.addEventListener("click", e => {
-        if (e.target === modal) closeModal(modal);
+    function setupEvents(){
+      $('addPlayerBtn').addEventListener('click', () => createPlayerInput(''));
+      $('startGameBtn').addEventListener('click', startGame);
+      $('todayBtn').addEventListener('click', () => $('playedDate').value = todayStr());
+      $('playedDate').value = todayStr();
+
+      $('multiplierRow').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-multiplier]');
+        if (!btn) return;
+        state.selectedMultiplier = btn.dataset.multiplier;
+        [...$('multiplierRow').children].forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        renderTurnPanel();
       });
-    });
 
+      $('missBtn').addEventListener('click', () => throwWrapper(0, state.selectedMultiplier, true));
+      $('undoBtn').addEventListener('click', undoLast);
+      $('fgBtn').addEventListener('click', attemptFG);
+      $('twoPtBtn').addEventListener('click', attempt2Pt);
+      $('puntBtn').addEventListener('click', attemptPunt);
+
+      $('newGameBtnTop').addEventListener('click', clearCurrentGameConfirm);
+      $('forceNewGameBtn').addEventListener('click', clearCurrentGameConfirm);
+
+      $('filterHistoryBtn').addEventListener('click', () => {
+        state.historyFilter = $('historyDateFilter').value;
+        renderHistory();
+      });
+
+      $('clearHistoryFilterBtn').addEventListener('click', () => {
+        state.historyFilter = '';
+        $('historyDateFilter').value = '';
+        renderHistory();
+      });
+
+      $('leaderboardBtn').addEventListener('click', () => openModal($('leaderboardModal')));
+      $('closeLeaderboardModal').addEventListener('click', () => closeModal($('leaderboardModal')));
+      $('showHistoryBtn').addEventListener('click', () => {
+        document.querySelector('.calendar-panel').scrollIntoView({behavior:'smooth', block:'start'});
+      });
+
+      $('closeFinalModal').addEventListener('click', () => closeModal($('finalModal')));
+      $('submitFinishedGameBtn').addEventListener('click', submitFinishedGame);
+      $('discardFinishedGameBtn').addEventListener('click', discardFinishedGame);
+
+      $('startClockBtn').addEventListener('click', startClock);
+      $('pauseClockBtn').addEventListener('click', stopClock);
+
+      [$('finalModal'), $('leaderboardModal')].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(modal);
+        });
+      });
+
+      $('numberGrid').addEventListener('click', (e) => {
+        const btn = e.target.closest('.num-btn');
+        if (!btn) return;
+        const val = Number(btn.dataset.value);
+        throwWrapper(val, state.selectedMultiplier, false);
+      });
+    }
+
+    function initReveal(){
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, {threshold:.12});
+
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    }
+
+    loadStorage();
     initPlayerInputs();
-    buildTargetButtons();
+    buildNumberGrid();
+    setupEvents();
+    if (state.activeGame) {
+      state.snapshots = [clone(state.activeGame)];
+      if (state.activeGame.clockRunning) startClock();
+    }
     renderAll();
-    renderLeaderboard();
-    renderAllGamesList();
-    loadPersistedCurrentGame();
+    initReveal();
   </script>
 </body>
 </html>
