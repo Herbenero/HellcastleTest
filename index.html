@@ -1092,21 +1092,7 @@
       return 'Segment';
     }
 
-    function buildNumberGrid(){
-      const grid = $('numberGrid');
-      grid.innerHTML = '';
-      const nums = Array.from({length:20}, (_,i)=>i+1);
-      nums.push(25);
-      nums.forEach(n => {
-        const btn = document.createElement('button');
-        btn.className = 'num-btn';
-        btn.type = 'button';
-        btn.textContent = n === 25 ? 'Bull' : n;
-        btn.dataset.value = n;
-        btn.addEventListener('click', () => throwDart(n, state.selectedMultiplier, false));
-        grid.appendChild(btn);
-      });
-    }
+    function buildNumberGrid(){ const grid = $('numberGrid'); grid.innerHTML = ''; const nums = Array.from({length:20}, (_,i)=>i+1); nums.push(25); nums.forEach(n => { const btn = document.createElement('button'); btn.className = 'num-btn'; btn.type = 'button'; btn.textContent = n === 25 ? 'Bull' : n; btn.dataset.value = n; // DO NOT add per-button click listeners here — use delegated handler in setupEvents() grid.appendChild(btn); }); }
 
     function segmentMatches(zone, base, segment){
       if (!zone) return false;
