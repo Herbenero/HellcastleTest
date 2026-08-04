@@ -188,6 +188,7 @@
 
           <h4>Active Events</h4>
           <label><input type="checkbox" id="eventCountUp" checked> 🎯 Count Up (8 Rounds)</label><br>
+          <label><input type="checkbox" id="eventRaceTrack" checked> 🏁 Race Track (Queensland Rules)</label><br>
           <label><input type="checkbox" id="eventGolf" checked> ⛳ Golf Darts</label>
           
           <div style="margin: 4px 0 12px 24px;">
@@ -312,6 +313,44 @@
               <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
             </div>
           </div>
+          <!-- RACE TRACK MODULE UI -->
+<div id="raceTrackModule" class="panel hidden" style="background:#fff; margin:0;">
+  <div class="meta-strip">
+    <div class="meta-card"><div class="k">Turn</div><div class="v" id="rtPlayer">Player 1</div></div>
+    <div class="meta-card"><div class="k">Lap</div><div class="v" id="rtLap">1 / 3</div></div>
+    <div class="meta-card"><div class="k">Current Seg</div><div class="v" id="rtCurrentSeg" style="color:var(--crimson); font-weight:800;">1</div></div>
+    <div class="meta-card"><div class="k">Status</div><div class="v" id="rtStatus">In Progress</div></div>
+  </div>
+
+  <!-- Track Progress Bar -->
+  <h3>Track Segments</h3>
+  <div class="track-container" id="rtTrackSegments" style="display:flex; gap:8px; margin: 1rem 0;">
+    <!-- Rendered dynamically -->
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <strong>Darts Thrown This Turn:</strong>
+      <button class="btn btn-secondary" id="rtUndoBtn" onclick="undoRaceTrackDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
+    </div>
+    <div id="rtDartsThrown" style="display:flex; gap:8px; margin-top:4px;">
+      <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
+    </div>
+  </div>
+
+  <!-- Keypad / Control Buttons -->
+  <div class="mult-row">
+    <button class="btn btn-secondary active" id="rtMult1" onclick="setRtMultiplier(1)">Single (1x)</button>
+    <button class="btn btn-secondary" id="rtMult2" onclick="setRtMultiplier(2)">Double (2x)</button>
+    <button class="btn btn-secondary" id="rtMult3" onclick="setRtMultiplier(3)">Triple (3x)</button>
+  </div>
+  
+  <div class="targets-grid" id="rtTargetsGrid"></div>
+
+  <button class="btn btn-green" id="rtAdvanceBtn" onclick="advanceRaceTrackTurn()" style="width:100%; margin-top:1.25rem;">
+    Next Player ➡️
+  </button>
+</div>
 
           <div class="bb-action-grid">
             <button class="bb-btn" onclick="recordBasketballDart(6, 'Double Ring')">
@@ -425,6 +464,18 @@
         currentDarts: [],
         scores: {} // playerId -> { total: 0, quarterScores: [0, 0, 0, 0] }
       },
+      const state = {
+  // ... existing state properties ...
+  activeEvents: [],
+  currentEventIdx: 0,
+  raceTrack: {
+    activePlayerIdx: 0,
+    currentRound: 1,
+    currentDarts: [],
+    targetLaps: 3, // Default target laps
+    scores: {}
+  }
+};
 
       tournamentPoints: {} // playerId -> totalPts
     };
@@ -482,6 +533,101 @@
       if (document.getElementById('eventCountUp').checked) state.eventQueue.push('countUp');
       if (document.getElementById('eventGolf').checked) state.eventQueue.push('golf');
       if (document.getElementById('eventBasketball').checked) state.eventQueue.push('basketball');
+      if (document.getElementById('eventRaceTrack').checked) {
+  state.activeEvents.push('raceTrack');
+}
+
+// Initialize Race Track player state
+state.players.forEach(p => {
+  state.raceTrack.scores[p.id] = {
+    currentLap: 1,
+    currentSeg: 1, // Segments 1 to 5
+    lapsCompleted: 0,
+    finished: false,
+    history: []
+  };
+});
+      let rtMultiplier = 1;
+
+function setRtMultiplier(m) {
+  rtMultiplier = m;
+  [1, 2, 3].forEach(mult => {
+    const btn = document.getElementById(`rtMult${mult}`);
+    if (btn) btn.classList.toggle('active', mult === m);
+  });
+}
+
+function recordRaceTrackDart(val) {
+  if (state.raceTrack.currentDarts.length >= 3) return;
+
+  const score = val * rtMultiplier;
+  const dartLabel = rtMultiplier === 3 ? `T${val}` : rtMultiplier === 2 ? `D${val}` : `${val}`;
+
+  state.raceTrack.currentDarts.push({ val, multiplier: rtMultiplier, score, label: dartLabel });
+  setRtMultiplier(1); // Reset multiplier after throw
+  
+  processRaceTrackProgress();
+  updateRaceTrackUI();
+}
+
+function processRaceTrackProgress() {
+  const activePlayer = state.players[state.raceTrack.activePlayerIdx];
+  const pScore = state.raceTrack.scores[activePlayer.id];
+  
+  // Example Queensland Segment Target Requirements (e.g. Seg 1 = 25 pts, Seg 2 = Bull/20s, etc.)
+  // Process dart scoring towards active segment completion
+}
+
+function advanceRaceTrackTurn() {
+  const activePlayer = state.players[state.raceTrack.activePlayerIdx];
+  const pScore = state.raceTrack.scores[activePlayer.id];
+
+  pScore.history.push([...state.raceTrack.currentDarts]);
+  state.raceTrack.currentDarts = [];
+
+  // Next player / round rotation
+  state.raceTrack.activePlayerIdx++;
+  if (state.raceTrack.activePlayerIdx >= state.players.length) {
+    state.raceTrack.activePlayerIdx = 0;
+    state.raceTrack.currentRound++;
+  }
+
+  updateRaceTrackUI();
+  renderActiveScoreboard();
+}
+
+function undoRaceTrackDart() {
+  if (state.raceTrack.currentDarts.length > 0) {
+    state.raceTrack.currentDarts.pop();
+    updateRaceTrackUI();
+    return;
+  }
+
+  // Undo previous turn if current turn hasn't started
+  let prevPlayerIdx = state.raceTrack.activePlayerIdx - 1;
+  let prevRound = state.raceTrack.currentRound;
+
+  if (prevPlayerIdx < 0) {
+    prevPlayerIdx = state.players.length - 1;
+    prevRound--;
+  }
+
+  if (prevRound < 1) return;
+
+  const prevPlayer = state.players[prevPlayerIdx];
+  const pScore = state.raceTrack.scores[prevPlayer.id];
+
+  if (pScore.history.length > 0) {
+    const lastDarts = pScore.history.pop();
+    state.raceTrack.activePlayerIdx = prevPlayerIdx;
+    state.raceTrack.currentRound = prevRound;
+    state.raceTrack.currentDarts = lastDarts;
+    state.raceTrack.currentDarts.pop();
+
+    updateRaceTrackUI();
+    renderActiveScoreboard();
+  }
+}
 
       if (state.eventQueue.length === 0) {
         alert('Please select at least one active event.');
