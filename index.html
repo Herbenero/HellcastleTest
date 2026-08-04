@@ -479,38 +479,86 @@
       renderScoreboard(bbScores);
     }
 
-    // --- ROMAN EMPIRE ---
-    let reMult = 1, reScores = {}, reTurn = 0;
-    function initRomanEmpire() {
-      reScores = {}; players.forEach(p => reScores[p] = { total: 0, territories: 0 });
-      reTurn = 0; reMult = 1;
-      const grid = document.getElementById('reTargetsGrid');
-      grid.innerHTML = '';
-      for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreRe(${i})">${i}</button>`;
-      grid.innerHTML += `<button class="target-btn bull" onclick="scoreRe(25)">BULL</button><button class="target-btn" onclick="scoreRe(0)">MISS</button>`;
-      updateReUI();
+    // --- ROMAN EMPIRE CORRECTED LOGIC ---
+let reMult = 1;
+let reScores = {};
+let reTurn = 0;
+let reTotalRounds = 10;
+
+function initRomanEmpire() {
+  reScores = {};
+  players.forEach(p => {
+    reScores[p] = {
+      totalPoints: 0,
+      territories: new Set(),
+      fortified: new Set()
+    };
+  });
+  reTurn = 0;
+  reMult = 1;
+  renderReBoard();
+  updateReUI();
+}
+
+function setReMult(m) {
+  reMult = m;
+  document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === m);
+  });
+}
+
+function scoreRe(targetSegment) {
+  const player = players[reTurn % players.length];
+  const playerData = reScores[player];
+
+  if (targetSegment === 0) {
+    // Miss: Turn advances
+  } else {
+    // Points earned equal segment base value
+    let pointsEarned = targetSegment;
+
+    if (!playerData.territories.has(targetSegment)) {
+      // Claim new territory
+      playerData.territories.add(targetSegment);
+      
+      // If hit with Double or Triple, fortify immediately
+      if (reMult > 1) {
+        playerData.fortified.add(targetSegment);
+        pointsEarned += (targetSegment * (reMult - 1));
+      }
+    } else {
+      // Already owned: Fortify if double/triple, otherwise collect tribute points
+      if (reMult > 1) playerData.fortified.add(targetSegment);
+      pointsEarned = targetSegment * reMult;
     }
-    function setReMult(m) {
-      reMult = m;
-      document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((b, i) => {
-        b.classList.toggle('active', i + 1 === m);
-      });
-    }
-    function scoreRe(pts) {
-      const p = players[reTurn % players.length];
-      reScores[p].total += pts * reMult;
-      if (pts > 0) reScores[p].territories++;
-      reTurn++; reMult = 1; setReMult(1);
-      updateReUI();
-    }
-    function updateReUI() {
-      const p = players[reTurn % players.length];
-      document.getElementById('rePlayer').innerText = p;
-      document.getElementById('reTotalScore').innerText = reScores[p].total;
-      document.getElementById('reTerritories').innerText = reScores[p].territories;
-      const map = {}; players.forEach(p => map[p] = reScores[p].total);
-      renderScoreboard(map);
-    }
+
+    playerData.totalPoints += pointsEarned;
+  }
+
+  // Reset multiplier & advance turn
+  reMult = 1;
+  setReMult(1);
+  reTurn++;
+  updateReUI();
+}
+
+function updateReUI() {
+  const playerIndex = reTurn % players.length;
+  const player = players[playerIndex];
+  const roundNum = Math.floor(reTurn / players.length) + 1;
+
+  document.getElementById('rePlayer').innerText = player;
+  document.getElementById('reRound').innerText = `${Math.min(roundNum, reTotalRounds)} / ${reTotalRounds}`;
+  document.getElementById('reTotalScore').innerText = reScores[player].totalPoints;
+  document.getElementById('reTerritories').innerText = `${reScores[player].territories.size} (${reScores[player].fortified.size} Shielded)`;
+
+  // Update Leaderboard Map
+  const scoreMap = {};
+  players.forEach(p => {
+    scoreMap[p] = `${reScores[p].totalPoints} pts (${reScores[p].territories.size} Terr.)`;
+  });
+  renderScoreboard(scoreMap);
+}
   </script>
 </body>
 </html>
