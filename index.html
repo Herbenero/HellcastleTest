@@ -479,67 +479,188 @@
       renderScoreboard(bbScores);
     }
 
-    // --- ROMAN EMPIRE CORRECTED LOGIC ---
-let reMult = 1;
-let reScores = {};
-let reTurn = 0;
-let reTotalRounds = 10;
+    // --- ROMAN EMPIRE GAME ENGINE & SCOREBOARD FIX ---
 
-function initRomanEmpire() {
-  reScores = {};
-  players.forEach(p => {
-    reScores[p] = {
-      totalPoints: 0,
+let reState = {
+  players: [],          // Player list
+  turnIndex: 0,        // Current player turn
+  round: 1,            // Current round (1 to maxRounds)
+  maxRounds: 10,
+  multiplier: 1,       // 1 (Single), 2 (Double), 3 (Triple)
+  dartsThisTurn: [],   // Array of recorded darts for current turn
+  playerStats: {}      // Map of { player: { points: 0, territories: Set(), shields: Set() } }
+};
+
+// 1. Initialize Roman Empire State
+function initRomanEmpire(playerList, maxRounds = 10) {
+  reState.players = playerList && playerList.length ? playerList : players;
+  reState.turnIndex = 0;
+  reState.round = 1;
+  reState.maxRounds = maxRounds;
+  reState.multiplier = 1;
+  reState.dartsThisTurn = [];
+  reState.playerStats = {};
+
+  reState.players.forEach(p => {
+    reState.playerStats[p] = {
+      points: 0,
       territories: new Set(),
-      fortified: new Set()
+      shields: new Set()
     };
   });
-  reTurn = 0;
-  reMult = 1;
-  renderReBoard();
-  updateReUI();
+
+  setReMultiplier(1);
+  updateRomanEmpireUI();
 }
 
-function setReMult(m) {
-  reMult = m;
-  document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((b, i) => {
-    b.classList.toggle('active', i + 1 === m);
+// 2. Set Multiplier (Single, Double, Triple)
+function setReMultiplier(mult) {
+  reState.multiplier = mult;
+  document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((btn, idx) => {
+    if (btn) btn.classList.toggle('active', idx + 1 === mult);
   });
 }
 
-function scoreRe(targetSegment) {
-  const player = players[reTurn % players.length];
-  const playerData = reScores[player];
+// 3. Record Dart Hit Logic
+function scoreRomanEmpire(segment) {
+  const currentPlayer = reState.players[reState.turnIndex];
+  if (!currentPlayer) return;
 
-  if (targetSegment === 0) {
-    // Miss: Turn advances
-  } else {
-    // Points earned equal segment base value
-    let pointsEarned = targetSegment;
+  const stats = reState.playerStats[currentPlayer];
+  const mult = reState.multiplier;
+  let pointsEarned = 0;
 
-    if (!playerData.territories.has(targetSegment)) {
-      // Claim new territory
-      playerData.territories.add(targetSegment);
-      
-      // If hit with Double or Triple, fortify immediately
-      if (reMult > 1) {
-        playerData.fortified.add(targetSegment);
-        pointsEarned += (targetSegment * (reMult - 1));
-      }
-    } else {
-      // Already owned: Fortify if double/triple, otherwise collect tribute points
-      if (reMult > 1) playerData.fortified.add(targetSegment);
-      pointsEarned = targetSegment * reMult;
+  if (segment > 0) {
+    // Standard Roman Empire Scoring Logic:
+    // Base points = segment value
+    // Single: Claims unowned territory or scores base points
+    // Double / Triple: Fortifies/Shields territory and provides multiplier bonus
+    pointsEarned = segment * mult;
+    stats.points += pointsEarned;
+
+    if (!stats.territories.has(segment)) {
+      stats.territories.add(segment);
     }
 
-    playerData.totalPoints += pointsEarned;
+    if (mult > 1) {
+      stats.shields.add(segment);
+    }
   }
 
-  // Reset multiplier & advance turn
-  reMult = 1;
-  setReMult(1);
-  reTurn++;
-  updateReUI();
+  // Push dart history for turn tracking / undo
+  reState.dartsThisTurn.push({ segment, mult, points: pointsEarned });
+
+  // Reset multiplier back to Single after throw
+  setReMultiplier(1);
+
+  // Check turn advancement (3 darts per turn)
+  if (reState.dartsThisTurn.length >= 3) {
+    reState.dartsThisTurn = [];
+    reState.turnIndex = (reState.turnIndex + 1) % reState.players.length;
+
+    // Advance round if full cycle of players completed
+    if (reState.turnIndex === 0) {
+      reState.round++;
+    }
+  }
+
+  updateRomanEmpireUI();
+}
+
+// 4. Undo Last Dart
+function undoRomanEmpireDart() {
+  if (reState.dartsThisTurn.length === 0) {
+    // Go back to previous player if at start of turn
+    if (reState.turnIndex === 0 && reState.round === 1) return; // Start of game
+    
+    reState.turnIndex = (reState.turnIndex - 1 + reState.players.length) % reState.players.length;
+    if (reState.turnIndex === reState.players.length - 1) {
+      reState.round = Math.max(1, reState.round - 1);
+    }
+    // Note: To support full undo across previous turns, track global stack
+  } else {
+    const lastDart = reState.dartsThisTurn.pop();
+    const currentPlayer = reState.players[reState.turnIndex];
+    const stats = reState.playerStats[currentPlayer];
+
+    if (lastDart && stats) {
+      stats.points = Math.max(0, stats.points - lastDart.points);
+      // Remove territory/shield if no other recorded hit exists for segment
+    }
+  }
+
+  setReMultiplier(1);
+  updateRomanEmpireUI();
+}
+
+// 5. Update Roman Empire UI & Shared Tournament Scoreboard
+function updateRomanEmpireUI() {
+  const currentPlayer = reState.players[reState.turnIndex] || '—';
+  const stats = reState.playerStats[currentPlayer] || { points: 0, territories: new Set(), shields: new Set() };
+
+  // Update Meta Cards
+  const elPlayer = document.getElementById('rePlayer');
+  const elRound = document.getElementById('reRound');
+  const elScore = document.getElementById('reTotalScore');
+  const elTerr = document.getElementById('reTerritories');
+
+  if (elPlayer) elPlayer.innerText = currentPlayer;
+  if (elRound) elRound.innerText = `${Math.min(reState.round, reState.maxRounds)} / ${reState.maxRounds}`;
+  if (elScore) elScore.innerText = stats.points;
+  if (elTerr) elTerr.innerText = `${stats.territories.size} (${stats.shields.size} Shielded)`;
+
+  // Update Darts Thrown Chips
+  const dartsContainer = document.getElementById('reDartsThrown');
+  if (dartsContainer) {
+    let chipsHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const d = reState.dartsThisTurn[i];
+      if (d) {
+        const prefix = d.mult === 3 ? 'T' : d.mult === 2 ? 'D' : '';
+        const label = d.segment === 25 ? 'BULL' : d.segment === 0 ? 'MISS' : `${prefix}${d.segment}`;
+        chipsHTML += `<span class="chip">${label} (${d.points}pts)</span>`;
+      } else {
+        chipsHTML += `<span class="chip">—</span>`;
+      }
+    }
+    dartsContainer.innerHTML = chipsHTML;
+  }
+
+  // Render Leaderboard / Scoreboard Table
+  renderRomanEmpireScoreboard();
+}
+
+// 6. Leaderboard Renderer (Fixed for Tournament & Module Views)
+function renderRomanEmpireScoreboard() {
+  const tbody = document.getElementById('scoreboardBody');
+  if (!tbody) return;
+
+  // Rank players by total points, then by total territories claimed
+  const rankedPlayers = [...reState.players].sort((a, b) => {
+    const statsA = reState.playerStats[a] || { points: 0, territories: new Set() };
+    const statsB = reState.playerStats[b] || { points: 0, territories: new Set() };
+    if (statsB.points !== statsA.points) {
+      return statsB.points - statsA.points;
+    }
+    return statsB.territories.size - statsA.territories.size;
+  });
+
+  tbody.innerHTML = rankedPlayers.map((player, rank) => {
+    const stats = reState.playerStats[player] || { points: 0, territories: new Set(), shields: new Set() };
+    const isCurrentTurn = player === reState.players[reState.turnIndex];
+
+    return `
+      <tr class="scoreboard-row ${isCurrentTurn ? 'active-row' : ''}">
+        <td>
+          <strong>${rank + 1}. ${player}</strong> ${isCurrentTurn ? '🎯' : ''}
+        </td>
+        <td>
+          <strong>${stats.points} pts</strong> 
+          <br><small style="color:var(--ink-soft);">${stats.territories.size} Terr. (${stats.shields.size} Shielded)</small>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function updateReUI() {
