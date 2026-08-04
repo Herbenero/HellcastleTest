@@ -369,13 +369,13 @@
 
       <h3>Current Lap Progress</h3>
       <div class="track-container">
-        <div class="track-segment" id="seg-1"><div class="seg-title">Seg 1</div><div class="seg-req">25 Pts</div></div>
-        <div class="track-segment" id="seg-2"><div class="seg-title">Seg 2</div><div class="seg-req">40 Pts</div></div>
-        <div class="track-segment" id="seg-3"><div class="seg-title">Seg 3</div><div class="seg-req">60+ Pts</div></div>
-        <div class="track-segment" id="seg-4"><div class="seg-title">Seg 4</div><div class="seg-req">75+</div></div>
-        <div class="track-segment" id="seg-5"><div class="seg-title">Seg 5</div><div class="seg-req">110 (6 Darts)</div></div>
-        <div class="track-segment" id="seg-6"><div class="seg-title">Seg 6</div><div class="seg-req">Same Color</div></div>
-      </div>
+  <div class="track-segment" id="seg-1"><div class="seg-title">SEG 1</div><div class="seg-req">25 Pts</div></div>
+  <div class="track-segment" id="seg-2"><div class="seg-title">SEG 2</div><div class="seg-req">40 Pts</div></div>
+  <div class="track-segment" id="seg-3"><div class="seg-title">SEG 3</div><div class="seg-req">60+ Pts</div></div>
+  <div class="track-segment" id="seg-4"><div class="seg-title">SEG 4</div><div class="seg-req">75+ Pts</div></div>
+  <div class="track-segment" id="seg-5"><div class="seg-title">SEG 5</div><div class="seg-req">110 (6 Darts)</div></div>
+  <div class="track-segment" id="seg-6"><div class="seg-title">SEG 6</div><div class="seg-req">Same Color</div></div>
+</div>
 
       <div class="dart-display-container">
         <div class="dart-display">
@@ -780,25 +780,48 @@
     }
 
     function evaluatePlayerSegmentProgress(p) {
-      for (let d of p.currentDarts) {
-        if (p.currentSegment === 1 && d.calculatedScore >= 30) advanceSegment(p);
-        else if (p.currentSegment === 2 && d.calculatedScore === 51) advanceSegment(p);
-        else if (p.currentSegment === 3 && d.calculatedScore >= 75) advanceSegment(p);
-        else if (p.currentSegment === 4 && d.type === 'color') {
-          if (!p.seg4Color) p.seg4Color = d.value;
-          else if (p.seg4Color === d.value) advanceSegment(p);
-        } else if (p.currentSegment === 5) {
-          p.seg5Darts++; p.seg5Score += d.calculatedScore;
-          if (p.seg5Score >= 130 && p.seg5Darts <= 6) advanceSegment(p);
-          else if (p.seg5Darts >= 6) { p.seg5Darts = 0; p.seg5Score = 0; }
-        } else if (p.currentSegment === 6) {
-          p.seg6Darts++; p.seg6Score += d.calculatedScore;
-          if (p.seg6Score >= 175 && p.seg6Darts <= 9) {
-            p.lapsCompleted++; p.currentSegment = 1; p.seg6Darts = 0; p.seg6Score = 0;
-          } else if (p.seg6Darts >= 9) { p.seg6Darts = 0; p.seg6Score = 0; }
-        }
+  for (let d of p.currentDarts) {
+    // Segment 1: Score 25 or higher
+    if (p.currentSegment === 1 && d.calculatedScore >= 25) {
+      advanceSegment(p);
+    } 
+    // Segment 2: Score 40 or higher
+    else if (p.currentSegment === 2 && d.calculatedScore >= 40) {
+      advanceSegment(p);
+    } 
+    // Segment 3: Score 60 or higher
+    else if (p.currentSegment === 3 && d.calculatedScore >= 60) {
+      advanceSegment(p);
+    } 
+    // Segment 4: Score 75 or higher
+    else if (p.currentSegment === 4 && d.calculatedScore >= 75) {
+      advanceSegment(p);
+    } 
+    // Segment 5: Accumulate 110+ points in 6 darts or fewer
+    else if (p.currentSegment === 5) {
+      p.seg5Darts = (p.seg5Darts || 0) + 1;
+      p.seg5Score = (p.seg5Score || 0) + (d.calculatedScore || 0);
+      
+      if (p.seg5Score >= 110 && p.seg5Darts <= 6) {
+        advanceSegment(p);
+      } else if (p.seg5Darts >= 6) {
+        // Reset if 6 darts reached without reaching 110
+        p.seg5Darts = 0;
+        p.seg5Score = 0;
+      }
+    } 
+    // Segment 6: Hit two consecutive matching color darts to complete a lap
+    else if (p.currentSegment === 6 && d.type === 'color') {
+      if (!p.seg6Color) {
+        p.seg6Color = d.value;
+      } else if (p.seg6Color === d.value) {
+        p.lapsCompleted++;
+        p.currentSegment = 1;
+        p.seg6Color = null;
       }
     }
+  }
+}
 
     function advanceSegment(p) { p.currentSegment++; p.seg4Color = null; p.seg5Darts = 0; p.seg5Score = 0; }
 
