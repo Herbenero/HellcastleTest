@@ -1247,31 +1247,38 @@
       return game;
     }
 
-    const GameModules = {
-      'count-up': {
-        id:'count-up',
-        name:'Count Up',
-        objective:'Highest total score after 8 rounds wins.',
-        scoreDirection:'desc',
-        roundsLimit:8,
-        scoreboardLabel:'Points',
-        getValueChoices(){ return [1,5,10,15,20,25,50]; },
-        create(players){
-          return makeBaseGame({
-            id:this.id,
-            name:this.name,
-            objective:this.objective,
-            scoreDirection:this.scoreDirection,
-            roundsLimit:this.roundsLimit,
-            scoreboardLabel:this.scoreboardLabel,
-            players,
-            applyTurn(game, player, throws){
-              const turnScore = throws.reduce((sum, t) => sum + throwScoreBasic(t.multiplier, t.value), 0);
-              return { turnScore, newScore: player.score + turnScore, note: `+${turnScore} points` };
-            }
-          });
-        }
-      },
+    'count-up': {
+  id:'count-up',
+  name:'Count Up',
+  objective:'Enter total score for each round. Highest total after 8 rounds wins.',
+  scoreDirection:'desc',
+  roundsLimit:8,
+  scoreboardLabel:'Points',
+  getValueChoices(){ return []; }, // no predefined choices needed
+  create(players){
+    return makeBaseGame({
+      id:'count-up',
+      name:'Count Up',
+      objective:'Enter total score for each round. Highest total after 8 rounds wins.',
+      scoreDirection:'desc',
+      roundsLimit:8,
+      scoreboardLabel:'Points',
+      players,
+      // Override UI rendering to accept single score input per round
+      applyTurn(game, player, throws){
+        // Here, throws will be an array of length 1 with the total score entered
+        // We expect throws[0].value to be the total score for the round
+        const roundScore = Number(throws[0].value) || 0;
+        return {
+          turnScore: roundScore,
+          newScore: player.score + roundScore,
+          note: `+${roundScore} points`
+        };
+      }
+    });
+  }
+}
+,
 
       'all-5s': {
         id:'all-5s',
@@ -1970,103 +1977,77 @@
       document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
     }
 
-    function renderCurrentEvent(){
-      if(!state.tournamentStarted){
-        refs.gameArea.innerHTML = `
-          <div class="empty">
-            Tournament not started yet. Add players, select events, and press <strong>Start Tournament</strong>.
+    if(game.id === 'count-up'){
+  refs.gameArea.innerHTML = `
+    <div class="game-shell">
+      <div class="game-top">
+        <div>
+          <div class="eyebrow">Event ${state.currentEventIndex + 1} of ${state.selectedEventIds.length}</div>
+          <h3 class="current-event-name">${escapeHtml(module.name)}</h3>
+          <p>${escapeHtml(module.objective)}</p>
+          <div class="event-progress">${getProgressHtml()}</div>
+          <div class="game-meta">
+            <span class="rule-tag">Round ${Math.min(game.currentRound, game.roundsLimit)} / ${game.roundsLimit}</span>
+            <span class="rule-tag">${module.scoreDirection === 'asc' ? 'Lower score wins' : 'Higher score wins'}</span>
+            <span class="rule-tag">${game.players.length} players</span>
           </div>
-        `;
-        return;
-      }
-
-      if(!state.currentGame){
-        renderTournamentComplete();
-        return;
-      }
-
-      const game = state.currentGame;
-      const module = GameModules[game.id];
-      const activePlayer = game.getActivePlayer();
-      const valueChoices = getValueChoicesForGame(game);
-
-      refs.gameArea.innerHTML = `
-        <div class="game-shell">
-          <div class="game-top">
-            <div>
-              <div class="eyebrow">Event ${state.currentEventIndex + 1} of ${state.selectedEventIds.length}</div>
-              <h3 class="current-event-name">${escapeHtml(module.name)}</h3>
-              <p>${escapeHtml(module.objective)}</p>
-              <div class="event-progress">${getProgressHtml()}</div>
-              <div class="game-meta">
-                <span class="rule-tag">Round ${Math.min(game.currentRound, game.roundsLimit)} / ${game.roundsLimit}</span>
-                <span class="rule-tag">${module.scoreDirection === 'asc' ? 'Lower score wins' : 'Higher score wins'}</span>
-                <span class="rule-tag">${game.players.length} players</span>
-                <span class="rule-tag">Allowed values: ${valueChoices.map(v => v === 25 ? 'OB' : v === 50 ? 'B' : v).join(', ')}</span>
-              </div>
-            </div>
-            <div class="hero-actions" style="margin-top:0">
-              <button class="btn btn-ghost btn-sm" id="forceFinishBtn" type="button">Force Finish Event</button>
-              <button class="btn btn-secondary btn-sm" id="resetTournamentBtn" type="button">Reset Tournament</button>
-            </div>
-          </div>
-
-          <div class="player-turn-banner">
-            <div>
-              <strong>Current thrower: ${escapeHtml(activePlayer.name)}</strong>
-              <div class="subtle">${escapeHtml(module.name)} live turn entry</div>
-            </div>
-            <div class="subtle">Three darts per turn</div>
-          </div>
-
-          <div class="round-panel">
-            <div class="throw-grid">
-              ${renderThrowBox(game, 0)}
-              ${renderThrowBox(game, 1)}
-              ${renderThrowBox(game, 2)}
-            </div>
-            <div class="hero-actions">
-              <button class="btn btn-primary" id="submitTurnBtn" type="button">Submit Turn</button>
-            </div>
-          </div>
-
-          <div class="two-col">
-            <div class="round-panel">
-              <strong>Live Scoreboard</strong>
-              ${renderScoreboard(game)}
-            </div>
-            <div class="round-panel">
-              <strong>Event Log</strong>
-              ${renderHistory(game)}
-            </div>
-          </div>
-
-          ${state.completedEvents.length ? `
-            <div>
-              <h4 style="margin-top:.5rem;">Most Recent Finished Event</h4>
-              <div class="event-results">
-                ${(() => {
-                  const last = state.completedEvents[state.completedEvents.length - 1];
-                  return `
-                    <div class="subtle" style="margin-bottom:.2rem;">${escapeHtml(last.eventName)}</div>
-                    ${last.results.map((r, i) => `
-                      <div class="event-result-row">
-                        <div class="medal-mini">${i + 1}</div>
-                        <div><strong>${escapeHtml(r.player)}</strong></div>
-                        <div>Raw: ${r.score}</div>
-                        <div>Olympic: ${r.olympicPoints}</div>
-                      </div>
-                    `).join('')}
-                  `;
-                })()}
-              </div>
-            </div>
-          ` : ''}
         </div>
-      `;
+        <div class="hero-actions" style="margin-top:0">
+          <button class="btn btn-ghost btn-sm" id="forceFinishBtn" type="button">Force Finish Event</button>
+          <button class="btn btn-secondary btn-sm" id="resetTournamentBtn" type="button">Reset Tournament</button>
+        </div>
+      </div>
 
-      bindGameControls();
+      <div class="player-turn-banner">
+        <div>
+          <strong>Current player: ${escapeHtml(game.getActivePlayer().name)}</strong>
+          <div class="subtle">${escapeHtml(module.name)} enter total score for this round</div>
+        </div>
+      </div>
+
+      <div class="round-panel">
+        <label for="roundScoreInput" class="small-label">Round Score</label>
+        <input id="roundScoreInput" type="number" min="0" step="1" class="field" aria-label="Round score input" value="${game.currentThrowSelections[0].value || ''}" />
+        <div class="hero-actions" style="margin-top:1rem">
+          <button class="btn btn-primary" id="submitTurnBtn" type="button">Submit Turn</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="round-panel">
+          <strong>Live Scoreboard</strong>
+          ${renderScoreboard(game)}
+        </div>
+        <div class="round-panel">
+          <strong>Event Log</strong>
+          ${renderHistory(game)}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Bind input change
+  document.getElementById('roundScoreInput').addEventListener('input', e => {
+    const val = e.target.value;
+    game.setThrow(0, { value: val });
+  });
+
+  // Bind submit button
+  document.getElementById('submitTurnBtn').addEventListener('click', () => {
+    game.applyTurn();
+    if(game.finished){
+      finishCurrentGame();
+    } else {
+      renderCurrentEvent();
     }
+  });
+
+  // Bind other buttons
+  document.getElementById('forceFinishBtn').addEventListener('click', () => finishCurrentGame(true));
+  document.getElementById('resetTournamentBtn').addEventListener('click', resetTournament);
+
+  return; // skip the default throw inputs rendering
+}
 
     function getSortedLeaderboard(){
       return state.players.map(player => ({
