@@ -1899,36 +1899,34 @@
       showToast(`${clean} added`);
     }
 
-    function startTournament(){
-      console.log('Start button clicked — players:', state.players, 'selectedEvents:', state.selectedEventIds);
-      if(state.players.length < 1) {
-        showToast('Add at least one player');
-        console.warn('Tournament not started: no players');
-        return;
-      }
-      if(state.selectedEventIds.length < 1){
-        showToast('Select at least one event');
-        console.warn('Tournament not started: no events selected');
-        return;
-      }
+    function startTournament() {
+  // 1. Reset game state flags
+  tournamentFinished = false;
+  currentRound = 1;
+  currentPlayerIndex = 0;
 
-      state.tournamentStarted = true;
-      state.currentEventIndex = 0;
-      state.completedEvents = [];
-      state.currentGame = null;
+  // 2. Reset player state for all active players
+  players.forEach(p => {
+    p.lapsCompleted = 0;
+    p.currentSegment = 1;
+    p.currentDarts = [];
+    p.seg5Darts = 0;
+    p.seg5Score = 0;
+    p.seg6Color = null;
+    p.seg6Count = 0;
+    p.isFinished = false; // Reset finished status flag
+  });
 
-      state.players.forEach(player => {
-        state.totals[player] = { olympicPoints:0, eventsPlayed:0, placements:[] };
-      });
+  // 3. Hide tournament modal/overlay if visible
+  const victoryModal = document.getElementById('victory-modal'); // or your finish modal ID
+  if (victoryModal) {
+    victoryModal.style.display = 'none';
+    victoryModal.classList.remove('active');
+  }
 
-      console.log('Creating first game for event:', state.selectedEventIds[state.currentEventIndex]);
-      createCurrentGame();
-      renderCurrentEvent();
-      renderLeaderboard();
-      showToast('Tournament started');
-      document.getElementById('play').scrollIntoView({ behavior:'smooth', block:'start' });
-    }
-
+  // 4. Render UI and start first turn
+  updateScoreboardUI();
+}
     function resetTournament(){
       state.tournamentStarted = false;
       state.currentEventIndex = 0;
