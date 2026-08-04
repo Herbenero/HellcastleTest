@@ -175,11 +175,12 @@
         </div>
 
         <div>
-          <h3>2. Active Events</h3>
-          <label><input type="checkbox" id="eventCountUp" checked> 🎯 Count Up (8 Rounds)</label><br>
-          <label><input type="checkbox" id="eventRaceTrack" checked> 🏁 Race Track (2 Laps - Queensland)</label><br>
-          <label><input type="checkbox" id="eventGolf" checked> ⛳ Golf Darts (9 Holes)</label><br>
-          <label><input type="checkbox" id="eventBasketball" checked> 🏀 Basketball Darts (4 Quarters)</label><br><br>
+          <!-- Inside #setupSection under <h3>2. Active Events</h3> -->
+<label><input type="checkbox" id="eventCountUp" checked> 🎯 Count Up (8 Rounds)</label><br>
+<label><input type="checkbox" id="eventRaceTrack" checked> 🏁 Race Track (2 Laps - Queensland)</label><br>
+<label><input type="checkbox" id="eventGolf" checked> ⛳ Golf Darts (9 Holes)</label><br>
+<label><input type="checkbox" id="eventBasketball" checked> 🏀 Basketball Darts (4 Quarters)</label><br>
+<label><input type="checkbox" id="eventRomanEmpire" checked> 🏛️ Roman Empire</label><br><br>
           <button class="btn btn-gold" id="startTournamentBtn" onclick="startTournament()" style="width: 100%;">Start Tournament</button>
         </div>
       </div>
@@ -219,6 +220,31 @@
             </div>
             <div class="targets-grid" id="cuTargetsGrid"></div>
           </div>
+          <!-- ROMAN EMPIRE MODULE UI -->
+<div id="romanEmpireModule" class="panel hidden" style="background:#fff; margin:0;">
+  <div class="meta-strip">
+    <div class="meta-card"><div class="k">Turn</div><div class="v" id="rePlayer">Player 1</div></div>
+    <div class="meta-card"><div class="k">Round</div><div class="v" id="reRound">1 / 10</div></div>
+    <div class="meta-card"><div class="k">Empire Score</div><div class="v" id="reTotalScore">0</div></div>
+    <div class="meta-card"><div class="k">Territories</div><div class="v" id="reTerritories">0</div></div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+    <strong>Darts Thrown This Turn:</strong>
+    <button class="btn btn-secondary" onclick="undoRomanEmpireDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
+  </div>
+  <div id="reDartsThrown" style="display:flex; gap:8px; margin-bottom: 1rem;">
+    <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
+  </div>
+
+  <div class="mult-row">
+    <button class="btn btn-secondary active" id="reMult1" onclick="setReMultiplier(1)">Single (1x)</button>
+    <button class="btn btn-secondary" id="reMult2" onclick="setReMultiplier(2)">Double (2x)</button>
+    <button class="btn btn-secondary" id="reMult3" onclick="setReMultiplier(3)">Triple (3x)</button>
+  </div>
+
+  <div class="targets-grid" id="reTargetsGrid"></div>
+</div>
 
           <!-- RACE TRACK MODULE UI -->
           <div id="raceTrackModule" class="panel hidden" style="background:#fff; margin:0;">
@@ -360,11 +386,48 @@
       if (document.getElementById('eventRaceTrack').checked) state.activeEvents.push('raceTrack');
       if (document.getElementById('eventGolf').checked) state.activeEvents.push('golf');
       if (document.getElementById('eventBasketball').checked) state.activeEvents.push('basketball');
+      if (document.getElementById('eventRomanEmpire').checked) activeEvents.push('Roman Empire');
 
-      if (state.activeEvents.length === 0) {
-        alert("Please select at least one event!");
-        return;
-      }
+      if (activeEvents.length === 0) {
+    alert("Please select at least one event!");
+    return;
+  }
+
+  currentEventIndex = 0;
+  initEvent(activeEvents[currentEventIndex]);
+}
+
+// In event routing switch/case:
+function initEvent(eventName) {
+  // Hide all modules
+  document.querySelectorAll('#activeEventContainer > .panel').forEach(m => m.classList.add('hidden'));
+
+  document.getElementById('currentEventBadge').innerText = `Event ${currentEventIndex + 1} of ${activeEvents.length}`;
+  document.getElementById('currentEventTitle').innerText = eventName;
+
+  switch (eventName) {
+    case 'Count Up':
+      document.getElementById('countUpModule').classList.remove('hidden');
+      initCountUp();
+      break;
+    case 'Race Track':
+      document.getElementById('raceTrackModule').classList.remove('hidden');
+      initRaceTrack();
+      break;
+    case 'Golf Darts':
+      document.getElementById('golfModule').classList.remove('hidden');
+      initGolf();
+      break;
+    case 'Basketball Darts':
+      document.getElementById('basketballModule').classList.remove('hidden');
+      initBasketball();
+      break;
+    case 'Roman Empire':
+      document.getElementById('romanEmpireModule').classList.remove('hidden');
+      initRomanEmpire();
+      break;
+  }
+}
 
       // Initialize structures for all players across modes
       state.players.forEach(p => {
