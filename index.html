@@ -118,6 +118,7 @@
     .track-container { display: flex; justify-content: space-between; gap: 8px; margin: 1rem 0; }
     .track-segment { flex: 1; background: #fff; border: 2px solid rgba(32,23,15,.12); border-radius: 8px; padding: 10px 4px; text-align: center; }
     .track-segment.completed { background: #e8f5e9; border-color: var(--green); color: var(--green-dark); }
+    .track-segment.active-seg { border-color: var(--crimson); background: #fdf0ed; }
     .track-segment .seg-title { font-size: 0.85rem; font-weight: bold; }
     .track-segment .seg-req { font-size: 0.75rem; color: var(--ink-soft); }
 
@@ -176,7 +177,7 @@
         <div>
           <h3>2. Active Events</h3>
           <label><input type="checkbox" id="eventCountUp" checked> 🎯 Count Up (8 Rounds)</label><br>
-          <label><input type="checkbox" id="eventRaceTrack" checked> 🏁 Race Track (Queensland Rules)</label><br>
+          <label><input type="checkbox" id="eventRaceTrack" checked> 🏁 Race Track (2 Laps - Queensland)</label><br>
           <label><input type="checkbox" id="eventGolf" checked> ⛳ Golf Darts (9 Holes)</label><br>
           <label><input type="checkbox" id="eventBasketball" checked> 🏀 Basketball Darts (4 Quarters)</label><br><br>
           <button class="btn btn-gold" id="startTournamentBtn" onclick="startTournament()" style="width: 100%;">Start Tournament</button>
@@ -223,9 +224,9 @@
           <div id="raceTrackModule" class="panel hidden" style="background:#fff; margin:0;">
             <div class="meta-strip">
               <div class="meta-card"><div class="k">Turn</div><div class="v" id="rtPlayer">Player 1</div></div>
-              <div class="meta-card"><div class="k">Lap</div><div class="v" id="rtLap">1 / 3</div></div>
+              <div class="meta-card"><div class="k">Lap</div><div class="v" id="rtLap">1 / 2</div></div>
               <div class="meta-card"><div class="k">Current Seg</div><div class="v" id="rtCurrentSeg" style="color:var(--crimson); font-weight:800;">1</div></div>
-              <div class="meta-card"><div class="k">Status</div><div class="v" id="rtStatus">In Progress</div></div>
+              <div class="meta-card"><div class="k">Seg 5 Darts</div><div class="v" id="rtSeg5Darts">0 / 6</div></div>
             </div>
             <h3>Track Segments</h3>
             <div class="track-container" id="rtTrackSegments"></div>
@@ -308,13 +309,21 @@
       activeEvents: [],
       currentEventIdx: 0,
       countUp: { activePlayerIdx: 0, currentRound: 1, currentDarts: [], scores: {} },
-      raceTrack: { activePlayerIdx: 0, currentRound: 1, currentDarts: [], targetLaps: 3, scores: {} },
+      raceTrack: { activePlayerIdx: 0, currentRound: 1, currentDarts: [], targetLaps: 2, scores: {} },
       golf: { activePlayerIdx: 0, currentHole: 1, bestHoleScore: null, scores: {} },
       basketball: { activePlayerIdx: 0, currentQuarter: 1, currentPossession: 1, possessionsPerQuarter: 6, currentDarts: [], scores: {} }
     };
 
     let cuMultiplier = 1;
     let rtMultiplier = 1;
+
+    const segmentRequirements = [
+      { seg: 1, req: "25 Pts (Exact Turn)" },
+      { seg: 2, req: "40 Pts (Turn)" },
+      { seg: 3, req: "60+ Pts (Turn)" },
+      { seg: 4, req: "75+ Pts (Turn)" },
+      { seg: 5, req: "110 Pts (6 Darts)" }
+    ];
 
     // --- SETUP LOGIC ---
     function addPlayer() {
@@ -360,7 +369,7 @@
       // Initialize structures for all players across modes
       state.players.forEach(p => {
         state.countUp.scores[p.id] = { total: 0, rounds: [] };
-        state.raceTrack.scores[p.id] = { currentLap: 1, currentSeg: 1, lapsCompleted: 0, finished: false, history: [] };
+        state.raceTrack.scores[p.id] = { currentLap: 1, currentSeg: 1, seg5Pts: 0, seg5DartsThrown: 0, finished: false, history: [] };
         state.golf.scores[p.id] = { total: 0, holeScores: [] };
         state.basketball.scores[p.id] = { total: 0, possessions: [] };
       });
@@ -510,7 +519,8 @@
 
     function recordRaceTrackDart(val) {
       if (state.raceTrack.currentDarts.length >= 3) return;
-      state.raceTrack.currentDarts.push({ val, multiplier: rtMultiplier });
+      const score = val * rtMultiplier;
+      state.raceTrack.currentDarts.push({ val, multiplier: rtMultiplier, score });
       setRtMultiplier(1);
       updateRaceTrackUI();
     }
@@ -518,6 +528,43 @@
     function advanceRaceTrackTurn() {
       const activePlayer = state.players[state.raceTrack.activePlayerIdx];
       const pScore = state.raceTrack.scores[activePlayer.id];
+      const turnScore = state.raceTrack.currentDarts.reduce((sum, d) => sum + d.score, 0);
+
+      // Evaluate Segment Progress
+      if (!pScore.finished) {
+        if (pScore.currentSeg === 1) {
+          // Exactly 25 pts in the turn
+          if (turnScore === 25) pScore.currentSeg = 2;
+        } else if (pScore.currentSeg === 2) {
+          // Exactly 40 pts in the turn
+          if (turnScore === 40) pScore.currentSeg = 3;
+        } else if (pScore.currentSeg === 3) {
+          // 60+ pts in the turn
+          if (turnScore >= 60) pScore.currentSeg = 4;
+        } else if (pScore.currentSeg === 4) {
+          // 75+ pts in the turn
+          if (turnScore >= 75) pScore.currentSeg = 5;
+        } else if (pScore.currentSeg === 5) {
+          // 110 pts accumulated in up to 6 darts
+          pScore.seg5Pts += turnScore;
+          pScore.seg5DartsThrown += state.raceTrack.currentDarts.length;
+
+          if (pScore.seg5Pts >= 110 && pScore.seg5DartsThrown <= 6) {
+            // Lap Completed
+            pScore.currentLap++;
+            pScore.currentSeg = 1;
+            pScore.seg5Pts = 0;
+            pScore.seg5DartsThrown = 0;
+            if (pScore.currentLap > state.raceTrack.targetLaps) {
+              pScore.finished = true;
+            }
+          } else if (pScore.seg5DartsThrown >= 6) {
+            // Reset Segment 5 progress if 6 darts thrown without hitting 110
+            pScore.seg5Pts = 0;
+            pScore.seg5DartsThrown = 0;
+          }
+        }
+      }
 
       pScore.history.push([...state.raceTrack.currentDarts]);
       state.raceTrack.currentDarts = [];
@@ -534,11 +581,13 @@
     function updateRaceTrackUI() {
       const p = state.players[state.raceTrack.activePlayerIdx];
       document.getElementById('rtPlayer').innerText = p ? p.name : '—';
-      const pScore = p ? state.raceTrack.scores[p.id] : { currentLap: 1, currentSeg: 1 };
-      document.getElementById('rtLap').innerText = `${pScore.currentLap} / ${state.raceTrack.targetLaps}`;
-      document.getElementById('rtCurrentSeg').innerText = pScore.currentSeg;
+      const pScore = p ? state.raceTrack.scores[p.id] : { currentLap: 1, currentSeg: 1, seg5DartsThrown: 0 };
+      
+      document.getElementById('rtLap').innerText = pScore.finished ? 'Finished' : `${pScore.currentLap} / ${state.raceTrack.targetLaps}`;
+      document.getElementById('rtCurrentSeg').innerText = pScore.finished ? '—' : pScore.currentSeg;
+      document.getElementById('rtSeg5Darts').innerText = `${pScore.seg5DartsThrown} / 6 (${pScore.seg5Pts || 0} pts)`;
 
-      const chips = state.raceTrack.currentDarts.map(d => `<span class="chip">${d.val}</span>`);
+      const chips = state.raceTrack.currentDarts.map(d => `<span class="chip">${d.score}</span>`);
       while (chips.length < 3) chips.push('<span class="chip">—</span>');
       document.getElementById('rtDartsThrown').innerHTML = chips.join('');
 
@@ -546,10 +595,11 @@
       segContainer.innerHTML = '';
       for (let s = 1; s <= 5; s++) {
         const isComp = s < pScore.currentSeg;
+        const isActive = s === pScore.currentSeg && !pScore.finished;
         segContainer.innerHTML += `
-          <div class="track-segment ${isComp ? 'completed' : ''}">
+          <div class="track-segment ${isComp ? 'completed' : ''} ${isActive ? 'active-seg' : ''}">
             <div class="seg-title">Seg ${s}</div>
-            <div class="seg-req">${isComp ? 'Done' : 'Target'}</div>
+            <div class="seg-req">${isComp ? 'Done' : segmentRequirements[s-1].req}</div>
           </div>`;
       }
     }
@@ -709,7 +759,7 @@
           isActive = idx === state.countUp.activePlayerIdx;
         } else if (currentEvent === 'raceTrack') {
           const s = state.raceTrack.scores[p.id];
-          scoreDisplay = s ? `Lap ${s.currentLap}, Seg ${s.currentSeg}` : '—';
+          scoreDisplay = s ? (s.finished ? '🏁 Finished' : `Lap ${s.currentLap}, Seg ${s.currentSeg}`) : '—';
           isActive = idx === state.raceTrack.activePlayerIdx;
         } else if (currentEvent === 'golf') {
           scoreDisplay = state.golf.scores[p.id]?.total || 0;
