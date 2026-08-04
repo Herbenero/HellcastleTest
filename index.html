@@ -759,86 +759,84 @@
 
   function advanceSegment(p) {
   p.currentSegment++;
-  
-  // If player completes Segment 6, increment laps and reset to Segment 1
-  if (p.currentSegment > 6) {
-    p.lapsCompleted = (p.lapsCompleted || 0) + 1;
-    p.currentSegment = 1;
-  }
 
-  // Reset Segment 5 & 6 turn tracking variables
+  // Reset segment tracking metrics
   p.seg5Darts = 0;
   p.seg5Score = 0;
   p.seg6Color = null;
   p.seg6Count = 0;
 
-  // Render/update UI and pass turn to the next player
-  updateScoreboardUI();
-  nextTurn(); 
+  // Lap completion
+  if (p.currentSegment > 6) {
+    p.lapsCompleted = (p.lapsCompleted || 0) + 1;
+    p.currentSegment = 1;
+  }
 }
 
-function evaluatePlayerSegmentProgress(p) {
-  const turnScore = p.currentDarts.reduce((sum, d) => sum + (d.calculatedScore || 0), 0);
+function recordDartInput(player, dartData) {
+  // 1. Push new dart to current turn array
+  player.currentDarts.push(dartData);
 
-  // SEGMENT 1: 25+ points in turn
-  if (p.currentSegment === 1) {
-    if (turnScore >= 25) {
-      advanceSegment(p);
-      return;
-    }
-  } 
-  // SEGMENT 2: 40+ points in turn
-  else if (p.currentSegment === 2) {
-    if (turnScore >= 40) {
-      advanceSegment(p);
-      return;
-    }
-  } 
-  // SEGMENT 3: 60+ points in turn
-  else if (p.currentSegment === 3) {
-    if (turnScore >= 60) {
-      advanceSegment(p);
-      return;
-    }
-  } 
-  // SEGMENT 4: 75+ points in turn
-  else if (p.currentSegment === 4) {
-    if (turnScore >= 75) {
-      advanceSegment(p);
-      return;
-    }
-  } 
-  // SEGMENT 5: 110+ points in 6 darts or fewer
-  else if (p.currentSegment === 5) {
-    for (let d of p.currentDarts) {
-      p.seg5Darts = (p.seg5Darts || 0) + 1;
-      p.seg5Score = (p.seg5Score || 0) + (d.calculatedScore || 0);
+  // 2. Evaluate Segment Criteria
+  const turnScore = player.currentDarts.reduce((sum, d) => sum + (d.calculatedScore || 0), 0);
+  let segmentAdvanced = false;
 
-      if (p.seg5Score >= 110 && p.seg5Darts <= 6) {
-        advanceSegment(p);
-        return;
-      } else if (p.seg5Darts >= 6) {
-        p.seg5Darts = 0;
-        p.seg5Score = 0;
-      }
+  if (player.currentSegment === 1 && turnScore >= 25) {
+    advanceSegment(player);
+    segmentAdvanced = true;
+  } else if (player.currentSegment === 2 && turnScore >= 40) {
+    advanceSegment(player);
+    segmentAdvanced = true;
+  } else if (player.currentSegment === 3 && turnScore >= 60) {
+    advanceSegment(player);
+    segmentAdvanced = true;
+  } else if (player.currentSegment === 4 && turnScore >= 75) {
+    advanceSegment(player);
+    segmentAdvanced = true;
+  } else if (player.currentSegment === 5) {
+    player.seg5Darts = (player.seg5Darts || 0) + 1;
+    player.seg5Score = (player.seg5Score || 0) + (dartData.calculatedScore || 0);
+
+    if (player.seg5Score >= 110 && player.seg5Darts <= 6) {
+      advanceSegment(player);
+      segmentAdvanced = true;
+    } else if (player.seg5Darts >= 6) {
+      player.seg5Darts = 0;
+      player.seg5Score = 0;
     }
-  } 
-  // SEGMENT 6: All 3 darts same color
-  else if (p.currentSegment === 6) {
-    const colorDarts = p.currentDarts.filter(d => d.type === 'color');
+  } else if (player.currentSegment === 6) {
+    const colorDarts = player.currentDarts.filter(d => d.type === 'color');
     if (colorDarts.length === 3) {
       const firstColor = colorDarts[0].value;
       if (colorDarts.every(d => d.value === firstColor)) {
-        advanceSegment(p);
-        return;
+        advanceSegment(player);
+        segmentAdvanced = true;
       }
     }
   }
 
-  // If 3 darts have been thrown without advancing the segment, advance to the next player's turn
-  if (p.currentDarts.length >= 3) {
-    nextTurn();
+  // 3. Force Turn Advancement if Target Met OR 3 Darts Reached
+  if (segmentAdvanced || player.currentDarts.length >= 3) {
+    finishTurnAndAdvance();
+  } else {
+    updateScoreboardUI();
   }
+}
+
+function finishTurnAndAdvance() {
+  const currentPlayer = players[currentPlayerIndex];
+
+  // Store turn history if needed
+  currentPlayer.turnHistory = currentPlayer.turnHistory || [];
+  currentPlayer.turnHistory.push([...currentPlayer.currentDarts]);
+
+  // Clear current dart storage for next round
+  currentPlayer.currentDarts = [];
+
+  // Cycle to next player index
+  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+
+  updateScoreboardUI();
 }
   function updateRTUI() {
     roundNumDisplay.innerText = rtCurrentRound;
