@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hellcastle Darts — Olympic Tournament Arena</title>
-  <meta name="description" content="Hellcastle Darts Olympic tournament app with 10 simple playable darts game modules." />
+  <meta name="description" content="Hellcastle Darts Olympic-style multi-event tournament app with playable modules for Racetrack, Roman Empire, Robin Hood, Golf Darts, Basketball Pub Style, Baseball, Count Up, Shove a Penny, Shanghai, and All 5's." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,6 +23,7 @@
       --line:rgba(32,23,15,.14);
       --shadow:0 20px 60px rgba(45,24,8,.14);
       --radius:24px;
+      --radius-sm:14px;
       --max:1360px;
       --trans:280ms cubic-bezier(.2,.8,.2,1);
     }
@@ -63,7 +64,7 @@
 
     p{line-height:1.6; color:var(--ink-soft)}
     a{text-decoration:none; color:inherit}
-    button, input, select{font:inherit}
+    button, input, select, textarea{font:inherit}
 
     .shell{
       width:min(calc(100% - 2rem), var(--max));
@@ -151,7 +152,7 @@
 
     .hero-grid{
       display:grid;
-      grid-template-columns:1.06fr .94fr;
+      grid-template-columns:1.1fr .9fr;
       gap:1.4rem;
       align-items:stretch;
     }
@@ -161,10 +162,10 @@
     .panel,
     .score-panel,
     .leader-panel{
-      background:linear-gradient(180deg, rgba(255,255,255,.56), rgba(255,255,255,.28));
+      background:linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,.28));
       border:1px solid rgba(32,23,15,.08);
       box-shadow:var(--shadow);
-      border-radius:24px;
+      border-radius:var(--radius);
       position:relative;
       overflow:hidden;
     }
@@ -173,11 +174,11 @@
       padding:clamp(1.4rem, 2vw, 2rem);
       min-height:430px;
       display:grid;
-      grid-template-columns:1.1fr .9fr;
+      grid-template-columns:1.15fr .85fr;
       gap:1rem;
       background:
         linear-gradient(135deg, rgba(111,29,27,.06), transparent 38%),
-        linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.32));
+        linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.32));
     }
 
     .hero-main::after{
@@ -203,7 +204,6 @@
       color:var(--crimson);
       margin-bottom:1rem;
     }
-
     .eyebrow::before{
       content:"";
       width:34px;
@@ -242,21 +242,27 @@
       position:relative;
       overflow:hidden;
     }
-
     .btn:active{transform:translateY(1px) scale(.99)}
     .btn-primary{
       color:#fff8ef;
       background:linear-gradient(180deg, var(--crimson-2), var(--crimson));
       box-shadow:0 12px 28px rgba(111,29,27,.28);
     }
-    .btn-primary:hover{transform:translateY(-2px); box-shadow:0 16px 34px rgba(111,29,27,.34)}
+    .btn-primary:hover{
+      transform:translateY(-2px);
+      box-shadow:0 16px 34px rgba(111,29,27,.34);
+      filter:saturate(1.08);
+    }
     .btn-secondary{
       color:var(--ink);
-      background:rgba(255,255,255,.7);
+      background:rgba(255,255,255,.62);
       border:1px solid rgba(32,23,15,.1);
       backdrop-filter:blur(10px);
     }
-    .btn-secondary:hover{transform:translateY(-2px); background:#fff9ef}
+    .btn-secondary:hover{
+      transform:translateY(-2px);
+      background:#fff9ef;
+    }
     .btn-gold{
       color:#24160a;
       background:linear-gradient(180deg, #e8c778, var(--gold));
@@ -268,7 +274,20 @@
       border:1px solid rgba(32,23,15,.12);
       color:var(--ink-soft);
     }
-    .btn-sm{padding:.62rem .9rem; font-size:.92rem}
+    .btn-danger{
+      color:#fff;
+      background:linear-gradient(180deg, #9f322f, #71211f);
+    }
+    .btn-sm{
+      padding:.62rem .9rem;
+      font-size:.92rem;
+    }
+    .btn-block{
+      width:100%;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
     .dartboard-wrap{
       display:grid;
@@ -330,7 +349,6 @@
       border-radius:999px;
       box-shadow:0 6px 18px rgba(0,0,0,.18);
     }
-
     .dart::before{
       content:"";
       position:absolute;
@@ -340,7 +358,6 @@
       border-bottom:4px solid transparent;
       border-left:16px solid #ccd7df;
     }
-
     .dart::after{
       content:"";
       position:absolute;
@@ -351,8 +368,8 @@
       border-top:9px solid transparent;
       border-bottom:9px solid transparent;
       border-right:14px solid #80302f;
+      filter:drop-shadow(0 1px 0 rgba(0,0,0,.15));
     }
-
     .dart.one{top:42%; left:6%; transform:rotate(-16deg)}
     .dart.two{top:18%; right:8%; transform:rotate(26deg)}
     .dart.three{bottom:19%; left:20%; transform:rotate(12deg)}
@@ -410,14 +427,16 @@
       color:#fff;
       background:linear-gradient(90deg, var(--green), #476653);
       box-shadow:0 12px 24px rgba(51,79,58,.18);
+      transform-origin:left center;
       transition:var(--trans);
     }
-
     .ribbon:nth-child(2){background:linear-gradient(90deg, var(--crimson), #8f2a27)}
     .ribbon:nth-child(3){background:linear-gradient(90deg, var(--gold-deep), #b68a32); color:#24180d}
     .ribbon:hover{transform:translateX(4px)}
 
-    .section{padding:1rem 0 1.4rem}
+    .section{
+      padding:1rem 0 1.4rem;
+    }
 
     .section-head{
       display:flex;
@@ -427,8 +446,14 @@
       margin-bottom:1rem;
     }
 
-    .section-head h2{font-size:clamp(1.6rem, 3vw, 2.5rem)}
-    .section-head p{max-width:58ch; margin:0}
+    .section-head h2{
+      font-size:clamp(1.6rem, 3vw, 2.5rem);
+    }
+
+    .section-head p{
+      max-width:56ch;
+      margin:0;
+    }
 
     .main-grid{
       display:grid;
@@ -438,7 +463,8 @@
       padding-bottom:3rem;
     }
 
-    .stack{display:grid; gap:1.2rem}
+    .stack{display:grid;gap:1.2rem}
+
     .panel{padding:1.2rem}
 
     .panel-title{
@@ -450,7 +476,7 @@
     }
 
     .panel-title h3{font-size:1.45rem}
-    .subtle{color:var(--ink-soft); font-size:.94rem}
+    .subtle{color:var(--ink-soft);font-size:.94rem}
 
     .player-entry{
       display:grid;
@@ -459,19 +485,23 @@
       margin-bottom:1rem;
     }
 
-    .field,.select{
+    .field,
+    .score-input,
+    .select{
       width:100%;
       border-radius:16px;
       border:1px solid rgba(32,23,15,.12);
       background:rgba(255,255,255,.68);
-      padding:1rem;
+      padding:1rem 1rem;
       color:var(--ink);
       outline:none;
       transition:var(--trans);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
     }
 
-    .field:focus,.select:focus{
+    .field:focus,
+    .score-input:focus,
+    .select:focus{
       border-color:rgba(143,42,39,.42);
       box-shadow:0 0 0 4px rgba(143,42,39,.08);
     }
@@ -493,7 +523,10 @@
       font-weight:700;
       transition:var(--trans);
     }
-
+    .chip:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 20px rgba(40,20,8,.08);
+    }
     .chip button{
       border:none;
       background:transparent;
@@ -536,11 +569,13 @@
       transition:var(--trans);
     }
 
-    .event-label strong{display:block; font-size:1rem}
-    .event-label span{display:block; font-size:.85rem; color:var(--ink-soft); margin-top:.2rem}
+    .event-label strong{display:block;font-size:1rem}
+    .event-label span{display:block;font-size:.85rem;color:var(--ink-soft);margin-top:.2rem}
 
     .check-mark{
-      width:22px;height:22px;border-radius:50%;
+      width:22px;
+      height:22px;
+      border-radius:50%;
       border:2px solid rgba(32,23,15,.18);
       transition:var(--trans);
       flex:0 0 auto;
@@ -553,13 +588,11 @@
       box-shadow:0 14px 28px rgba(111,29,27,.12);
       background:linear-gradient(180deg, rgba(255,247,237,.94), rgba(247,236,213,.72));
     }
-
     .event-item input:checked + .event-label .check-mark{
       border-color:var(--crimson);
       background:var(--crimson);
       box-shadow:0 0 0 5px rgba(111,29,27,.1);
     }
-
     .event-item input:checked + .event-label .check-mark::after{
       content:"";
       position:absolute;
@@ -597,7 +630,7 @@
       border:1px solid rgba(32,23,15,.08);
     }
 
-    .game-layout{display:grid; gap:1rem}
+    .game-layout{display:grid;gap:1rem}
 
     .score-panel{
       padding:1.2rem;
@@ -606,7 +639,9 @@
         linear-gradient(120deg, rgba(51,79,58,.08), transparent 40%);
     }
 
-    .current-event-name{font-size:clamp(1.8rem, 4vw, 3rem)}
+    .current-event-name{
+      font-size:clamp(1.8rem, 4vw, 3rem);
+    }
 
     .event-progress{
       display:flex;
@@ -623,9 +658,16 @@
       font-size:.84rem;
       font-weight:700;
     }
-
-    .progress-pill.active{background:var(--crimson); color:#fff; border-color:transparent}
-    .progress-pill.done{background:linear-gradient(180deg,#e6c46f,#bf9130); color:#23150b; border-color:transparent}
+    .progress-pill.active{
+      background:var(--crimson);
+      color:#fff;
+      border-color:transparent;
+    }
+    .progress-pill.done{
+      background:linear-gradient(180deg, #e6c46f, #bf9130);
+      color:#23150b;
+      border-color:transparent;
+    }
 
     .leader-panel{
       padding:1.2rem;
@@ -657,6 +699,7 @@
       letter-spacing:.12em;
     }
 
+    .leaderboard-table tbody tr{transition:var(--trans)}
     .leaderboard-table tbody tr:hover{background:rgba(255,251,244,.75)}
 
     .rank{
@@ -669,7 +712,6 @@
       background:#f6ede0;
       border:1px solid rgba(32,23,15,.08);
     }
-
     .rank.r1{background:linear-gradient(180deg,#f7e5a9,#d7a84c)}
     .rank.r2{background:linear-gradient(180deg,#eef2f5,#b6c1c9)}
     .rank.r3{background:linear-gradient(180deg,#e6c8b2,#b97d4c)}
@@ -691,14 +733,19 @@
       border:1px solid rgba(32,23,15,.08);
     }
 
-    .medal-mini{
-      width:34px;height:34px;border-radius:50%;
-      display:grid;place-items:center;
-      font-weight:800;font-size:.82rem;
+    .event-result-row .medal-mini{
+      width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.82rem;
       background:#f6ecdc;border:1px solid rgba(32,23,15,.08);
     }
+    .event-result-row:nth-child(1) .medal-mini{background:linear-gradient(180deg,#f8e7ac,#cf9f3f)}
+    .event-result-row:nth-child(2) .medal-mini{background:linear-gradient(180deg,#f0f4f7,#b7c1c9)}
+    .event-result-row:nth-child(3) .medal-mini{background:linear-gradient(180deg,#ead0bd,#bb7f4f)}
 
-    .game-shell{display:grid; gap:1rem}
+    .game-shell{
+      display:grid;
+      gap:1rem;
+    }
+
     .game-top{
       display:grid;
       grid-template-columns:1fr auto;
@@ -772,6 +819,23 @@
       gap:.5rem;
     }
 
+    .throw-value-grid{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:.5rem;
+      margin-top:.5rem;
+    }
+
+    .small-label{
+      display:block;
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:var(--ink-soft);
+      margin-bottom:.35rem;
+      font-weight:800;
+    }
+
     .number-strip{
       display:flex;
       flex-wrap:wrap;
@@ -789,8 +853,10 @@
       font-weight:800;
       transition:var(--trans);
     }
-
-    .mini-btn:hover{transform:translateY(-2px); background:#fff}
+    .mini-btn:hover{
+      transform:translateY(-2px);
+      background:#fff;
+    }
 
     .scoreboard{
       display:grid;
@@ -815,18 +881,35 @@
     }
 
     .avatar-dot{
-      width:40px;height:40px;border-radius:50%;
-      display:grid;place-items:center;
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
       background:linear-gradient(180deg, #f3d999, #bb8a2f);
-      font-weight:900;color:#2c180d;
+      font-weight:900;
+      color:#2c180d;
       font-family:"Cinzel", serif;
     }
 
-    .score-main strong{display:block; font-size:1rem}
-    .score-main span{display:block; color:var(--ink-soft); font-size:.84rem}
+    .score-main strong{
+      display:block;
+      font-size:1rem;
+    }
+    .score-main span{
+      display:block;
+      color:var(--ink-soft);
+      font-size:.84rem;
+    }
 
-    .score-stat{text-align:right; min-width:72px}
-    .score-stat strong{display:block; font-size:1.08rem}
+    .score-stat{
+      text-align:right;
+      min-width:72px;
+    }
+    .score-stat strong{
+      display:block;
+      font-size:1.08rem;
+    }
     .score-stat span{
       display:block;
       color:var(--ink-soft);
@@ -891,43 +974,65 @@
       transition:var(--trans);
       max-width:min(92vw, 340px);
     }
-
-    .toast.show{transform:translateY(0); opacity:1}
+    .toast.show{
+      transform:translateY(0);
+      opacity:1;
+    }
 
     .reveal{
       opacity:0;
       transform:translateY(24px);
       transition:700ms cubic-bezier(.2,.7,.2,1);
     }
-
-    .reveal.in{opacity:1; transform:translateY(0)}
+    .reveal.in{
+      opacity:1;
+      transform:translateY(0);
+    }
 
     .stagger > *{
       opacity:0;
       transform:translateY(18px);
       animation:rise .7s forwards;
     }
-
     .stagger > *:nth-child(1){animation-delay:.05s}
     .stagger > *:nth-child(2){animation-delay:.12s}
     .stagger > *:nth-child(3){animation-delay:.19s}
     .stagger > *:nth-child(4){animation-delay:.26s}
     .stagger > *:nth-child(5){animation-delay:.33s}
     .stagger > *:nth-child(6){animation-delay:.40s}
+    .stagger > *:nth-child(7){animation-delay:.47s}
+    .stagger > *:nth-child(8){animation-delay:.54s}
+    .stagger > *:nth-child(9){animation-delay:.61s}
+    .stagger > *:nth-child(10){animation-delay:.68s}
 
     @keyframes rise{
       to{opacity:1; transform:translateY(0)}
     }
 
     @media (max-width: 1180px){
-      .hero-grid,.main-grid,.hero-main,.two-col{grid-template-columns:1fr}
+      .hero-grid,
+      .main-grid,
+      .hero-main,
+      .two-col{
+        grid-template-columns:1fr;
+      }
       .hero-main{min-height:auto}
     }
 
     @media (max-width: 860px){
       .nav-links{display:none}
-      .player-entry,.throw-grid,.game-top,.scoreboard-row,.event-result-row{grid-template-columns:1fr}
+      .player-entry,
+      .throw-grid,
+      .game-top,
+      .scoreboard-row,
+      .event-result-row{
+        grid-template-columns:1fr;
+      }
       .event-grid{grid-template-columns:1fr}
+      .scoreboard-row,
+      .event-result-row{
+        align-items:start;
+      }
       .score-stat{text-align:left}
     }
   </style>
@@ -956,13 +1061,13 @@
         <article class="hero-main reveal">
           <div class="stagger">
             <div class="eyebrow">Castle League Format</div>
-            <h1>Ten playable darts events. One Olympic leaderboard.</h1>
+            <h1>Play every event inside one Olympic tournament.</h1>
             <p>
-              Build a shared roster, choose your events, then play every selected discipline inside the same tournament app.
-              Each finished event converts to Olympic placement points so no one game dominates the standings.
+              This version includes playable modules for Racetrack, Roman Empire, Robin Hood, Golf Darts, Basketball Pub Style, Baseball,
+              Count Up, Shove a Penny, Shanghai, and All 5's. Add players once, select events, play each game in sequence, and convert final placements into Olympic tournament points.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#setup">Build Tournament</a>
+              <a class="btn btn-primary" href="#setup">Start Tournament</a>
               <button class="btn btn-secondary" id="loadDemoBtn" type="button">Load Demo Setup</button>
             </div>
           </div>
@@ -980,24 +1085,24 @@
             <div class="medal">10</div>
             <div>
               <strong>Playable game modules</strong>
-              <span>Racetrack to All 5's</span>
+              <span>Each event runs inside the app</span>
             </div>
           </div>
           <div class="side-stat">
             <div class="medal">∞</div>
             <div>
-              <strong>Olympic conversion</strong>
-              <span>Placings matter more than raw scale</span>
+              <strong>Olympic scoring layer</strong>
+              <span>Event score scale never matters</span>
             </div>
           </div>
           <div class="ribbon-list stagger">
             <div class="ribbon">
-              <span>One roster</span>
-              <strong>All events</strong>
+              <span>Shared player roster</span>
+              <strong>Across all events</strong>
             </div>
             <div class="ribbon">
-              <span>Three dart turns</span>
-              <strong>Fast play flow</strong>
+              <span>Interactive turn engine</span>
+              <strong>Three-dart rounds</strong>
             </div>
             <div class="ribbon">
               <span>Automatic standings</span>
@@ -1013,10 +1118,10 @@
         <div class="section-head reveal">
           <div>
             <div class="eyebrow">Tournament Setup</div>
-            <h2>Choose the roster. Choose the order. Start the gauntlet.</h2>
+            <h2>Choose the roster. Then choose the order of war.</h2>
           </div>
           <p>
-            Add players once, select any mix of events, and start the tournament. Each module is a simple playable version designed to run directly inside this app.
+            Add players, select any event mix, and start. Each module tracks live turns, round logic, and scoring. Once an event completes, the app assigns Olympic points by finish position and updates the overall leaderboard.
           </p>
         </div>
 
@@ -1039,7 +1144,7 @@
             <section class="panel reveal" aria-labelledby="eventsTitle">
               <div class="panel-title">
                 <h3 id="eventsTitle">Select Events</h3>
-                <span class="subtle">Played in the order shown below</span>
+                <span class="subtle">Play them in the selected order below</span>
               </div>
 
               <div class="event-grid" id="eventGrid"></div>
@@ -1049,9 +1154,9 @@
               <div class="state-band">
                 <div>
                   <strong id="selectionSummary">0 players • 0 events selected</strong>
-                  <div class="subtle">Add at least 1 player and select at least 1 event</div>
+                  <div class="subtle">At least 1 player and 1 event are required to start</div>
                 </div>
-                <button class="btn btn-gold" id="startTournamentBtn" type="button" disabled>Start Tournament</button>
+                <button class="btn btn-gold" id="startTournamentBtn" type="button">Start Tournament</button>
               </div>
             </section>
           </div>
@@ -1060,7 +1165,7 @@
             <section class="score-panel reveal" id="play" aria-labelledby="playTitle">
               <div class="panel-title">
                 <h3 id="playTitle">Current Event</h3>
-                <span class="subtle">Simple playable game modules</span>
+                <span class="subtle">Playable module + live scoring</span>
               </div>
 
               <div id="gameArea" class="game-layout">
@@ -1089,12 +1194,22 @@
   </main>
 
   <footer class="footer shell">
-    Hellcastle Darts — simple playable tournament arena with Olympic scoring.
+    Hellcastle Darts — integrated multi-event Olympic tournament arena.
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
+    const state = {
+      players: [],
+      selectedEventIds: [],
+      tournamentStarted: false,
+      currentEventIndex: 0,
+      completedEvents: [],
+      totals: {},
+      currentGame: null
+    };
+
     const refs = {
       playerInput: document.getElementById('playerNameInput'),
       addPlayerBtn: document.getElementById('addPlayerBtn'),
@@ -1107,16 +1222,6 @@
       leaderboardArea: document.getElementById('leaderboardArea'),
       loadDemoBtn: document.getElementById('loadDemoBtn'),
       toast: document.getElementById('toast')
-    };
-
-    const state = {
-      players: [],
-      selectedEventIds: [],
-      tournamentStarted: false,
-      currentEventIndex: 0,
-      completedEvents: [],
-      totals: {},
-      currentGame: null
     };
 
     function showToast(message){
@@ -1145,7 +1250,7 @@
     }
 
     function playerInitial(name){
-      return (name || '?').charAt(0).toUpperCase();
+      return (name || '?').trim().charAt(0).toUpperCase();
     }
 
     function olympicPointsByRank(rank, totalPlayers){
@@ -1164,9 +1269,18 @@
       });
     }
 
-    function throwScoreBasic(multiplier, value){
-      const map = { S:1, D:2, T:3 };
-      return (Number(value) || 0) * (map[multiplier] || 1);
+    function getSortedLeaderboard(){
+      return state.players.map(player => ({
+        player,
+        ...(state.totals[player] || { olympicPoints:0, eventsPlayed:0, placements:[] })
+      })).sort((a,b) => {
+        if(b.olympicPoints !== a.olympicPoints) return b.olympicPoints - a.olympicPoints;
+        if(b.eventsPlayed !== a.eventsPlayed) return b.eventsPlayed - a.eventsPlayed;
+        const aBest = Math.min(...a.placements.map(p => p.rank), Infinity);
+        const bBest = Math.min(...b.placements.map(p => p.rank), Infinity);
+        if(aBest !== bBest) return aBest - bBest;
+        return a.player.localeCompare(b.player);
+      });
     }
 
     function makeBaseGame(config){
@@ -1182,26 +1296,40 @@
       const game = {
         id: config.id,
         name: config.name,
+        subtitle: config.subtitle || '',
         objective: config.objective,
         scoreDirection: config.scoreDirection,
         roundsLimit: config.roundsLimit || 10,
-        players,
-        currentRound: 1,
+        throwsPerTurn: 3,
         currentPlayerIndex: 0,
-        currentThrowSelections: Array.from({ length: 3 }, () => ({ multiplier:'S', value:20 })),
+        currentRound: 1,
+        players,
         log: [],
+        currentThrowSelections: Array.from({length:3}, () => ({ multiplier:'S', value:20 })),
         finished: false,
         settings: config.settings || {},
         scoreboardLabel: config.scoreboardLabel || 'Score',
+        isComplete(){
+          if(typeof config.isComplete === 'function') return config.isComplete(this);
+          return this.currentRound > this.roundsLimit && this.currentPlayerIndex === 0;
+        },
         getActivePlayer(){
           return this.players[this.currentPlayerIndex];
         },
         setThrow(index, patch){
-          this.currentThrowSelections[index] = { ...this.currentThrowSelections[index], ...patch };
+          this.currentThrowSelections[index] = {
+            ...this.currentThrowSelections[index],
+            ...patch
+          };
         },
         addLog(text){
-          this.log.unshift({ id: uid(), text });
-          this.log = this.log.slice(0, 50);
+          this.log.unshift({ id: uid(), text, time: Date.now() });
+          this.log = this.log.slice(0, 40);
+        },
+        computeThrowScore(throwData){
+          if(config.computeThrowScore) return config.computeThrowScore(this, throwData);
+          const map = { S:1, D:2, T:3 };
+          return (Number(throwData.value) || 0) * (map[throwData.multiplier] || 1);
         },
         getThrowDescription(throwData){
           if(config.getThrowDescription) return config.getThrowDescription(this, throwData);
@@ -1212,7 +1340,6 @@
           const player = this.getActivePlayer();
           const throws = clone(this.currentThrowSelections);
           const result = config.applyTurn(this, player, throws);
-
           player.rounds.push({
             round: this.currentRound,
             throws,
@@ -1220,20 +1347,29 @@
             note: result.note || ''
           });
 
-          if(typeof result.newScore === 'number') player.score = result.newScore;
-          if(result.meta) player.meta = { ...player.meta, ...result.meta };
-          if(result.playerFinished) player.finishedAt = this.currentRound;
+          if(typeof result.newScore === 'number'){
+            player.score = result.newScore;
+          }
+
+          if(result.meta){
+            player.meta = { ...player.meta, ...result.meta };
+          }
 
           this.addLog(`${player.name}: ${result.note || result.turnScore}`);
 
-          this.currentThrowSelections = Array.from({ length: 3 }, () => ({ multiplier:'S', value:20 }));
+          if(result.playerFinished){
+            player.finishedAt = this.log.length;
+          }
+
+          this.currentThrowSelections = Array.from({length:3}, () => ({ multiplier:'S', value:20 }));
 
           const wasLastPlayer = this.currentPlayerIndex === this.players.length - 1;
           this.currentPlayerIndex = wasLastPlayer ? 0 : this.currentPlayerIndex + 1;
           if(wasLastPlayer) this.currentRound += 1;
 
           if(config.postTurn) config.postTurn(this, player, result);
-          if(config.isComplete ? config.isComplete(this) : (this.currentRound > this.roundsLimit && this.currentPlayerIndex === 0)){
+
+          if(this.isComplete()){
             this.finished = true;
           }
         },
@@ -1247,47 +1383,19 @@
       return game;
     }
 
-    'count-up': {
-  id:'count-up',
-  name:'Count Up',
-  objective:'Enter total score for each round. Highest total after 8 rounds wins.',
-  scoreDirection:'desc',
-  roundsLimit:8,
-  scoreboardLabel:'Points',
-  getValueChoices(){ return []; }, // no predefined choices needed
-  create(players){
-    return makeBaseGame({
-      id:'count-up',
-      name:'Count Up',
-      objective:'Enter total score for each round. Highest total after 8 rounds wins.',
-      scoreDirection:'desc',
-      roundsLimit:8,
-      scoreboardLabel:'Points',
-      players,
-      // Override UI rendering to accept single score input per round
-      applyTurn(game, player, throws){
-        // Here, throws will be an array of length 1 with the total score entered
-        // We expect throws[0].value to be the total score for the round
-        const roundScore = Number(throws[0].value) || 0;
-        return {
-          turnScore: roundScore,
-          newScore: player.score + roundScore,
-          note: `+${roundScore} points`
-        };
-      }
-    });
-  }
-}
-,
+    function throwScoreBasic(multiplier, value){
+      const map = {S:1,D:2,T:3};
+      return (Number(value) || 0) * (map[multiplier] || 1);
+    }
 
-      'all-5s': {
-        id:'all-5s',
-        name:"All 5's",
-        objective:'Only turns that total a multiple of 5 score. Earn total ÷ 5. Highest after 8 rounds wins.',
+    const GameModules = {
+      'count-up': {
+        id:'count-up',
+        name:'Count Up',
+        objective:'Highest total score after 8 rounds wins.',
         scoreDirection:'desc',
         roundsLimit:8,
-        scoreboardLabel:'5-Points',
-        getValueChoices(){ return [1,5,10,15,20,25,50]; },
+        scoreboardLabel:'Points',
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1296,11 +1404,13 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             applyTurn(game, player, throws){
-              const total = throws.reduce((sum, t) => sum + throwScoreBasic(t.multiplier, t.value), 0);
-              const earned = total % 5 === 0 ? total / 5 : 0;
-              return { turnScore: earned, newScore: player.score + earned, note: `${total} total → +${earned}` };
+              const turnScore = throws.reduce((sum, t) => sum + throwScoreBasic(t.multiplier, t.value), 0);
+              return {
+                turnScore,
+                newScore: player.score + turnScore,
+                note: `+${turnScore} points`
+              };
             }
           });
         }
@@ -1309,11 +1419,10 @@
       'golf-darts': {
         id:'golf-darts',
         name:'Golf Darts',
-        objective:'Lowest strokes after 9 holes wins. Bull = 1, double on target = 2, single = 3, triple = 4, miss = 5.',
+        objective:'Lowest total strokes after 9 holes wins. Bull = hole in one, double = 2, single = 3, triple = 4, miss/other = 5.',
         scoreDirection:'asc',
         roundsLimit:9,
         scoreboardLabel:'Strokes',
-        getValueChoices(game){ return [game.currentRound,25,50]; },
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1322,24 +1431,29 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             initialScore:0,
+            settings:{ valueChoices:[25,50] },
             getThrowDescription(game, throwData){
-              if(Number(throwData.value) === 50) return 'Bull';
+              if(throwData.value === 50) return 'Bull';
               return `${throwData.multiplier}${throwData.value}`;
             },
             applyTurn(game, player, throws){
               const hole = game.currentRound;
               let bestStroke = 5;
               throws.forEach(t => {
-                if(Number(t.value) === 50) bestStroke = Math.min(bestStroke, 1);
-                else if(Number(t.value) === hole){
+                if(Number(t.value) === 50){
+                  bestStroke = Math.min(bestStroke, 1);
+                } else if(Number(t.value) === hole){
                   if(t.multiplier === 'D') bestStroke = Math.min(bestStroke, 2);
-                  if(t.multiplier === 'S') bestStroke = Math.min(bestStroke, 3);
-                  if(t.multiplier === 'T') bestStroke = Math.min(bestStroke, 4);
+                  else if(t.multiplier === 'S') bestStroke = Math.min(bestStroke, 3);
+                  else if(t.multiplier === 'T') bestStroke = Math.min(bestStroke, 4);
                 }
               });
-              return { turnScore: bestStroke, newScore: player.score + bestStroke, note: `Hole ${hole}: ${bestStroke} strokes` };
+              return {
+                turnScore: bestStroke,
+                newScore: player.score + bestStroke,
+                note: `Hole ${hole}: ${bestStroke} stroke${bestStroke === 1 ? '' : 's'}`
+              };
             }
           });
         }
@@ -1352,7 +1466,6 @@
         scoreDirection:'desc',
         roundsLimit:9,
         scoreboardLabel:'Runs',
-        getValueChoices(game){ return [game.currentRound]; },
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1361,7 +1474,6 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             applyTurn(game, player, throws){
               const inning = game.currentRound;
               let runs = 0;
@@ -1372,7 +1484,11 @@
                   if(t.multiplier === 'T') runs += 3;
                 }
               });
-              return { turnScore:runs, newScore:player.score + runs, note:`Inning ${inning}: +${runs}` };
+              return {
+                turnScore: runs,
+                newScore: player.score + runs,
+                note: `Inning ${inning}: +${runs} run${runs === 1 ? '' : 's'}`
+              };
             }
           });
         }
@@ -1381,14 +1497,10 @@
       'basketball-pub-style': {
         id:'basketball-pub-style',
         name:'Basketball Pub Style',
-        objective:'Hit the round target. Single = 1, Double = 2, Triple = 3. Highest score after 8 rounds wins.',
+        objective:'Highest made baskets after 8 rounds wins. Need exact target hit: single = 1, double = 2, triple = 3.',
         scoreDirection:'desc',
         roundsLimit:8,
         scoreboardLabel:'Baskets',
-        getValueChoices(game){
-          const target = game.settings.sequence[game.currentRound - 1];
-          return target === 25 ? [25,50] : [target];
-        },
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1397,21 +1509,53 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             settings:{ sequence:[6,11,14,9,12,5,20,25] },
             applyTurn(game, player, throws){
               const target = game.settings.sequence[game.currentRound - 1];
               let baskets = 0;
               throws.forEach(t => {
-                const v = Number(t.value);
-                if(target === 25){
-                  if(v === 25) baskets += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
-                  if(v === 50) baskets += 3;
-                } else if(v === target){
-                  baskets += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+                if(Number(t.value) === target){
+                  if(t.multiplier === 'S') baskets += 1;
+                  if(t.multiplier === 'D') baskets += 2;
+                  if(t.multiplier === 'T') baskets += 3;
+                }
+                if(target === 25 && Number(t.value) === 50){
+                  baskets += 3;
                 }
               });
-              return { turnScore:baskets, newScore:player.score + baskets, note:`Target ${target === 25 ? 'Bull' : target}: +${baskets}` };
+              return {
+                turnScore: baskets,
+                newScore: player.score + baskets,
+                note: `Target ${target === 25 ? 'Bull' : target}: +${baskets}`
+              };
+            }
+          });
+        }
+      },
+
+      'all-5s': {
+        id:'all-5s',
+        name:"All 5's",
+        objective:'Only turns totaling a multiple of 5 score. Score equals turn total ÷ 5. Highest after 10 rounds wins.',
+        scoreDirection:'desc',
+        roundsLimit:10,
+        scoreboardLabel:'5-Points',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            applyTurn(game, player, throws){
+              const total = throws.reduce((sum, t) => sum + throwScoreBasic(t.multiplier, t.value), 0);
+              const earned = total % 5 === 0 ? total / 5 : 0;
+              return {
+                turnScore: earned,
+                newScore: player.score + earned,
+                note: `${total} total → +${earned}`
+              };
             }
           });
         }
@@ -1420,11 +1564,10 @@
       'shanghai': {
         id:'shanghai',
         name:'Shanghai',
-        objective:'Rounds 1 to 7. Score hits on the target number. Hit single, double, and triple of the target in one round for an instant Shanghai win.',
+        objective:'Highest score after rounds 1 to 7 wins. Single = 1× target, double = 2×, triple = 3×. Any player hitting S, D and T of the target in one round scores a Shanghai and wins instantly.',
         scoreDirection:'desc',
         roundsLimit:7,
         scoreboardLabel:'Points',
-        getValueChoices(game){ return [game.currentRound]; },
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1433,7 +1576,6 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             applyTurn(game, player, throws){
               const target = game.currentRound;
               let gained = 0;
@@ -1446,35 +1588,33 @@
               });
               const shanghai = hitSet.has('S') && hitSet.has('D') && hitSet.has('T');
               return {
-                turnScore:gained,
-                newScore:player.score + gained + (shanghai ? 1000 : 0),
-                note: shanghai ? `Shanghai on ${target}!` : `Target ${target}: +${gained}`,
+                turnScore: gained,
+                newScore: player.score + gained + (shanghai ? 1000 : 0),
+                note: shanghai ? `Shanghai on ${target}! instant victory marker` : `Target ${target}: +${gained}`,
                 meta:{ shanghai }
               };
             },
             isComplete(game){
-              return game.players.some(p => p.meta.shanghai) || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
+              const someoneShanghai = game.players.some(p => p.meta.shanghai);
+              return someoneShanghai || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
             },
             getResults(game){
-              return game.players.map(p => ({ player:p.name, score:p.score }));
+              return game.players.map(p => ({
+                player:p.name,
+                score:p.meta.shanghai ? 1000 + p.score : p.score
+              }));
             }
           });
         }
       },
 
-      'roman-empire': {
-        id:'roman-empire',
-        name:'Roman Empire',
-        objective:'Score on 20, 19, 18, 17, 16, 15, Bull, Doubles, and Triples. Highest empire total wins.',
+      'shove-a-penny': {
+        id:'shove-a-penny',
+        name:'Shove a Penny',
+        objective:'Score exactly 3 marks on each number 1 through 9. Extra marks can be thrown to opponents who have not closed the number. Best completion and progress wins.',
         scoreDirection:'desc',
-        roundsLimit:9,
-        scoreboardLabel:'Empire',
-        getValueChoices(game){
-          const target = game.settings.sequence[game.currentRound - 1];
-          if(target === 'BULL') return [25,50];
-          if(target === 'DOUBLES' || target === 'TRIPLES') return [1,5,10,15,20,25];
-          return [Number(target)];
-        },
+        roundsLimit:18,
+        scoreboardLabel:'Closure',
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1483,7 +1623,72 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
+            init(game){
+              game.players.forEach(p => {
+                p.meta.marks = {};
+                for(let i=1;i<=9;i++) p.meta.marks[i]=0;
+                p.meta.closedCount = 0;
+                p.meta.progressScore = 0;
+              });
+              game.currentThrowSelections = Array.from({length:3}, () => ({ multiplier:'S', value:1 }));
+            },
+            applyTurn(game, player, throws){
+              let noteParts = [];
+              throws.forEach(t => {
+                const num = Number(t.value);
+                if(num < 1 || num > 9) return;
+                let marks = t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+                while(marks > 0){
+                  if(player.meta.marks[num] < 3){
+                    player.meta.marks[num]++;
+                    marks--;
+                  } else {
+                    const openOpponents = game.players.filter(op => op.name !== player.name && op.meta.marks[num] < 3);
+                    if(openOpponents.length){
+                      openOpponents.forEach(op => {
+                        if(marks > 0 && op.meta.marks[num] < 3){
+                          op.meta.marks[num]++;
+                        }
+                      });
+                      marks = 0;
+                    } else {
+                      marks = 0;
+                    }
+                  }
+                }
+              });
+              player.meta.closedCount = Object.values(player.meta.marks).filter(v => v >= 3).length;
+              player.meta.progressScore = Object.values(player.meta.marks).reduce((a,b)=>a+b,0);
+              noteParts.push(`Closed ${player.meta.closedCount}/9`);
+              return {
+                turnScore: player.meta.closedCount * 100 + player.meta.progressScore,
+                newScore: player.meta.closedCount * 100 + player.meta.progressScore,
+                note: noteParts.join(' • ')
+              };
+            },
+            isComplete(game){
+              const someoneClosedAll = game.players.some(p => p.meta.closedCount === 9);
+              return someoneClosedAll || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
+            }
+          });
+        }
+      },
+
+      'roman-empire': {
+        id:'roman-empire',
+        name:'Roman Empire',
+        objective:'Highest empire score across themed targets: 20, 19, 18, 17, 16, 15, Bull, Doubles, Triples.',
+        scoreDirection:'desc',
+        roundsLimit:9,
+        scoreboardLabel:'Empire',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
             settings:{ sequence:['20','19','18','17','16','15','BULL','DOUBLES','TRIPLES'] },
             applyTurn(game, player, throws){
               const target = game.settings.sequence[game.currentRound - 1];
@@ -1500,7 +1705,11 @@
                   gained += throwScoreBasic(t.multiplier, t.value);
                 }
               });
-              return { turnScore:gained, newScore:player.score + gained, note:`${target}: +${gained}` };
+              return {
+                turnScore:gained,
+                newScore:player.score + gained,
+                note:`${target}: +${gained}`
+              };
             }
           });
         }
@@ -1509,14 +1718,10 @@
       'robin-hood': {
         id:'robin-hood',
         name:'Robin Hood',
-        objective:'Hit the target sequence 1, 3, 5, 7, 9, 11, 13, 15, Bull. Highest score wins.',
+        objective:'Hit the announced sequence 1, 3, 5, 7, 9, 11, 13, 15, Bull. Highest points wins.',
         scoreDirection:'desc',
         roundsLimit:9,
         scoreboardLabel:'Hits',
-        getValueChoices(game){
-          const target = game.settings.sequence[game.currentRound - 1];
-          return target === 25 ? [25,50] : [target];
-        },
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1525,20 +1730,23 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             settings:{ sequence:[1,3,5,7,9,11,13,15,25] },
             applyTurn(game, player, throws){
               const target = game.settings.sequence[game.currentRound - 1];
               let gained = 0;
               throws.forEach(t => {
-                const v = Number(t.value);
-                if(target === 25 && (v === 25 || v === 50)){
-                  gained += v === 50 ? 5 : 3;
-                } else if(v === target){
+                const value = Number(t.value);
+                if(target === 25 && (value === 25 || value === 50)){
+                  gained += value === 50 ? 5 : 3;
+                } else if(value === target){
                   gained += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
                 }
               });
-              return { turnScore:gained, newScore:player.score + gained, note:`Target ${target === 25 ? 'Bull' : target}: +${gained}` };
+              return {
+                turnScore:gained,
+                newScore:player.score + gained,
+                note:`Target ${target === 25 ? 'Bull' : target}: +${gained}`
+              };
             }
           });
         }
@@ -1547,14 +1755,10 @@
       'racetrack': {
         id:'racetrack',
         name:'Racetrack',
-        objective:'Race through numbers 1 to 20 in order. Furthest progress wins.',
+        objective:'Race through target sequence 1 to 20 in order. Furthest progress wins; ties broken by overflow hits.',
         scoreDirection:'desc',
         roundsLimit:20,
         scoreboardLabel:'Track',
-        getValueChoices(game){
-          const p = game.getActivePlayer();
-          return [p.meta.track || 1];
-        },
         create(players){
           return makeBaseGame({
             id:this.id,
@@ -1563,79 +1767,149 @@
             scoreDirection:this.scoreDirection,
             roundsLimit:this.roundsLimit,
             scoreboardLabel:this.scoreboardLabel,
-            players,
             init(game){
               game.players.forEach(p => {
                 p.meta.track = 1;
                 p.meta.progress = 0;
               });
-              game.currentThrowSelections = Array.from({ length:3 }, () => ({ multiplier:'S', value:1 }));
+              game.currentThrowSelections = Array.from({length:3}, () => ({ multiplier:'S', value:1 }));
             },
             applyTurn(game, player, throws){
               throws.forEach(t => {
                 const target = player.meta.track;
+                const val = Number(t.value);
                 const step = t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
-                if(Number(t.value) === target){
+                if(val === target){
                   player.meta.progress += step;
                   player.meta.track = Math.min(20, player.meta.track + step);
                 }
               });
               const finished = player.meta.track >= 20;
               const score = player.meta.progress + (finished ? 1000 : 0);
-              return { turnScore:score, newScore:score, playerFinished:finished, note:`Reached ${Math.min(player.meta.track,20)}` };
+              return {
+                turnScore:score,
+                newScore:score,
+                playerFinished:finished,
+                note:`Reached ${Math.min(player.meta.track,20)}`
+              };
             },
             isComplete(game){
-              return game.players.some(p => p.meta.track >= 20) || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
+              const done = game.players.some(p => p.meta.track >= 20);
+              return done || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
             }
           });
         }
       },
 
-      'shove-a-penny': {
-        id:'shove-a-penny',
-        name:'Shove a Penny',
-        objective:'Close numbers 1 through 9 by scoring 3 marks on each. Most closure progress wins.',
-        scoreDirection:'desc',
-        roundsLimit:18,
-        scoreboardLabel:'Closure',
-        getValueChoices(){ return [1,2,3,4,5,6,7,8,9]; },
-        create(players){
-          return makeBaseGame({
-            id:this.id,
-            name:this.name,
-            objective:this.objective,
-            scoreDirection:this.scoreDirection,
-            roundsLimit:this.roundsLimit,
-            scoreboardLabel:this.scoreboardLabel,
-            players,
-            init(game){
-              game.players.forEach(p => {
-                p.meta.marks = {};
-                for(let i=1;i<=9;i++) p.meta.marks[i] = 0;
-                p.meta.closedCount = 0;
-                p.meta.progressScore = 0;
-              });
-              game.currentThrowSelections = Array.from({ length:3 }, () => ({ multiplier:'S', value:1 }));
-            },
-            applyTurn(game, player, throws){
-              throws.forEach(t => {
-                const num = Number(t.value);
-                if(num < 1 || num > 9) return;
-                const add = t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
-                player.meta.marks[num] = Math.min(3, player.meta.marks[num] + add);
-              });
-              player.meta.closedCount = Object.values(player.meta.marks).filter(v => v >= 3).length;
-              player.meta.progressScore = Object.values(player.meta.marks).reduce((a,b) => a + b, 0);
-              const score = player.meta.closedCount * 100 + player.meta.progressScore;
-              return { turnScore:score, newScore:score, note:`Closed ${player.meta.closedCount}/9` };
-            },
-            isComplete(game){
-              return game.players.some(p => p.meta.closedCount === 9) || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
-            }
-          });
-        }
+      'basketball-pub-style': null,
+      'baseball': null
+    };
+
+    GameModules['basketball-pub-style'] = GameModules['basketball-pub-style'] || {
+      id:'basketball-pub-style',
+      name:'Basketball Pub Style',
+      objective:'Highest made baskets after 8 rounds wins. Need exact target hit: single = 1, double = 2, triple = 3.',
+      scoreDirection:'desc',
+      roundsLimit:8,
+      scoreboardLabel:'Baskets',
+      create(players){
+        return makeBaseGame({
+          id:this.id,
+          name:this.name,
+          objective:this.objective,
+          scoreDirection:this.scoreDirection,
+          roundsLimit:this.roundsLimit,
+          scoreboardLabel:this.scoreboardLabel,
+          settings:{ sequence:[6,11,14,9,12,5,20,25] },
+          applyTurn(game, player, throws){
+            const target = game.settings.sequence[game.currentRound - 1];
+            let baskets = 0;
+            throws.forEach(t => {
+              if(target === 25){
+                if(Number(t.value) === 25) baskets += (t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3);
+                if(Number(t.value) === 50) baskets += 3;
+              } else if(Number(t.value) === target){
+                baskets += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+              }
+            });
+            return {
+              turnScore:baskets,
+              newScore:player.score + baskets,
+              note:`Target ${target === 25 ? 'Bull' : target}: +${baskets}`
+            };
+          }
+        });
       }
     };
+
+    GameModules['baseball'] = GameModules['baseball'] || {
+      id:'baseball',
+      name:'Baseball',
+      objective:'Highest runs after innings 1 through 9 wins.',
+      scoreDirection:'desc',
+      roundsLimit:9,
+      scoreboardLabel:'Runs',
+      create(players){
+        return makeBaseGame({
+          id:this.id,
+          name:this.name,
+          objective:this.objective,
+          scoreDirection:this.scoreDirection,
+          roundsLimit:this.roundsLimit,
+          scoreboardLabel:this.scoreboardLabel,
+          applyTurn(game, player, throws){
+            const inning = game.currentRound;
+            let runs = 0;
+            throws.forEach(t => {
+              if(Number(t.value) === inning){
+                runs += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+              }
+            });
+            return {
+              turnScore:runs,
+              newScore:player.score + runs,
+              note:`Inning ${inning}: +${runs}`
+            };
+          }
+        });
+      }
+    };
+
+    GameModules['count-up'] = GameModules['count-up'];
+    GameModules['golf-darts'] = GameModules['golf-darts'];
+    GameModules['shanghai'] = GameModules['shanghai'];
+    GameModules['all-5s'] = GameModules['all-5s'];
+    GameModules['shove-a-penny'] = GameModules['shove-a-penny'];
+    GameModules['roman-empire'] = GameModules['roman-empire'];
+    GameModules['robin-hood'] = GameModules['robin-hood'];
+    GameModules['racetrack'] = GameModules['racetrack'];
+
+    GameModules['basketball-pub-style'] = GameModules['basketball-pub-style'];
+
+    GameModules['shove-a-penny'].getValueChoices = () => [1,2,3,4,5,6,7,8,9];
+    GameModules['golf-darts'].getValueChoices = game => [game.currentRound,25,50];
+    GameModules['baseball'].getValueChoices = game => [game.currentRound];
+    GameModules['basketball-pub-style'].getValueChoices = game => {
+      const target = game.settings.sequence[game.currentRound - 1];
+      return target === 25 ? [25,50] : [target];
+    };
+    GameModules['roman-empire'].getValueChoices = game => {
+      const target = game.settings.sequence[game.currentRound - 1];
+      if(target === 'BULL') return [25,50];
+      if(target === 'DOUBLES' || target === 'TRIPLES') return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+      return [Number(target)];
+    };
+    GameModules['robin-hood'].getValueChoices = game => {
+      const target = game.settings.sequence[game.currentRound - 1];
+      return target === 25 ? [25,50] : [target];
+    };
+    GameModules['shanghai'].getValueChoices = game => [game.currentRound];
+    GameModules['racetrack'].getValueChoices = game => {
+      const p = game.getActivePlayer();
+      return [p.meta.track];
+    };
+    GameModules['count-up'].getValueChoices = () => [1,5,10,15,20,25,50];
+    GameModules['all-5s'].getValueChoices = () => [1,5,10,15,20,25,50];
 
     const EVENTS = [
       { id:'racetrack', name:'Racetrack', objective:GameModules['racetrack'].objective, scoreDirection:GameModules['racetrack'].scoreDirection },
@@ -1716,8 +1990,6 @@
 
     function updateSummary(){
       refs.selectionSummary.textContent = `${state.players.length} player${state.players.length === 1 ? '' : 's'} • ${state.selectedEventIds.length} event${state.selectedEventIds.length === 1 ? '' : 's'} selected`;
-      refs.startTournamentBtn.disabled = !(state.players.length >= 1 && state.selectedEventIds.length >= 1);
-      refs.startTournamentBtn.style.opacity = refs.startTournamentBtn.disabled ? '.6' : '1';
     }
 
     function addPlayer(name){
@@ -1732,28 +2004,9 @@
       showToast(`${clean} added`);
     }
 
-    function createCurrentGame(){
-      const eventId = state.selectedEventIds[state.currentEventIndex];
-      const module = GameModules[eventId];
-      if(!module){
-        console.error('Missing module:', eventId);
-        state.currentGame = null;
-        return;
-      }
-      try{
-        state.currentGame = module.create(state.players);
-      }catch(err){
-        console.error('Error creating game:', eventId, err);
-        state.currentGame = null;
-        showToast('Error starting event — check console');
-      }
-    }
-
     function startTournament(){
-      console.log('Start button clicked', state.players, state.selectedEventIds);
       if(state.players.length < 1) return showToast('Add at least one player');
       if(state.selectedEventIds.length < 1) return showToast('Select at least one event');
-
       state.tournamentStarted = true;
       state.currentEventIndex = 0;
       state.completedEvents = [];
@@ -1783,25 +2036,40 @@
       showToast('Tournament reset');
     }
 
+    function createCurrentGame(){
+      const eventId = state.selectedEventIds[state.currentEventIndex];
+      const module = GameModules[eventId];
+      if(!module){
+        state.currentGame = null;
+        return;
+      }
+      state.currentGame = module.create(state.players);
+    }
+
     function getProgressHtml(){
       return state.selectedEventIds.map((id, idx) => {
-        const event = slugToEvent(id);
+        const e = slugToEvent(id);
         const cls = idx < state.currentEventIndex ? 'done' : idx === state.currentEventIndex ? 'active' : '';
-        return `<span class="progress-pill ${cls}">${escapeHtml(event.name)}</span>`;
+        return `<span class="progress-pill ${cls}">${escapeHtml(e.name)}</span>`;
       }).join('');
     }
 
     function getActiveGameModule(){
-      return state.currentGame ? GameModules[state.currentGame.id] : null;
+      if(!state.currentGame) return null;
+      return GameModules[state.currentGame.id];
     }
 
     function getValueChoicesForGame(game){
       const mod = getActiveGameModule();
-      if(mod && typeof mod.getValueChoices === 'function') return mod.getValueChoices(game);
+      if(mod && typeof mod.getValueChoices === 'function'){
+        return mod.getValueChoices(game);
+      }
       return [1,5,10,15,20,25,50];
     }
 
     function getMultiplierChoicesForGame(game){
+      if(game.id === 'golf-darts') return ['S','D','T'];
+      if(game.id === 'shove-a-penny') return ['S','D','T'];
       return ['S','D','T'];
     }
 
@@ -1825,7 +2093,7 @@
             </select>
           </div>
           <div class="number-strip">
-            ${choices.slice(0, 7).map(v => `<button class="mini-btn" type="button" data-quick-value="${throwIndex}" data-value="${v}">${v === 25 ? 'OB' : v === 50 ? 'B' : v}</button>`).join('')}
+            ${choices.slice(0, Math.min(7, choices.length)).map(v => `<button class="mini-btn" type="button" data-quick-value="${throwIndex}" data-value="${v}">${v === 25 ? 'OB' : v === 50 ? 'B' : v}</button>`).join('')}
           </div>
         </div>
       `;
@@ -1897,7 +2165,10 @@
         }
       });
 
-      document.getElementById('forceFinishBtn')?.addEventListener('click', () => finishCurrentGame(true));
+      document.getElementById('forceFinishBtn')?.addEventListener('click', () => {
+        finishCurrentGame(true);
+      });
+
       document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
     }
 
@@ -1938,7 +2209,6 @@
       } else {
         state.currentGame = null;
       }
-
       renderCurrentEvent();
       renderLeaderboard();
       showToast(`${module.name} completed`);
@@ -1949,7 +2219,7 @@
         <div>
           <div class="eyebrow">Tournament Complete</div>
           <h3 class="current-event-name">All selected events finished.</h3>
-          <p>Your final Olympic leaderboard is below. Reset to play again with the same roster or change the event selection and restart.</p>
+          <p>Your final Olympic leaderboard is locked below. Reset to play the tournament again with the same roster or change event selection and restart.</p>
           <div class="event-progress">${getProgressHtml()}</div>
           <div class="hero-actions" style="margin-top:1rem">
             <button class="btn btn-secondary" id="resetTournamentBtn" type="button">Reset Tournament</button>
@@ -1977,90 +2247,103 @@
       document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
     }
 
-    if(game.id === 'count-up'){
-  refs.gameArea.innerHTML = `
-    <div class="game-shell">
-      <div class="game-top">
-        <div>
-          <div class="eyebrow">Event ${state.currentEventIndex + 1} of ${state.selectedEventIds.length}</div>
-          <h3 class="current-event-name">${escapeHtml(module.name)}</h3>
-          <p>${escapeHtml(module.objective)}</p>
-          <div class="event-progress">${getProgressHtml()}</div>
-          <div class="game-meta">
-            <span class="rule-tag">Round ${Math.min(game.currentRound, game.roundsLimit)} / ${game.roundsLimit}</span>
-            <span class="rule-tag">${module.scoreDirection === 'asc' ? 'Lower score wins' : 'Higher score wins'}</span>
-            <span class="rule-tag">${game.players.length} players</span>
+    function renderCurrentEvent(){
+      if(!state.tournamentStarted){
+        refs.gameArea.innerHTML = `
+          <div class="empty">
+            Tournament not started yet. Add players, select events, and press <strong>Start Tournament</strong>.
           </div>
+        `;
+        return;
+      }
+
+      if(!state.currentGame){
+        renderTournamentComplete();
+        return;
+      }
+
+      const game = state.currentGame;
+      const module = GameModules[game.id];
+      const activePlayer = game.getActivePlayer();
+      const valueChoices = getValueChoicesForGame(game);
+
+      refs.gameArea.innerHTML = `
+        <div class="game-shell">
+          <div class="game-top">
+            <div>
+              <div class="eyebrow">Event ${state.currentEventIndex + 1} of ${state.selectedEventIds.length}</div>
+              <h3 class="current-event-name">${escapeHtml(module.name)}</h3>
+              <p>${escapeHtml(module.objective)}</p>
+              <div class="event-progress">${getProgressHtml()}</div>
+              <div class="game-meta">
+                <span class="rule-tag">Round ${Math.min(game.currentRound, game.roundsLimit)} / ${game.roundsLimit}</span>
+                <span class="rule-tag">${module.scoreDirection === 'asc' ? 'Lower score wins' : 'Higher score wins'}</span>
+                <span class="rule-tag">${game.players.length} players</span>
+                <span class="rule-tag">Values: ${valueChoices.map(v => v === 25 ? 'OB' : v === 50 ? 'B' : v).join(', ')}</span>
+              </div>
+            </div>
+            <div class="score-actions">
+              <button class="btn btn-ghost btn-sm" id="forceFinishBtn" type="button">Force Finish Event</button>
+              <button class="btn btn-secondary btn-sm" id="resetTournamentBtn" type="button">Reset Tournament</button>
+            </div>
+          </div>
+
+          <div class="player-turn-banner">
+            <div>
+              <strong>Current thrower: ${escapeHtml(activePlayer.name)}</strong>
+              <div class="subtle">${escapeHtml(module.name)} live turn entry</div>
+            </div>
+            <div class="subtle">Three darts per turn</div>
+          </div>
+
+          <div class="round-panel">
+            <span class="small-label">Enter this turn</span>
+            <div class="throw-grid">
+              ${renderThrowBox(game, 0)}
+              ${renderThrowBox(game, 1)}
+              ${renderThrowBox(game, 2)}
+            </div>
+            <div class="hero-actions">
+              <button class="btn btn-primary" id="submitTurnBtn" type="button">Submit Turn</button>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="round-panel">
+              <span class="small-label">Live Scoreboard</span>
+              ${renderScoreboard(game)}
+            </div>
+            <div class="round-panel">
+              <span class="small-label">Event Log</span>
+              ${renderHistory(game)}
+            </div>
+          </div>
+
+          ${state.completedEvents.length ? `
+            <div>
+              <h4 style="margin-top:.5rem;">Most Recent Finished Event</h4>
+              <div class="event-results">
+                ${(() => {
+                  const last = state.completedEvents[state.completedEvents.length - 1];
+                  return `
+                    <div class="subtle" style="margin-bottom:.2rem;">${escapeHtml(last.eventName)}</div>
+                    ${last.results.map((r, i) => `
+                      <div class="event-result-row">
+                        <div class="medal-mini">${i + 1}</div>
+                        <div><strong>${escapeHtml(r.player)}</strong></div>
+                        <div>Raw: ${r.score}</div>
+                        <div>Olympic: ${r.olympicPoints}</div>
+                      </div>
+                    `).join('')}
+                  `;
+                })()}
+              </div>
+            </div>
+          ` : ''}
         </div>
-        <div class="hero-actions" style="margin-top:0">
-          <button class="btn btn-ghost btn-sm" id="forceFinishBtn" type="button">Force Finish Event</button>
-          <button class="btn btn-secondary btn-sm" id="resetTournamentBtn" type="button">Reset Tournament</button>
-        </div>
-      </div>
+      `;
 
-      <div class="player-turn-banner">
-        <div>
-          <strong>Current player: ${escapeHtml(game.getActivePlayer().name)}</strong>
-          <div class="subtle">${escapeHtml(module.name)} enter total score for this round</div>
-        </div>
-      </div>
-
-      <div class="round-panel">
-        <label for="roundScoreInput" class="small-label">Round Score</label>
-        <input id="roundScoreInput" type="number" min="0" step="1" class="field" aria-label="Round score input" value="${game.currentThrowSelections[0].value || ''}" />
-        <div class="hero-actions" style="margin-top:1rem">
-          <button class="btn btn-primary" id="submitTurnBtn" type="button">Submit Turn</button>
-        </div>
-      </div>
-
-      <div class="two-col">
-        <div class="round-panel">
-          <strong>Live Scoreboard</strong>
-          ${renderScoreboard(game)}
-        </div>
-        <div class="round-panel">
-          <strong>Event Log</strong>
-          ${renderHistory(game)}
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Bind input change
-  document.getElementById('roundScoreInput').addEventListener('input', e => {
-    const val = e.target.value;
-    game.setThrow(0, { value: val });
-  });
-
-  // Bind submit button
-  document.getElementById('submitTurnBtn').addEventListener('click', () => {
-    game.applyTurn();
-    if(game.finished){
-      finishCurrentGame();
-    } else {
-      renderCurrentEvent();
-    }
-  });
-
-  // Bind other buttons
-  document.getElementById('forceFinishBtn').addEventListener('click', () => finishCurrentGame(true));
-  document.getElementById('resetTournamentBtn').addEventListener('click', resetTournament);
-
-  return; // skip the default throw inputs rendering
-}
-
-    function getSortedLeaderboard(){
-      return state.players.map(player => ({
-        player,
-        ...(state.totals[player] || { olympicPoints:0, eventsPlayed:0, placements:[] })
-      })).sort((a,b) => {
-        if(b.olympicPoints !== a.olympicPoints) return b.olympicPoints - a.olympicPoints;
-        if(b.eventsPlayed !== a.eventsPlayed) return b.eventsPlayed - a.eventsPlayed;
-        const aBest = Math.min(...a.placements.map(p => p.rank), Infinity);
-        const bBest = Math.min(...b.placements.map(p => p.rank), Infinity);
-        if(aBest !== bBest) return aBest - bBest;
-        return a.player.localeCompare(b.player);
-      });
+      bindGameControls();
     }
 
     function renderLeaderboard(){
@@ -2140,10 +2423,16 @@
 
     refs.loadDemoBtn.addEventListener('click', () => {
       state.players = ['Ava', 'Mason', 'Ronan', 'Skye'];
-      state.selectedEventIds = ['count-up', 'golf-darts', 'baseball', 'shanghai', 'racetrack'];
       state.players.forEach(player => {
         state.totals[player] = { olympicPoints:0, eventsPlayed:0, placements:[] };
       });
+      state.selectedEventIds = [
+        'count-up',
+        'golf-darts',
+        'baseball',
+        'shanghai',
+        'racetrack'
+      ];
       renderPlayers();
       renderEventOptions();
       renderSelectedEvents();
