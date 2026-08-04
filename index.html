@@ -763,12 +763,12 @@
 
   function evaluatePlayerSegmentProgress(p) {
   for (let d of p.currentDarts) {
-    // Segment 1: Exactly 25 points on a dart
-    if (p.currentSegment === 1 && d.calculatedScore === 25) {
-      advanceSegment(p);
-    } 
+    // Strict 25 exact target:
+if (p.currentSegment === 1 && turnScore === 25) {
+  advanceSegment(p);
+}
     // Segment 2: Exactly 40 points on a dart
-    else if (p.currentSegment === 2 && d.calculatedScore === 40) {
+    else if (p.currentSegment === 2 && turnScore === 40) {
       advanceSegment(p);
     } 
     // Segment 3: 60 or higher
