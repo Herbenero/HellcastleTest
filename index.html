@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hellcastle Darts — Olympic Tournament App</title>
-  <meta name="description" content="Hellcastle Darts Olympic-style tournament tracker with selectable events, shared player roster, event scoring, and live leaderboard." />
+  <title>Hellcastle Darts — Olympic Tournament Arena</title>
+  <meta name="description" content="Hellcastle Darts Olympic-style multi-event tournament app with playable modules for Racetrack, Roman Empire, Robin Hood, Golf Darts, Basketball Pub Style, Baseball, Count Up, Shove a Penny, Shanghai, and All 5's." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
       --shadow:0 20px 60px rgba(45,24,8,.14);
       --radius:24px;
       --radius-sm:14px;
-      --max:1280px;
+      --max:1360px;
       --trans:280ms cubic-bezier(.2,.8,.2,1);
     }
 
@@ -55,7 +55,7 @@
       mask-image:linear-gradient(to bottom, rgba(0,0,0,.7), transparent 90%);
     }
 
-    h1,h2,h3,h4{
+    h1,h2,h3,h4,h5{
       font-family:"Cinzel", serif;
       margin:0 0 .5rem;
       line-height:1.02;
@@ -64,9 +64,7 @@
 
     p{line-height:1.6; color:var(--ink-soft)}
     a{text-decoration:none; color:inherit}
-    button, input, select, textarea{
-      font:inherit;
-    }
+    button, input, select, textarea{font:inherit}
 
     .shell{
       width:min(calc(100% - 2rem), var(--max));
@@ -154,7 +152,7 @@
 
     .hero-grid{
       display:grid;
-      grid-template-columns:1.12fr .88fr;
+      grid-template-columns:1.1fr .9fr;
       gap:1.4rem;
       align-items:stretch;
     }
@@ -174,9 +172,9 @@
 
     .hero-main{
       padding:clamp(1.4rem, 2vw, 2rem);
-      min-height:460px;
+      min-height:430px;
       display:grid;
-      grid-template-columns:1.18fr .82fr;
+      grid-template-columns:1.15fr .85fr;
       gap:1rem;
       background:
         linear-gradient(135deg, rgba(111,29,27,.06), transparent 38%),
@@ -206,7 +204,6 @@
       color:var(--crimson);
       margin-bottom:1rem;
     }
-
     .eyebrow::before{
       content:"";
       width:34px;
@@ -216,7 +213,7 @@
     }
 
     .hero-main h1{
-      font-size:clamp(2.5rem, 7vw, 5.6rem);
+      font-size:clamp(2.4rem, 6.4vw, 5.4rem);
       max-width:10ch;
     }
 
@@ -245,7 +242,6 @@
       position:relative;
       overflow:hidden;
     }
-
     .btn:active{transform:translateY(1px) scale(.99)}
     .btn-primary{
       color:#fff8ef;
@@ -272,17 +268,15 @@
       background:linear-gradient(180deg, #e8c778, var(--gold));
       box-shadow:0 12px 28px rgba(201,154,59,.28);
     }
-    .btn-gold:hover{
-      transform:translateY(-2px) scale(1.01);
-    }
-    .btn-danger{
-      color:#fff;
-      background:linear-gradient(180deg, #9f322f, #71211f);
-    }
+    .btn-gold:hover{transform:translateY(-2px) scale(1.01)}
     .btn-ghost{
       background:transparent;
       border:1px solid rgba(32,23,15,.12);
       color:var(--ink-soft);
+    }
+    .btn-danger{
+      color:#fff;
+      background:linear-gradient(180deg, #9f322f, #71211f);
     }
     .btn-sm{
       padding:.62rem .9rem;
@@ -290,9 +284,9 @@
     }
     .btn-block{
       width:100%;
-      justify-content:center;
       display:inline-flex;
       align-items:center;
+      justify-content:center;
     }
 
     .dartboard-wrap{
@@ -343,8 +337,8 @@
           var(--ink) 324deg 342deg,
           #e9dfca 342deg 360deg
         );
-        mask:radial-gradient(circle, transparent 0 40%, #000 40% 100%);
-        opacity:.85;
+      mask:radial-gradient(circle, transparent 0 40%, #000 40% 100%);
+      opacity:.85;
     }
 
     .dart{
@@ -376,7 +370,6 @@
       border-right:14px solid #80302f;
       filter:drop-shadow(0 1px 0 rgba(0,0,0,.15));
     }
-
     .dart.one{top:42%; left:6%; transform:rotate(-16deg)}
     .dart.two{top:18%; right:8%; transform:rotate(26deg)}
     .dart.three{bottom:19%; left:20%; transform:rotate(12deg)}
@@ -415,14 +408,8 @@
       box-shadow:inset 0 2px 10px rgba(255,255,255,.4), 0 8px 20px rgba(201,154,59,.24);
     }
 
-    .side-stat strong{
-      display:block;
-      font-size:1.02rem;
-    }
-    .side-stat span{
-      color:var(--ink-soft);
-      font-size:.94rem;
-    }
+    .side-stat strong{display:block;font-size:1.02rem}
+    .side-stat span{color:var(--ink-soft);font-size:.94rem}
 
     .ribbon-list{
       display:grid;
@@ -464,7 +451,7 @@
     }
 
     .section-head p{
-      max-width:54ch;
+      max-width:56ch;
       margin:0;
     }
 
@@ -476,14 +463,9 @@
       padding-bottom:3rem;
     }
 
-    .stack{
-      display:grid;
-      gap:1.2rem;
-    }
+    .stack{display:grid;gap:1.2rem}
 
-    .panel{
-      padding:1.2rem;
-    }
+    .panel{padding:1.2rem}
 
     .panel-title{
       display:flex;
@@ -493,14 +475,8 @@
       margin-bottom:1rem;
     }
 
-    .panel-title h3{
-      font-size:1.45rem;
-    }
-
-    .subtle{
-      color:var(--ink-soft);
-      font-size:.94rem;
-    }
+    .panel-title h3{font-size:1.45rem}
+    .subtle{color:var(--ink-soft);font-size:.94rem}
 
     .player-entry{
       display:grid;
@@ -547,12 +523,10 @@
       font-weight:700;
       transition:var(--trans);
     }
-
     .chip:hover{
       transform:translateY(-2px);
       box-shadow:0 10px 20px rgba(40,20,8,.08);
     }
-
     .chip button{
       border:none;
       background:transparent;
@@ -583,7 +557,7 @@
     }
 
     .event-label{
-      min-height:84px;
+      min-height:100px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -591,22 +565,12 @@
       padding:1rem;
       border:1px solid rgba(32,23,15,.1);
       border-radius:18px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.44));
+      background:linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.44));
       transition:var(--trans);
     }
 
-    .event-label strong{
-      display:block;
-      font-size:1rem;
-    }
-
-    .event-label span{
-      display:block;
-      font-size:.85rem;
-      color:var(--ink-soft);
-      margin-top:.2rem;
-    }
+    .event-label strong{display:block;font-size:1rem}
+    .event-label span{display:block;font-size:.85rem;color:var(--ink-soft);margin-top:.2rem}
 
     .check-mark{
       width:22px;
@@ -666,10 +630,7 @@
       border:1px solid rgba(32,23,15,.08);
     }
 
-    .game-layout{
-      display:grid;
-      gap:1rem;
-    }
+    .game-layout{display:grid;gap:1rem}
 
     .score-panel{
       padding:1.2rem;
@@ -708,40 +669,6 @@
       border-color:transparent;
     }
 
-    .score-grid{
-      margin-top:1rem;
-      display:grid;
-      gap:.8rem;
-    }
-
-    .score-row{
-      display:grid;
-      grid-template-columns:1.2fr .9fr;
-      gap:.8rem;
-      align-items:center;
-      padding:.75rem;
-      border-radius:18px;
-      background:rgba(255,252,245,.7);
-      border:1px solid rgba(32,23,15,.08);
-    }
-
-    .player-tag strong{
-      display:block;
-      font-size:1rem;
-    }
-
-    .player-tag span{
-      color:var(--ink-soft);
-      font-size:.86rem;
-    }
-
-    .score-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:.75rem;
-      margin-top:1rem;
-    }
-
     .leader-panel{
       padding:1.2rem;
       background:
@@ -762,19 +689,19 @@
       padding:.88rem .8rem;
       border-bottom:1px solid rgba(32,23,15,.08);
       font-size:.95rem;
+      vertical-align:top;
     }
+
     .leaderboard-table th{
       color:var(--ink-soft);
       font-size:.84rem;
       text-transform:uppercase;
       letter-spacing:.12em;
     }
-    .leaderboard-table tbody tr{
-      transition:var(--trans);
-    }
-    .leaderboard-table tbody tr:hover{
-      background:rgba(255,251,244,.75);
-    }
+
+    .leaderboard-table tbody tr{transition:var(--trans)}
+    .leaderboard-table tbody tr:hover{background:rgba(255,251,244,.75)}
+
     .rank{
       display:inline-grid;
       place-items:center;
@@ -813,6 +740,217 @@
     .event-result-row:nth-child(1) .medal-mini{background:linear-gradient(180deg,#f8e7ac,#cf9f3f)}
     .event-result-row:nth-child(2) .medal-mini{background:linear-gradient(180deg,#f0f4f7,#b7c1c9)}
     .event-result-row:nth-child(3) .medal-mini{background:linear-gradient(180deg,#ead0bd,#bb7f4f)}
+
+    .game-shell{
+      display:grid;
+      gap:1rem;
+    }
+
+    .game-top{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:1rem;
+      align-items:start;
+    }
+
+    .game-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.6rem;
+      margin-top:.7rem;
+    }
+
+    .rule-tag{
+      padding:.48rem .72rem;
+      border-radius:999px;
+      background:#fff9ef;
+      border:1px solid rgba(32,23,15,.1);
+      font-size:.84rem;
+      font-weight:700;
+    }
+
+    .player-turn-banner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+      flex-wrap:wrap;
+      padding:1rem;
+      border-radius:20px;
+      border:1px solid rgba(32,23,15,.08);
+      background:linear-gradient(90deg, rgba(201,154,59,.14), rgba(111,29,27,.06));
+    }
+
+    .round-panel{
+      display:grid;
+      gap:.8rem;
+      padding:1rem;
+      border-radius:22px;
+      border:1px solid rgba(32,23,15,.08);
+      background:rgba(255,252,245,.72);
+    }
+
+    .throw-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:.7rem;
+    }
+
+    .throw-box{
+      padding:.75rem;
+      border-radius:16px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(32,23,15,.08);
+    }
+
+    .throw-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.5rem;
+      margin-bottom:.45rem;
+      font-weight:700;
+      font-size:.92rem;
+    }
+
+    .throw-controls{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:.5rem;
+    }
+
+    .throw-value-grid{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:.5rem;
+      margin-top:.5rem;
+    }
+
+    .small-label{
+      display:block;
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:var(--ink-soft);
+      margin-bottom:.35rem;
+      font-weight:800;
+    }
+
+    .number-strip{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.45rem;
+      margin-top:.45rem;
+    }
+
+    .mini-btn{
+      border:none;
+      cursor:pointer;
+      border-radius:12px;
+      padding:.5rem .7rem;
+      background:#fff9ef;
+      border:1px solid rgba(32,23,15,.1);
+      font-weight:800;
+      transition:var(--trans);
+    }
+    .mini-btn:hover{
+      transform:translateY(-2px);
+      background:#fff;
+    }
+
+    .scoreboard{
+      display:grid;
+      gap:.75rem;
+    }
+
+    .scoreboard-row{
+      display:grid;
+      grid-template-columns:auto 1fr auto auto;
+      gap:.75rem;
+      align-items:center;
+      padding:.85rem 1rem;
+      border-radius:18px;
+      background:rgba(255,252,245,.74);
+      border:1px solid rgba(32,23,15,.08);
+    }
+
+    .scoreboard-row.active{
+      border-color:rgba(111,29,27,.26);
+      background:linear-gradient(90deg, rgba(111,29,27,.07), rgba(201,154,59,.12));
+      box-shadow:0 14px 24px rgba(111,29,27,.08);
+    }
+
+    .avatar-dot{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #f3d999, #bb8a2f);
+      font-weight:900;
+      color:#2c180d;
+      font-family:"Cinzel", serif;
+    }
+
+    .score-main strong{
+      display:block;
+      font-size:1rem;
+    }
+    .score-main span{
+      display:block;
+      color:var(--ink-soft);
+      font-size:.84rem;
+    }
+
+    .score-stat{
+      text-align:right;
+      min-width:72px;
+    }
+    .score-stat strong{
+      display:block;
+      font-size:1.08rem;
+    }
+    .score-stat span{
+      display:block;
+      color:var(--ink-soft);
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
+    .history-log{
+      display:grid;
+      gap:.45rem;
+      max-height:220px;
+      overflow:auto;
+      padding-right:.2rem;
+    }
+
+    .history-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+      padding:.65rem .8rem;
+      border-radius:14px;
+      background:rgba(255,255,255,.68);
+      border:1px solid rgba(32,23,15,.08);
+      font-size:.9rem;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+    }
+
+    .empty{
+      padding:1rem;
+      border-radius:18px;
+      background:rgba(255,252,245,.72);
+      border:1px dashed rgba(32,23,15,.18);
+      color:var(--ink-soft);
+    }
 
     .footer{
       padding:2rem 0 3rem;
@@ -871,46 +1009,31 @@
       to{opacity:1; transform:translateY(0)}
     }
 
-    .empty{
-      padding:1rem;
-      border-radius:18px;
-      background:rgba(255,252,245,.72);
-      border:1px dashed rgba(32,23,15,.18);
-      color:var(--ink-soft);
-    }
-
-    @media (max-width: 1080px){
+    @media (max-width: 1180px){
       .hero-grid,
       .main-grid,
-      .hero-main{
+      .hero-main,
+      .two-col{
         grid-template-columns:1fr;
       }
-      .hero-main{
-        min-height:auto;
-      }
+      .hero-main{min-height:auto}
     }
 
-    @media (max-width: 760px){
+    @media (max-width: 860px){
       .nav-links{display:none}
       .player-entry,
-      .score-row{
-        grid-template-columns:1fr;
-      }
-      .event-grid{
-        grid-template-columns:1fr;
-      }
+      .throw-grid,
+      .game-top,
+      .scoreboard-row,
       .event-result-row{
-        grid-template-columns:auto 1fr auto;
+        grid-template-columns:1fr;
       }
-      .event-result-row > div:last-child{
-        grid-column:2 / -1;
+      .event-grid{grid-template-columns:1fr}
+      .scoreboard-row,
+      .event-result-row{
+        align-items:start;
       }
-      .topbar-inner{
-        min-height:66px;
-      }
-      .hero{
-        padding-top:1rem;
-      }
+      .score-stat{text-align:left}
     }
   </style>
 </head>
@@ -938,14 +1061,14 @@
         <article class="hero-main reveal">
           <div class="stagger">
             <div class="eyebrow">Castle League Format</div>
-            <h1>Olympic scoring for every darts event.</h1>
+            <h1>Play every event inside one Olympic tournament.</h1>
             <p>
-              Build a shared roster, choose your tournament disciplines, enter raw event scores, and let the app convert each game into Olympic-style placement points.
-              Every event counts equally on the overall leaderboard—regardless of the score scale.
+              This version includes playable modules for Racetrack, Roman Empire, Robin Hood, Golf Darts, Basketball Pub Style, Baseball,
+              Count Up, Shove a Penny, Shanghai, and All 5's. Add players once, select events, play each game in sequence, and convert final placements into Olympic tournament points.
             </p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="#setup">Start Tournament</a>
-              <button class="btn btn-secondary" id="loadDemoBtn" type="button">Load Demo Players</button>
+              <button class="btn btn-secondary" id="loadDemoBtn" type="button">Load Demo Setup</button>
             </div>
           </div>
           <div class="dartboard-wrap" aria-hidden="true">
@@ -961,29 +1084,29 @@
           <div class="side-stat">
             <div class="medal">10</div>
             <div>
-              <strong>Selectable events</strong>
-              <span>Racetrack to All 5's</span>
+              <strong>Playable game modules</strong>
+              <span>Each event runs inside the app</span>
             </div>
           </div>
           <div class="side-stat">
             <div class="medal">∞</div>
             <div>
-              <strong>Score agnostic</strong>
-              <span>Low score or high score—rank by finish</span>
+              <strong>Olympic scoring layer</strong>
+              <span>Event score scale never matters</span>
             </div>
           </div>
           <div class="ribbon-list stagger">
             <div class="ribbon">
               <span>Shared player roster</span>
-              <strong>Across all games</strong>
+              <strong>Across all events</strong>
             </div>
             <div class="ribbon">
-              <span>Event result conversion</span>
-              <strong>Olympic points</strong>
+              <span>Interactive turn engine</span>
+              <strong>Three-dart rounds</strong>
             </div>
             <div class="ribbon">
-              <span>After each finish</span>
-              <strong>Leaderboard update</strong>
+              <span>Automatic standings</span>
+              <strong>After every finish</strong>
             </div>
           </div>
         </aside>
@@ -995,10 +1118,10 @@
         <div class="section-head reveal">
           <div>
             <div class="eyebrow">Tournament Setup</div>
-            <h2>Choose your roster. Choose your battles.</h2>
+            <h2>Choose the roster. Then choose the order of war.</h2>
           </div>
           <p>
-            Add the players once, select any combination of events, then run the tournament in sequence. Each completed event awards Olympic-style standings points based on placing.
+            Add players, select any event mix, and start. Each module tracks live turns, round logic, and scoring. Once an event completes, the app assigns Olympic points by finish position and updates the overall leaderboard.
           </p>
         </div>
 
@@ -1007,7 +1130,7 @@
             <section class="panel reveal" aria-labelledby="playersTitle">
               <div class="panel-title">
                 <h3 id="playersTitle">Players</h3>
-                <span class="subtle">Used across every selected event</span>
+                <span class="subtle">Shared across every selected event</span>
               </div>
 
               <div class="player-entry">
@@ -1021,7 +1144,7 @@
             <section class="panel reveal" aria-labelledby="eventsTitle">
               <div class="panel-title">
                 <h3 id="eventsTitle">Select Events</h3>
-                <span class="subtle">Pick the tournament disciplines to play</span>
+                <span class="subtle">Play them in the selected order below</span>
               </div>
 
               <div class="event-grid" id="eventGrid"></div>
@@ -1030,7 +1153,7 @@
 
               <div class="state-band">
                 <div>
-                  <strong id="selectionSummary">0 events selected</strong>
+                  <strong id="selectionSummary">0 players • 0 events selected</strong>
                   <div class="subtle">At least 1 player and 1 event are required to start</div>
                 </div>
                 <button class="btn btn-gold" id="startTournamentBtn" type="button">Start Tournament</button>
@@ -1042,7 +1165,7 @@
             <section class="score-panel reveal" id="play" aria-labelledby="playTitle">
               <div class="panel-title">
                 <h3 id="playTitle">Current Event</h3>
-                <span class="subtle">Enter raw results when a game finishes</span>
+                <span class="subtle">Playable module + live scoring</span>
               </div>
 
               <div id="gameArea" class="game-layout">
@@ -1071,32 +1194,20 @@
   </main>
 
   <footer class="footer shell">
-    Hellcastle Darts — Olympic tournament tracker for mixed darts disciplines.
+    Hellcastle Darts — integrated multi-event Olympic tournament arena.
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const EVENTS = [
-      { id: 'racetrack', name: 'Racetrack', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'roman-empire', name: 'Roman Empire', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'robin-hood', name: 'Robin Hood', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'golf-darts', name: 'Golf Darts', objective: 'Lower score ranks better', scoreDirection: 'asc' },
-      { id: 'basketball-pub-style', name: 'Basketball Pub Style', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'baseball', name: 'Baseball', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'count-up', name: 'Count Up', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'shove-a-penny', name: 'Shove a Penny', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'shanghai', name: 'Shanghai', objective: 'Higher score ranks better', scoreDirection: 'desc' },
-      { id: 'all-5s', name: "All 5's", objective: 'Higher score ranks better', scoreDirection: 'desc' }
-    ];
-
     const state = {
       players: [],
       selectedEventIds: [],
       tournamentStarted: false,
       currentEventIndex: 0,
       completedEvents: [],
-      totals: {}
+      totals: {},
+      currentGame: null
     };
 
     const refs = {
@@ -1120,10 +1231,6 @@
       showToast._t = setTimeout(() => refs.toast.classList.remove('show'), 2200);
     }
 
-    function slugToEvent(id){
-      return EVENTS.find(e => e.id === id);
-    }
-
     function escapeHtml(str){
       return String(str).replace(/[&<>"']/g, m => ({
         '&': '&amp;',
@@ -1134,6 +1241,693 @@
       }[m]));
     }
 
+    function uid(){
+      return Math.random().toString(36).slice(2,10);
+    }
+
+    function clone(obj){
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function playerInitial(name){
+      return (name || '?').trim().charAt(0).toUpperCase();
+    }
+
+    function olympicPointsByRank(rank, totalPlayers){
+      return Math.max(1, totalPlayers - rank + 1);
+    }
+
+    function rankScores(entries, direction){
+      const sorted = [...entries].sort((a,b) => direction === 'asc' ? a.score - b.score : b.score - a.score);
+      let lastScore = null;
+      let lastRank = 0;
+      return sorted.map((entry, index) => {
+        const rank = (lastScore !== null && entry.score === lastScore) ? lastRank : index + 1;
+        lastScore = entry.score;
+        lastRank = rank;
+        return { ...entry, rank };
+      });
+    }
+
+    function getSortedLeaderboard(){
+      return state.players.map(player => ({
+        player,
+        ...(state.totals[player] || { olympicPoints:0, eventsPlayed:0, placements:[] })
+      })).sort((a,b) => {
+        if(b.olympicPoints !== a.olympicPoints) return b.olympicPoints - a.olympicPoints;
+        if(b.eventsPlayed !== a.eventsPlayed) return b.eventsPlayed - a.eventsPlayed;
+        const aBest = Math.min(...a.placements.map(p => p.rank), Infinity);
+        const bBest = Math.min(...b.placements.map(p => p.rank), Infinity);
+        if(aBest !== bBest) return aBest - bBest;
+        return a.player.localeCompare(b.player);
+      });
+    }
+
+    function makeBaseGame(config){
+      const players = config.players.map(name => ({
+        id: uid(),
+        name,
+        score: config.initialScore ?? 0,
+        rounds: [],
+        finishedAt: null,
+        meta: {}
+      }));
+
+      const game = {
+        id: config.id,
+        name: config.name,
+        subtitle: config.subtitle || '',
+        objective: config.objective,
+        scoreDirection: config.scoreDirection,
+        roundsLimit: config.roundsLimit || 10,
+        throwsPerTurn: 3,
+        currentPlayerIndex: 0,
+        currentRound: 1,
+        players,
+        log: [],
+        currentThrowSelections: Array.from({length:3}, () => ({ multiplier:'S', value:20 })),
+        finished: false,
+        settings: config.settings || {},
+        scoreboardLabel: config.scoreboardLabel || 'Score',
+        isComplete(){
+          if(typeof config.isComplete === 'function') return config.isComplete(this);
+          return this.currentRound > this.roundsLimit && this.currentPlayerIndex === 0;
+        },
+        getActivePlayer(){
+          return this.players[this.currentPlayerIndex];
+        },
+        setThrow(index, patch){
+          this.currentThrowSelections[index] = {
+            ...this.currentThrowSelections[index],
+            ...patch
+          };
+        },
+        addLog(text){
+          this.log.unshift({ id: uid(), text, time: Date.now() });
+          this.log = this.log.slice(0, 40);
+        },
+        computeThrowScore(throwData){
+          if(config.computeThrowScore) return config.computeThrowScore(this, throwData);
+          const map = { S:1, D:2, T:3 };
+          return (Number(throwData.value) || 0) * (map[throwData.multiplier] || 1);
+        },
+        getThrowDescription(throwData){
+          if(config.getThrowDescription) return config.getThrowDescription(this, throwData);
+          return `${throwData.multiplier}${throwData.value}`;
+        },
+        applyTurn(){
+          if(this.finished) return;
+          const player = this.getActivePlayer();
+          const throws = clone(this.currentThrowSelections);
+          const result = config.applyTurn(this, player, throws);
+          player.rounds.push({
+            round: this.currentRound,
+            throws,
+            total: result.turnScore,
+            note: result.note || ''
+          });
+
+          if(typeof result.newScore === 'number'){
+            player.score = result.newScore;
+          }
+
+          if(result.meta){
+            player.meta = { ...player.meta, ...result.meta };
+          }
+
+          this.addLog(`${player.name}: ${result.note || result.turnScore}`);
+
+          if(result.playerFinished){
+            player.finishedAt = this.log.length;
+          }
+
+          this.currentThrowSelections = Array.from({length:3}, () => ({ multiplier:'S', value:20 }));
+
+          const wasLastPlayer = this.currentPlayerIndex === this.players.length - 1;
+          this.currentPlayerIndex = wasLastPlayer ? 0 : this.currentPlayerIndex + 1;
+          if(wasLastPlayer) this.currentRound += 1;
+
+          if(config.postTurn) config.postTurn(this, player, result);
+
+          if(this.isComplete()){
+            this.finished = true;
+          }
+        },
+        getResults(){
+          if(config.getResults) return config.getResults(this);
+          return this.players.map(p => ({ player:p.name, score:p.score }));
+        }
+      };
+
+      if(config.init) config.init(game);
+      return game;
+    }
+
+    function throwScoreBasic(multiplier, value){
+      const map = {S:1,D:2,T:3};
+      return (Number(value) || 0) * (map[multiplier] || 1);
+    }
+
+    const GameModules = {
+      'count-up': {
+        id:'count-up',
+        name:'Count Up',
+        objective:'Highest total score after 8 rounds wins.',
+        scoreDirection:'desc',
+        roundsLimit:8,
+        scoreboardLabel:'Points',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            applyTurn(game, player, throws){
+              const turnScore = throws.reduce((sum, t) => sum + throwScoreBasic(t.multiplier, t.value), 0);
+              return {
+                turnScore,
+                newScore: player.score + turnScore,
+                note: `+${turnScore} points`
+              };
+            }
+          });
+        }
+      },
+
+      'golf-darts': {
+        id:'golf-darts',
+        name:'Golf Darts',
+        objective:'Lowest total strokes after 9 holes wins. Bull = hole in one, double = 2, single = 3, triple = 4, miss/other = 5.',
+        scoreDirection:'asc',
+        roundsLimit:9,
+        scoreboardLabel:'Strokes',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            initialScore:0,
+            settings:{ valueChoices:[25,50] },
+            getThrowDescription(game, throwData){
+              if(throwData.value === 50) return 'Bull';
+              return `${throwData.multiplier}${throwData.value}`;
+            },
+            applyTurn(game, player, throws){
+              const hole = game.currentRound;
+              let bestStroke = 5;
+              throws.forEach(t => {
+                if(Number(t.value) === 50){
+                  bestStroke = Math.min(bestStroke, 1);
+                } else if(Number(t.value) === hole){
+                  if(t.multiplier === 'D') bestStroke = Math.min(bestStroke, 2);
+                  else if(t.multiplier === 'S') bestStroke = Math.min(bestStroke, 3);
+                  else if(t.multiplier === 'T') bestStroke = Math.min(bestStroke, 4);
+                }
+              });
+              return {
+                turnScore: bestStroke,
+                newScore: player.score + bestStroke,
+                note: `Hole ${hole}: ${bestStroke} stroke${bestStroke === 1 ? '' : 's'}`
+              };
+            }
+          });
+        }
+      },
+
+      'baseball': {
+        id:'baseball',
+        name:'Baseball',
+        objective:'Highest runs after innings 1 through 9 wins.',
+        scoreDirection:'desc',
+        roundsLimit:9,
+        scoreboardLabel:'Runs',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            applyTurn(game, player, throws){
+              const inning = game.currentRound;
+              let runs = 0;
+              throws.forEach(t => {
+                if(Number(t.value) === inning){
+                  if(t.multiplier === 'S') runs += 1;
+                  if(t.multiplier === 'D') runs += 2;
+                  if(t.multiplier === 'T') runs += 3;
+                }
+              });
+              return {
+                turnScore: runs,
+                newScore: player.score + runs,
+                note: `Inning ${inning}: +${runs} run${runs === 1 ? '' : 's'}`
+              };
+            }
+          });
+        }
+      },
+
+      'basketball-pub-style': {
+        id:'basketball-pub-style',
+        name:'Basketball Pub Style',
+        objective:'Highest made baskets after 8 rounds wins. Need exact target hit: single = 1, double = 2, triple = 3.',
+        scoreDirection:'desc',
+        roundsLimit:8,
+        scoreboardLabel:'Baskets',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            settings:{ sequence:[6,11,14,9,12,5,20,25] },
+            applyTurn(game, player, throws){
+              const target = game.settings.sequence[game.currentRound - 1];
+              let baskets = 0;
+              throws.forEach(t => {
+                if(Number(t.value) === target){
+                  if(t.multiplier === 'S') baskets += 1;
+                  if(t.multiplier === 'D') baskets += 2;
+                  if(t.multiplier === 'T') baskets += 3;
+                }
+                if(target === 25 && Number(t.value) === 50){
+                  baskets += 3;
+                }
+              });
+              return {
+                turnScore: baskets,
+                newScore: player.score + baskets,
+                note: `Target ${target === 25 ? 'Bull' : target}: +${baskets}`
+              };
+            }
+          });
+        }
+      },
+
+      'all-5s': {
+        id:'all-5s',
+        name:"All 5's",
+        objective:'Only turns totaling a multiple of 5 score. Score equals turn total ÷ 5. Highest after 10 rounds wins.',
+        scoreDirection:'desc',
+        roundsLimit:10,
+        scoreboardLabel:'5-Points',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            applyTurn(game, player, throws){
+              const total = throws.reduce((sum, t) => sum + throwScoreBasic(t.multiplier, t.value), 0);
+              const earned = total % 5 === 0 ? total / 5 : 0;
+              return {
+                turnScore: earned,
+                newScore: player.score + earned,
+                note: `${total} total → +${earned}`
+              };
+            }
+          });
+        }
+      },
+
+      'shanghai': {
+        id:'shanghai',
+        name:'Shanghai',
+        objective:'Highest score after rounds 1 to 7 wins. Single = 1× target, double = 2×, triple = 3×. Any player hitting S, D and T of the target in one round scores a Shanghai and wins instantly.',
+        scoreDirection:'desc',
+        roundsLimit:7,
+        scoreboardLabel:'Points',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            applyTurn(game, player, throws){
+              const target = game.currentRound;
+              let gained = 0;
+              const hitSet = new Set();
+              throws.forEach(t => {
+                if(Number(t.value) === target){
+                  gained += throwScoreBasic(t.multiplier, t.value);
+                  hitSet.add(t.multiplier);
+                }
+              });
+              const shanghai = hitSet.has('S') && hitSet.has('D') && hitSet.has('T');
+              return {
+                turnScore: gained,
+                newScore: player.score + gained + (shanghai ? 1000 : 0),
+                note: shanghai ? `Shanghai on ${target}! instant victory marker` : `Target ${target}: +${gained}`,
+                meta:{ shanghai }
+              };
+            },
+            isComplete(game){
+              const someoneShanghai = game.players.some(p => p.meta.shanghai);
+              return someoneShanghai || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
+            },
+            getResults(game){
+              return game.players.map(p => ({
+                player:p.name,
+                score:p.meta.shanghai ? 1000 + p.score : p.score
+              }));
+            }
+          });
+        }
+      },
+
+      'shove-a-penny': {
+        id:'shove-a-penny',
+        name:'Shove a Penny',
+        objective:'Score exactly 3 marks on each number 1 through 9. Extra marks can be thrown to opponents who have not closed the number. Best completion and progress wins.',
+        scoreDirection:'desc',
+        roundsLimit:18,
+        scoreboardLabel:'Closure',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            init(game){
+              game.players.forEach(p => {
+                p.meta.marks = {};
+                for(let i=1;i<=9;i++) p.meta.marks[i]=0;
+                p.meta.closedCount = 0;
+                p.meta.progressScore = 0;
+              });
+              game.currentThrowSelections = Array.from({length:3}, () => ({ multiplier:'S', value:1 }));
+            },
+            applyTurn(game, player, throws){
+              let noteParts = [];
+              throws.forEach(t => {
+                const num = Number(t.value);
+                if(num < 1 || num > 9) return;
+                let marks = t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+                while(marks > 0){
+                  if(player.meta.marks[num] < 3){
+                    player.meta.marks[num]++;
+                    marks--;
+                  } else {
+                    const openOpponents = game.players.filter(op => op.name !== player.name && op.meta.marks[num] < 3);
+                    if(openOpponents.length){
+                      openOpponents.forEach(op => {
+                        if(marks > 0 && op.meta.marks[num] < 3){
+                          op.meta.marks[num]++;
+                        }
+                      });
+                      marks = 0;
+                    } else {
+                      marks = 0;
+                    }
+                  }
+                }
+              });
+              player.meta.closedCount = Object.values(player.meta.marks).filter(v => v >= 3).length;
+              player.meta.progressScore = Object.values(player.meta.marks).reduce((a,b)=>a+b,0);
+              noteParts.push(`Closed ${player.meta.closedCount}/9`);
+              return {
+                turnScore: player.meta.closedCount * 100 + player.meta.progressScore,
+                newScore: player.meta.closedCount * 100 + player.meta.progressScore,
+                note: noteParts.join(' • ')
+              };
+            },
+            isComplete(game){
+              const someoneClosedAll = game.players.some(p => p.meta.closedCount === 9);
+              return someoneClosedAll || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
+            }
+          });
+        }
+      },
+
+      'roman-empire': {
+        id:'roman-empire',
+        name:'Roman Empire',
+        objective:'Highest empire score across themed targets: 20, 19, 18, 17, 16, 15, Bull, Doubles, Triples.',
+        scoreDirection:'desc',
+        roundsLimit:9,
+        scoreboardLabel:'Empire',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            settings:{ sequence:['20','19','18','17','16','15','BULL','DOUBLES','TRIPLES'] },
+            applyTurn(game, player, throws){
+              const target = game.settings.sequence[game.currentRound - 1];
+              let gained = 0;
+              throws.forEach(t => {
+                const v = Number(t.value);
+                if(target === 'BULL' && (v === 25 || v === 50)){
+                  gained += v === 50 ? 50 : 25;
+                } else if(target === 'DOUBLES' && t.multiplier === 'D'){
+                  gained += throwScoreBasic(t.multiplier, t.value);
+                } else if(target === 'TRIPLES' && t.multiplier === 'T'){
+                  gained += throwScoreBasic(t.multiplier, t.value);
+                } else if(String(v) === target){
+                  gained += throwScoreBasic(t.multiplier, t.value);
+                }
+              });
+              return {
+                turnScore:gained,
+                newScore:player.score + gained,
+                note:`${target}: +${gained}`
+              };
+            }
+          });
+        }
+      },
+
+      'robin-hood': {
+        id:'robin-hood',
+        name:'Robin Hood',
+        objective:'Hit the announced sequence 1, 3, 5, 7, 9, 11, 13, 15, Bull. Highest points wins.',
+        scoreDirection:'desc',
+        roundsLimit:9,
+        scoreboardLabel:'Hits',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            settings:{ sequence:[1,3,5,7,9,11,13,15,25] },
+            applyTurn(game, player, throws){
+              const target = game.settings.sequence[game.currentRound - 1];
+              let gained = 0;
+              throws.forEach(t => {
+                const value = Number(t.value);
+                if(target === 25 && (value === 25 || value === 50)){
+                  gained += value === 50 ? 5 : 3;
+                } else if(value === target){
+                  gained += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+                }
+              });
+              return {
+                turnScore:gained,
+                newScore:player.score + gained,
+                note:`Target ${target === 25 ? 'Bull' : target}: +${gained}`
+              };
+            }
+          });
+        }
+      },
+
+      'racetrack': {
+        id:'racetrack',
+        name:'Racetrack',
+        objective:'Race through target sequence 1 to 20 in order. Furthest progress wins; ties broken by overflow hits.',
+        scoreDirection:'desc',
+        roundsLimit:20,
+        scoreboardLabel:'Track',
+        create(players){
+          return makeBaseGame({
+            id:this.id,
+            name:this.name,
+            objective:this.objective,
+            scoreDirection:this.scoreDirection,
+            roundsLimit:this.roundsLimit,
+            scoreboardLabel:this.scoreboardLabel,
+            init(game){
+              game.players.forEach(p => {
+                p.meta.track = 1;
+                p.meta.progress = 0;
+              });
+              game.currentThrowSelections = Array.from({length:3}, () => ({ multiplier:'S', value:1 }));
+            },
+            applyTurn(game, player, throws){
+              throws.forEach(t => {
+                const target = player.meta.track;
+                const val = Number(t.value);
+                const step = t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+                if(val === target){
+                  player.meta.progress += step;
+                  player.meta.track = Math.min(20, player.meta.track + step);
+                }
+              });
+              const finished = player.meta.track >= 20;
+              const score = player.meta.progress + (finished ? 1000 : 0);
+              return {
+                turnScore:score,
+                newScore:score,
+                playerFinished:finished,
+                note:`Reached ${Math.min(player.meta.track,20)}`
+              };
+            },
+            isComplete(game){
+              const done = game.players.some(p => p.meta.track >= 20);
+              return done || (game.currentRound > game.roundsLimit && game.currentPlayerIndex === 0);
+            }
+          });
+        }
+      },
+
+      'basketball-pub-style': null,
+      'baseball': null
+    };
+
+    GameModules['basketball-pub-style'] = GameModules['basketball-pub-style'] || {
+      id:'basketball-pub-style',
+      name:'Basketball Pub Style',
+      objective:'Highest made baskets after 8 rounds wins. Need exact target hit: single = 1, double = 2, triple = 3.',
+      scoreDirection:'desc',
+      roundsLimit:8,
+      scoreboardLabel:'Baskets',
+      create(players){
+        return makeBaseGame({
+          id:this.id,
+          name:this.name,
+          objective:this.objective,
+          scoreDirection:this.scoreDirection,
+          roundsLimit:this.roundsLimit,
+          scoreboardLabel:this.scoreboardLabel,
+          settings:{ sequence:[6,11,14,9,12,5,20,25] },
+          applyTurn(game, player, throws){
+            const target = game.settings.sequence[game.currentRound - 1];
+            let baskets = 0;
+            throws.forEach(t => {
+              if(target === 25){
+                if(Number(t.value) === 25) baskets += (t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3);
+                if(Number(t.value) === 50) baskets += 3;
+              } else if(Number(t.value) === target){
+                baskets += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+              }
+            });
+            return {
+              turnScore:baskets,
+              newScore:player.score + baskets,
+              note:`Target ${target === 25 ? 'Bull' : target}: +${baskets}`
+            };
+          }
+        });
+      }
+    };
+
+    GameModules['baseball'] = GameModules['baseball'] || {
+      id:'baseball',
+      name:'Baseball',
+      objective:'Highest runs after innings 1 through 9 wins.',
+      scoreDirection:'desc',
+      roundsLimit:9,
+      scoreboardLabel:'Runs',
+      create(players){
+        return makeBaseGame({
+          id:this.id,
+          name:this.name,
+          objective:this.objective,
+          scoreDirection:this.scoreDirection,
+          roundsLimit:this.roundsLimit,
+          scoreboardLabel:this.scoreboardLabel,
+          applyTurn(game, player, throws){
+            const inning = game.currentRound;
+            let runs = 0;
+            throws.forEach(t => {
+              if(Number(t.value) === inning){
+                runs += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
+              }
+            });
+            return {
+              turnScore:runs,
+              newScore:player.score + runs,
+              note:`Inning ${inning}: +${runs}`
+            };
+          }
+        });
+      }
+    };
+
+    GameModules['count-up'] = GameModules['count-up'];
+    GameModules['golf-darts'] = GameModules['golf-darts'];
+    GameModules['shanghai'] = GameModules['shanghai'];
+    GameModules['all-5s'] = GameModules['all-5s'];
+    GameModules['shove-a-penny'] = GameModules['shove-a-penny'];
+    GameModules['roman-empire'] = GameModules['roman-empire'];
+    GameModules['robin-hood'] = GameModules['robin-hood'];
+    GameModules['racetrack'] = GameModules['racetrack'];
+
+    GameModules['basketball-pub-style'] = GameModules['basketball-pub-style'];
+
+    GameModules['shove-a-penny'].getValueChoices = () => [1,2,3,4,5,6,7,8,9];
+    GameModules['golf-darts'].getValueChoices = game => [game.currentRound,25,50];
+    GameModules['baseball'].getValueChoices = game => [game.currentRound];
+    GameModules['basketball-pub-style'].getValueChoices = game => {
+      const target = game.settings.sequence[game.currentRound - 1];
+      return target === 25 ? [25,50] : [target];
+    };
+    GameModules['roman-empire'].getValueChoices = game => {
+      const target = game.settings.sequence[game.currentRound - 1];
+      if(target === 'BULL') return [25,50];
+      if(target === 'DOUBLES' || target === 'TRIPLES') return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+      return [Number(target)];
+    };
+    GameModules['robin-hood'].getValueChoices = game => {
+      const target = game.settings.sequence[game.currentRound - 1];
+      return target === 25 ? [25,50] : [target];
+    };
+    GameModules['shanghai'].getValueChoices = game => [game.currentRound];
+    GameModules['racetrack'].getValueChoices = game => {
+      const p = game.getActivePlayer();
+      return [p.meta.track];
+    };
+    GameModules['count-up'].getValueChoices = () => [1,5,10,15,20,25,50];
+    GameModules['all-5s'].getValueChoices = () => [1,5,10,15,20,25,50];
+
+    const EVENTS = [
+      { id:'racetrack', name:'Racetrack', objective:GameModules['racetrack'].objective, scoreDirection:GameModules['racetrack'].scoreDirection },
+      { id:'roman-empire', name:'Roman Empire', objective:GameModules['roman-empire'].objective, scoreDirection:GameModules['roman-empire'].scoreDirection },
+      { id:'robin-hood', name:'Robin Hood', objective:GameModules['robin-hood'].objective, scoreDirection:GameModules['robin-hood'].scoreDirection },
+      { id:'golf-darts', name:'Golf Darts', objective:GameModules['golf-darts'].objective, scoreDirection:GameModules['golf-darts'].scoreDirection },
+      { id:'basketball-pub-style', name:'Basketball Pub Style', objective:GameModules['basketball-pub-style'].objective, scoreDirection:GameModules['basketball-pub-style'].scoreDirection },
+      { id:'baseball', name:'Baseball', objective:GameModules['baseball'].objective, scoreDirection:GameModules['baseball'].scoreDirection },
+      { id:'count-up', name:'Count Up', objective:GameModules['count-up'].objective, scoreDirection:GameModules['count-up'].scoreDirection },
+      { id:'shove-a-penny', name:'Shove a Penny', objective:GameModules['shove-a-penny'].objective, scoreDirection:GameModules['shove-a-penny'].scoreDirection },
+      { id:'shanghai', name:'Shanghai', objective:GameModules['shanghai'].objective, scoreDirection:GameModules['shanghai'].scoreDirection },
+      { id:'all-5s', name:"All 5's", objective:GameModules['all-5s'].objective, scoreDirection:GameModules['all-5s'].scoreDirection }
+    ];
+
+    function slugToEvent(id){
+      return EVENTS.find(e => e.id === id);
+    }
+
     function renderEventOptions(){
       refs.eventGrid.innerHTML = EVENTS.map(event => `
         <label class="event-item">
@@ -1141,7 +1935,7 @@
           <span class="event-label">
             <span>
               <strong>${event.name}</strong>
-              <span>${event.objective}</span>
+              <span>${event.scoreDirection === 'asc' ? 'Lower score wins' : 'Higher score wins'}</span>
             </span>
             <span class="check-mark" aria-hidden="true"></span>
           </span>
@@ -1158,6 +1952,13 @@
           renderSelectedEvents();
         });
       });
+    }
+
+    function renderSelectedEvents(){
+      refs.selectedEventsDisplay.innerHTML = state.selectedEventIds.length
+        ? state.selectedEventIds.map((id, idx) => `<span class="mini-badge">${idx + 1}. ${escapeHtml(slugToEvent(id).name)}</span>`).join('')
+        : `<div class="empty" style="width:100%">No events selected yet.</div>`;
+      updateSummary();
     }
 
     function renderPlayers(){
@@ -1187,17 +1988,8 @@
       });
     }
 
-    function renderSelectedEvents(){
-      refs.selectedEventsDisplay.innerHTML = state.selectedEventIds.length
-        ? state.selectedEventIds.map(id => `<span class="mini-badge">${escapeHtml(slugToEvent(id).name)}</span>`).join('')
-        : `<div class="empty" style="width:100%">No events selected yet.</div>`;
-      updateSummary();
-    }
-
     function updateSummary(){
-      const playerText = `${state.players.length} player${state.players.length === 1 ? '' : 's'}`;
-      const eventText = `${state.selectedEventIds.length} event${state.selectedEventIds.length === 1 ? '' : 's'} selected`;
-      refs.selectionSummary.textContent = `${playerText} • ${eventText}`;
+      refs.selectionSummary.textContent = `${state.players.length} player${state.players.length === 1 ? '' : 's'} • ${state.selectedEventIds.length} event${state.selectedEventIds.length === 1 ? '' : 's'} selected`;
     }
 
     function addPlayer(name){
@@ -1205,71 +1997,188 @@
       if(!clean) return showToast('Enter a player name');
       if(state.players.some(p => p.toLowerCase() === clean.toLowerCase())) return showToast('Player already added');
       state.players.push(clean);
-      state.totals[clean] = state.totals[clean] || { olympicPoints: 0, eventsPlayed: 0, placements: [] };
+      state.totals[clean] = state.totals[clean] || { olympicPoints:0, eventsPlayed:0, placements:[] };
       refs.playerInput.value = '';
       renderPlayers();
       updateSummary();
       showToast(`${clean} added`);
     }
 
-    function olympicPointsByRank(rank, totalPlayers){
-      const max = totalPlayers;
-      return Math.max(1, max - rank + 1);
-    }
-
-    function rankScores(entries, direction){
-      const sorted = [...entries].sort((a,b) => direction === 'asc' ? a.score - b.score : b.score - a.score);
-      let lastScore = null;
-      let lastRank = 0;
-
-      return sorted.map((entry, index) => {
-        const rank = (lastScore !== null && entry.score === lastScore) ? lastRank : index + 1;
-        lastScore = entry.score;
-        lastRank = rank;
-        return { ...entry, rank };
-      });
-    }
-
     function startTournament(){
       if(state.players.length < 1) return showToast('Add at least one player');
       if(state.selectedEventIds.length < 1) return showToast('Select at least one event');
-
       state.tournamentStarted = true;
       state.currentEventIndex = 0;
       state.completedEvents = [];
+      state.currentGame = null;
+
       state.players.forEach(player => {
-        state.totals[player] = { olympicPoints: 0, eventsPlayed: 0, placements: [] };
+        state.totals[player] = { olympicPoints:0, eventsPlayed:0, placements:[] };
       });
 
+      createCurrentGame();
       renderCurrentEvent();
       renderLeaderboard();
       showToast('Tournament started');
       document.getElementById('play').scrollIntoView({ behavior:'smooth', block:'start' });
     }
 
-    function getCurrentEvent(){
-      return slugToEvent(state.selectedEventIds[state.currentEventIndex]);
+    function resetTournament(){
+      state.tournamentStarted = false;
+      state.currentEventIndex = 0;
+      state.completedEvents = [];
+      state.currentGame = null;
+      state.players.forEach(player => {
+        state.totals[player] = { olympicPoints:0, eventsPlayed:0, placements:[] };
+      });
+      renderCurrentEvent();
+      renderLeaderboard();
+      showToast('Tournament reset');
     }
 
-    function completeCurrentEvent(){
-      const event = getCurrentEvent();
-      if(!event) return;
+    function createCurrentGame(){
+      const eventId = state.selectedEventIds[state.currentEventIndex];
+      const module = GameModules[eventId];
+      if(!module){
+        state.currentGame = null;
+        return;
+      }
+      state.currentGame = module.create(state.players);
+    }
 
-      const inputs = Array.from(document.querySelectorAll('[data-score-player]'));
-      const entries = inputs.map(input => {
-        const player = input.dataset.scorePlayer;
-        const raw = input.value.trim();
-        return {
-          player,
-          score: raw === '' ? null : Number(raw)
-        };
+    function getProgressHtml(){
+      return state.selectedEventIds.map((id, idx) => {
+        const e = slugToEvent(id);
+        const cls = idx < state.currentEventIndex ? 'done' : idx === state.currentEventIndex ? 'active' : '';
+        return `<span class="progress-pill ${cls}">${escapeHtml(e.name)}</span>`;
+      }).join('');
+    }
+
+    function getActiveGameModule(){
+      if(!state.currentGame) return null;
+      return GameModules[state.currentGame.id];
+    }
+
+    function getValueChoicesForGame(game){
+      const mod = getActiveGameModule();
+      if(mod && typeof mod.getValueChoices === 'function'){
+        return mod.getValueChoices(game);
+      }
+      return [1,5,10,15,20,25,50];
+    }
+
+    function getMultiplierChoicesForGame(game){
+      if(game.id === 'golf-darts') return ['S','D','T'];
+      if(game.id === 'shove-a-penny') return ['S','D','T'];
+      return ['S','D','T'];
+    }
+
+    function renderThrowBox(game, throwIndex){
+      const throwState = game.currentThrowSelections[throwIndex];
+      const choices = getValueChoicesForGame(game);
+      const multipliers = getMultiplierChoicesForGame(game);
+
+      return `
+        <div class="throw-box">
+          <div class="throw-head">
+            <span>Dart ${throwIndex + 1}</span>
+            <span>${escapeHtml(game.getThrowDescription(throwState))}</span>
+          </div>
+          <div class="throw-controls">
+            <select class="select" data-throw-multiplier="${throwIndex}" aria-label="Multiplier for dart ${throwIndex + 1}">
+              ${multipliers.map(m => `<option value="${m}" ${throwState.multiplier === m ? 'selected' : ''}>${m === 'S' ? 'Single' : m === 'D' ? 'Double' : 'Triple'}</option>`).join('')}
+            </select>
+            <select class="select" data-throw-value="${throwIndex}" aria-label="Value for dart ${throwIndex + 1}">
+              ${choices.map(v => `<option value="${v}" ${Number(throwState.value) === Number(v) ? 'selected' : ''}>${v === 25 ? 'Outer Bull' : v === 50 ? 'Bull' : v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="number-strip">
+            ${choices.slice(0, Math.min(7, choices.length)).map(v => `<button class="mini-btn" type="button" data-quick-value="${throwIndex}" data-value="${v}">${v === 25 ? 'OB' : v === 50 ? 'B' : v}</button>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderScoreboard(game){
+      return `
+        <div class="scoreboard">
+          ${game.players.map((player, idx) => `
+            <div class="scoreboard-row ${idx === game.currentPlayerIndex && !game.finished ? 'active' : ''}">
+              <div class="avatar-dot">${escapeHtml(playerInitial(player.name))}</div>
+              <div class="score-main">
+                <strong>${escapeHtml(player.name)}</strong>
+                <span>${player.rounds.length} turn${player.rounds.length === 1 ? '' : 's'} played</span>
+              </div>
+              <div class="score-stat">
+                <strong>${player.score}</strong>
+                <span>${escapeHtml(game.scoreboardLabel)}</span>
+              </div>
+              <div class="score-stat">
+                <strong>${player.finishedAt ? 'Done' : 'Live'}</strong>
+                <span>Status</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderHistory(game){
+      return game.log.length ? `
+        <div class="history-log">
+          ${game.log.map(item => `<div class="history-item"><span>${escapeHtml(item.text)}</span></div>`).join('')}
+        </div>
+      ` : `<div class="empty">No throws recorded yet.</div>`;
+    }
+
+    function bindGameControls(){
+      if(!state.currentGame) return;
+      const game = state.currentGame;
+
+      document.querySelectorAll('[data-throw-multiplier]').forEach(el => {
+        el.addEventListener('change', () => {
+          game.setThrow(Number(el.dataset.throwMultiplier), { multiplier: el.value });
+          renderCurrentEvent();
+        });
       });
 
-      if(entries.some(e => e.score === null || Number.isNaN(e.score))){
-        return showToast('Enter a score for every player');
-      }
+      document.querySelectorAll('[data-throw-value]').forEach(el => {
+        el.addEventListener('change', () => {
+          game.setThrow(Number(el.dataset.throwValue), { value: Number(el.value) });
+          renderCurrentEvent();
+        });
+      });
 
-      const ranked = rankScores(entries, event.scoreDirection).map(item => ({
+      document.querySelectorAll('[data-quick-value]').forEach(el => {
+        el.addEventListener('click', () => {
+          game.setThrow(Number(el.dataset.quickValue), { value: Number(el.dataset.value) });
+          renderCurrentEvent();
+        });
+      });
+
+      document.getElementById('submitTurnBtn')?.addEventListener('click', () => {
+        game.applyTurn();
+        if(game.finished){
+          finishCurrentGame();
+        } else {
+          renderCurrentEvent();
+        }
+      });
+
+      document.getElementById('forceFinishBtn')?.addEventListener('click', () => {
+        finishCurrentGame(true);
+      });
+
+      document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
+    }
+
+    function finishCurrentGame(forced = false){
+      const game = state.currentGame;
+      if(!game) return;
+
+      const module = GameModules[game.id];
+      const rawResults = game.getResults();
+      const ranked = rankScores(rawResults, module.scoreDirection).map(item => ({
         ...item,
         olympicPoints: olympicPointsByRank(item.rank, state.players.length)
       }));
@@ -1278,8 +2187,8 @@
         state.totals[row.player].olympicPoints += row.olympicPoints;
         state.totals[row.player].eventsPlayed += 1;
         state.totals[row.player].placements.push({
-          eventId: event.id,
-          eventName: event.name,
+          eventId: module.id,
+          eventName: module.name,
           rawScore: row.score,
           rank: row.rank,
           olympicPoints: row.olympicPoints
@@ -1287,28 +2196,55 @@
       });
 
       state.completedEvents.push({
-        eventId: event.id,
-        eventName: event.name,
-        direction: event.scoreDirection,
-        results: ranked
+        eventId: module.id,
+        eventName: module.name,
+        direction: module.scoreDirection,
+        results: ranked,
+        forced
       });
 
       state.currentEventIndex += 1;
+      if(state.currentEventIndex < state.selectedEventIds.length){
+        createCurrentGame();
+      } else {
+        state.currentGame = null;
+      }
       renderCurrentEvent();
       renderLeaderboard();
-      showToast(`${event.name} completed`);
+      showToast(`${module.name} completed`);
     }
 
-    function resetTournament(){
-      state.tournamentStarted = false;
-      state.currentEventIndex = 0;
-      state.completedEvents = [];
-      state.players.forEach(player => {
-        state.totals[player] = { olympicPoints: 0, eventsPlayed: 0, placements: [] };
-      });
-      renderCurrentEvent();
-      renderLeaderboard();
-      showToast('Tournament reset');
+    function renderTournamentComplete(){
+      refs.gameArea.innerHTML = `
+        <div>
+          <div class="eyebrow">Tournament Complete</div>
+          <h3 class="current-event-name">All selected events finished.</h3>
+          <p>Your final Olympic leaderboard is locked below. Reset to play the tournament again with the same roster or change event selection and restart.</p>
+          <div class="event-progress">${getProgressHtml()}</div>
+          <div class="hero-actions" style="margin-top:1rem">
+            <button class="btn btn-secondary" id="resetTournamentBtn" type="button">Reset Tournament</button>
+          </div>
+        </div>
+        <div>
+          <h4 style="margin:1rem 0 .7rem;">Completed Event Summaries</h4>
+          <div class="event-results">
+            ${state.completedEvents.map(ev => `
+              <div class="panel" style="padding:1rem; border-radius:20px;">
+                <strong style="display:block; margin-bottom:.7rem;">${escapeHtml(ev.eventName)}</strong>
+                ${ev.results.map((r, i) => `
+                  <div class="event-result-row" style="margin-bottom:.45rem;">
+                    <div class="medal-mini">${i + 1}</div>
+                    <strong>${escapeHtml(r.player)}</strong>
+                    <span>Raw: ${r.score}</span>
+                    <span>Olympic: ${r.olympicPoints}</span>
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
     }
 
     function renderCurrentEvent(){
@@ -1321,120 +2257,93 @@
         return;
       }
 
-      const event = getCurrentEvent();
-      const progressHtml = state.selectedEventIds.map((id, idx) => {
-        const e = slugToEvent(id);
-        const cls = idx < state.currentEventIndex ? 'done' : idx === state.currentEventIndex ? 'active' : '';
-        return `<span class="progress-pill ${cls}">${escapeHtml(e.name)}</span>`;
-      }).join('');
-
-      if(!event){
-        refs.gameArea.innerHTML = `
-          <div>
-            <div class="eyebrow">Tournament Complete</div>
-            <h3 class="current-event-name">All selected events finished.</h3>
-            <p>Your final Olympic leaderboard is locked in below. You can reset and run the tournament again with the same roster and event list.</p>
-            <div class="event-progress">${progressHtml}</div>
-            <div class="score-actions">
-              <button class="btn btn-secondary" id="resetTournamentBtn" type="button">Reset Scores</button>
-            </div>
-          </div>
-          <div>
-            <h4 style="margin-top:1.2rem;">Completed Event Summaries</h4>
-            <div class="event-results">
-              ${state.completedEvents.map(ev => `
-                <div class="panel" style="padding:1rem; border-radius:20px;">
-                  <strong style="display:block; margin-bottom:.7rem;">${escapeHtml(ev.eventName)}</strong>
-                  ${ev.results.map((r, i) => `
-                    <div class="event-result-row" style="margin-bottom:.45rem;">
-                      <div class="medal-mini">${i+1}</div>
-                      <strong>${escapeHtml(r.player)}</strong>
-                      <span>Raw: ${r.score}</span>
-                      <span>Olympic: ${r.olympicPoints}</span>
-                    </div>
-                  `).join('')}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
+      if(!state.currentGame){
+        renderTournamentComplete();
         return;
       }
 
+      const game = state.currentGame;
+      const module = GameModules[game.id];
+      const activePlayer = game.getActivePlayer();
+      const valueChoices = getValueChoicesForGame(game);
+
       refs.gameArea.innerHTML = `
-        <div>
-          <div class="eyebrow">Event ${state.currentEventIndex + 1} of ${state.selectedEventIds.length}</div>
-          <h3 class="current-event-name">${escapeHtml(event.name)}</h3>
-          <p>${escapeHtml(event.objective)}. Enter the finished raw score for each player. The app will convert placements into Olympic points automatically.</p>
-          <div class="event-progress">${progressHtml}</div>
-        </div>
-
-        <div class="score-grid">
-          ${state.players.map(player => `
-            <div class="score-row">
-              <div class="player-tag">
-                <strong>${escapeHtml(player)}</strong>
-                <span>Result entry for ${escapeHtml(event.name)}</span>
+        <div class="game-shell">
+          <div class="game-top">
+            <div>
+              <div class="eyebrow">Event ${state.currentEventIndex + 1} of ${state.selectedEventIds.length}</div>
+              <h3 class="current-event-name">${escapeHtml(module.name)}</h3>
+              <p>${escapeHtml(module.objective)}</p>
+              <div class="event-progress">${getProgressHtml()}</div>
+              <div class="game-meta">
+                <span class="rule-tag">Round ${Math.min(game.currentRound, game.roundsLimit)} / ${game.roundsLimit}</span>
+                <span class="rule-tag">${module.scoreDirection === 'asc' ? 'Lower score wins' : 'Higher score wins'}</span>
+                <span class="rule-tag">${game.players.length} players</span>
+                <span class="rule-tag">Values: ${valueChoices.map(v => v === 25 ? 'OB' : v === 50 ? 'B' : v).join(', ')}</span>
               </div>
-              <input
-                class="score-input"
-                type="number"
-                step="any"
-                placeholder="Enter score"
-                data-score-player="${escapeHtml(player)}"
-                aria-label="Score for ${escapeHtml(player)} in ${escapeHtml(event.name)}"
-              />
             </div>
-          `).join('')}
-        </div>
-
-        <div class="score-actions">
-          <button class="btn btn-primary" id="finishEventBtn" type="button">Finish Event</button>
-          <button class="btn btn-ghost" id="resetTournamentBtn" type="button">Reset Tournament</button>
-        </div>
-
-        ${state.completedEvents.length ? `
-          <div>
-            <h4 style="margin-top:1rem;">Most Recent Event Results</h4>
-            <div class="event-results">
-              ${(() => {
-                const last = state.completedEvents[state.completedEvents.length - 1];
-                return `
-                  <div class="subtle" style="margin-bottom:.4rem;">${escapeHtml(last.eventName)}</div>
-                  ${last.results.map((r, i) => `
-                    <div class="event-result-row">
-                      <div class="medal-mini">${i+1}</div>
-                      <div><strong>${escapeHtml(r.player)}</strong></div>
-                      <div>Raw: ${r.score}</div>
-                      <div>Olympic: ${r.olympicPoints}</div>
-                    </div>
-                  `).join('')}
-                `;
-              })()}
+            <div class="score-actions">
+              <button class="btn btn-ghost btn-sm" id="forceFinishBtn" type="button">Force Finish Event</button>
+              <button class="btn btn-secondary btn-sm" id="resetTournamentBtn" type="button">Reset Tournament</button>
             </div>
           </div>
-        ` : ''}
+
+          <div class="player-turn-banner">
+            <div>
+              <strong>Current thrower: ${escapeHtml(activePlayer.name)}</strong>
+              <div class="subtle">${escapeHtml(module.name)} live turn entry</div>
+            </div>
+            <div class="subtle">Three darts per turn</div>
+          </div>
+
+          <div class="round-panel">
+            <span class="small-label">Enter this turn</span>
+            <div class="throw-grid">
+              ${renderThrowBox(game, 0)}
+              ${renderThrowBox(game, 1)}
+              ${renderThrowBox(game, 2)}
+            </div>
+            <div class="hero-actions">
+              <button class="btn btn-primary" id="submitTurnBtn" type="button">Submit Turn</button>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="round-panel">
+              <span class="small-label">Live Scoreboard</span>
+              ${renderScoreboard(game)}
+            </div>
+            <div class="round-panel">
+              <span class="small-label">Event Log</span>
+              ${renderHistory(game)}
+            </div>
+          </div>
+
+          ${state.completedEvents.length ? `
+            <div>
+              <h4 style="margin-top:.5rem;">Most Recent Finished Event</h4>
+              <div class="event-results">
+                ${(() => {
+                  const last = state.completedEvents[state.completedEvents.length - 1];
+                  return `
+                    <div class="subtle" style="margin-bottom:.2rem;">${escapeHtml(last.eventName)}</div>
+                    ${last.results.map((r, i) => `
+                      <div class="event-result-row">
+                        <div class="medal-mini">${i + 1}</div>
+                        <div><strong>${escapeHtml(r.player)}</strong></div>
+                        <div>Raw: ${r.score}</div>
+                        <div>Olympic: ${r.olympicPoints}</div>
+                      </div>
+                    `).join('')}
+                  `;
+                })()}
+              </div>
+            </div>
+          ` : ''}
+        </div>
       `;
 
-      document.getElementById('finishEventBtn')?.addEventListener('click', completeCurrentEvent);
-      document.getElementById('resetTournamentBtn')?.addEventListener('click', resetTournament);
-    }
-
-    function getSortedLeaderboard(){
-      return state.players.map(player => ({
-        player,
-        ...state.totals[player]
-      })).sort((a,b) => {
-        if(b.olympicPoints !== a.olympicPoints) return b.olympicPoints - a.olympicPoints;
-        if(b.eventsPlayed !== a.eventsPlayed) return b.eventsPlayed - a.eventsPlayed;
-
-        const aBest = Math.min(...a.placements.map(p => p.rank), Infinity);
-        const bBest = Math.min(...b.placements.map(p => p.rank), Infinity);
-        if(aBest !== bBest) return aBest - bBest;
-
-        return a.player.localeCompare(b.player);
-      });
+      bindGameControls();
     }
 
     function renderLeaderboard(){
@@ -1471,7 +2380,10 @@
               return `
                 <tr>
                   <td><span class="rank ${rankClass}">${idx + 1}</span></td>
-                  <td><strong>${escapeHtml(row.player)}</strong></td>
+                  <td>
+                    <strong>${escapeHtml(row.player)}</strong>
+                    ${row.placements.length ? `<div class="subtle" style="margin-top:.25rem">${row.placements.map(p => `${escapeHtml(p.eventName)}: #${p.rank}`).join(' • ')}</div>` : ''}
+                  </td>
                   <td>${row.olympicPoints}</td>
                   <td>${row.eventsPlayed}</td>
                   <td>${bestFinish}</td>
@@ -1512,24 +2424,28 @@
     refs.loadDemoBtn.addEventListener('click', () => {
       state.players = ['Ava', 'Mason', 'Ronan', 'Skye'];
       state.players.forEach(player => {
-        state.totals[player] = { olympicPoints: 0, eventsPlayed: 0, placements: [] };
+        state.totals[player] = { olympicPoints:0, eventsPlayed:0, placements:[] };
       });
-      if(state.selectedEventIds.length === 0){
-        state.selectedEventIds = ['racetrack', 'golf-darts', 'baseball', 'shanghai'];
-      }
+      state.selectedEventIds = [
+        'count-up',
+        'golf-darts',
+        'baseball',
+        'shanghai',
+        'racetrack'
+      ];
       renderPlayers();
       renderEventOptions();
       renderSelectedEvents();
       renderCurrentEvent();
       renderLeaderboard();
-      showToast('Demo loaded');
+      showToast('Demo setup loaded');
     });
 
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if(entry.isIntersecting) entry.target.classList.add('in');
       });
-    }, { threshold: .14 });
+    }, { threshold:.14 });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
