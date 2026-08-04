@@ -120,17 +120,14 @@
     .target-btn:hover { background: #fdf5e6; transform: translateY(-1px); }
     .target-btn.bull { background: linear-gradient(180deg, #fff2b4, #d4a33f); color: #2c180d; }
     
-    /* Race Track UI */
     .track-container { display: flex; justify-content: space-between; gap: 8px; margin: 1rem 0; }
     .track-segment { flex: 1; background: #fff; border: 2px solid rgba(32,23,15,.12); border-radius: 8px; padding: 10px 4px; text-align: center; }
     .track-segment.completed { background: #e8f5e9; border-color: var(--green); color: var(--green-dark); }
     .track-segment.active-seg { border-color: var(--crimson); background: #fdf0ed; }
 
-    /* Golf UI */
     .golf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem; }
     .golf-btn { padding: 14px 10px; border-radius: 12px; background: #fff; border: 1px solid rgba(32,23,15,.12); cursor: pointer; text-align: center; font-weight: 800; }
 
-    /* Scoreboard */
     .scoreboard-panel { background: #fff; border-radius: 16px; border: 1px solid rgba(32,23,15,.1); padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
     .scoreboard-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
     .scoreboard-table th, .scoreboard-table td { padding: 8px 10px; border-bottom: 1px solid rgba(32,23,15,.08); text-align: left; font-size: .9rem; }
@@ -253,6 +250,13 @@
               <div class="meta-card"><div class="k">Empire Score</div><div class="v" id="reTotalScore">0</div></div>
               <div class="meta-card"><div class="k">Territories</div><div class="v" id="reTerritories">0</div></div>
             </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+              <strong>Darts Thrown This Turn:</strong>
+              <button class="btn btn-secondary" onclick="undoRomanEmpireDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
+            </div>
+            <div id="reDartsThrown" style="display:flex; gap:8px; margin-bottom: 1rem;">
+              <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
+            </div>
             <div class="mult-row">
               <button class="btn btn-secondary active" id="reMult1" onclick="setReMult(1)">Single (1x)</button>
               <button class="btn btn-secondary" id="reMult2" onclick="setReMult(2)">Double (2x)</button>
@@ -284,7 +288,7 @@
     let activeEvents = [];
     let currentEventIndex = 0;
 
-    // --- SETUP ---
+    // --- SETUP MANAGEMENT ---
     function addPlayer() {
       const input = document.getElementById('playerInput');
       const name = input.value.trim();
@@ -479,207 +483,119 @@
       renderScoreboard(bbScores);
     }
 
-    // --- ROMAN EMPIRE GAME ENGINE & SCOREBOARD FIX ---
+    // --- ROMAN EMPIRE (ENGINE FIX) ---
+    let reMult = 1;
+    let reScores = {};
+    let reTurn = 0;
+    let reDartsThisTurn = [];
 
-let reState = {
-  players: [],          // Player list
-  turnIndex: 0,        // Current player turn
-  round: 1,            // Current round (1 to maxRounds)
-  maxRounds: 10,
-  multiplier: 1,       // 1 (Single), 2 (Double), 3 (Triple)
-  dartsThisTurn: [],   // Array of recorded darts for current turn
-  playerStats: {}      // Map of { player: { points: 0, territories: Set(), shields: Set() } }
-};
+    function initRomanEmpire() {
+      reScores = {};
+      players.forEach(p => {
+        reScores[p] = {
+          total: 0,
+          territories: new Set(),
+          shields: new Set()
+        };
+      });
+      reTurn = 0;
+      reMult = 1;
+      reDartsThisTurn = [];
 
-// 1. Initialize Roman Empire State
-function initRomanEmpire(playerList, maxRounds = 10) {
-  reState.players = playerList && playerList.length ? playerList : players;
-  reState.turnIndex = 0;
-  reState.round = 1;
-  reState.maxRounds = maxRounds;
-  reState.multiplier = 1;
-  reState.dartsThisTurn = [];
-  reState.playerStats = {};
+      const grid = document.getElementById('reTargetsGrid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreRe(${i})">${i}</button>`;
+      grid.innerHTML += `<button class="target-btn bull" onclick="scoreRe(25)">BULL</button><button class="target-btn" onclick="scoreRe(0)">MISS</button>`;
 
-  reState.players.forEach(p => {
-    reState.playerStats[p] = {
-      points: 0,
-      territories: new Set(),
-      shields: new Set()
-    };
-  });
-
-  setReMultiplier(1);
-  updateRomanEmpireUI();
-}
-
-// 2. Set Multiplier (Single, Double, Triple)
-function setReMultiplier(mult) {
-  reState.multiplier = mult;
-  document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((btn, idx) => {
-    if (btn) btn.classList.toggle('active', idx + 1 === mult);
-  });
-}
-
-// 3. Record Dart Hit Logic
-function scoreRomanEmpire(segment) {
-  const currentPlayer = reState.players[reState.turnIndex];
-  if (!currentPlayer) return;
-
-  const stats = reState.playerStats[currentPlayer];
-  const mult = reState.multiplier;
-  let pointsEarned = 0;
-
-  if (segment > 0) {
-    // Standard Roman Empire Scoring Logic:
-    // Base points = segment value
-    // Single: Claims unowned territory or scores base points
-    // Double / Triple: Fortifies/Shields territory and provides multiplier bonus
-    pointsEarned = segment * mult;
-    stats.points += pointsEarned;
-
-    if (!stats.territories.has(segment)) {
-      stats.territories.add(segment);
+      setReMult(1);
+      updateReUI();
     }
 
-    if (mult > 1) {
-      stats.shields.add(segment);
+    function setReMult(m) {
+      reMult = m;
+      document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((b, i) => {
+        b.classList.toggle('active', i + 1 === m);
+      });
     }
-  }
 
-  // Push dart history for turn tracking / undo
-  reState.dartsThisTurn.push({ segment, mult, points: pointsEarned });
+    function scoreRe(pts) {
+      const player = players[reTurn % players.length];
+      if (!player) return;
 
-  // Reset multiplier back to Single after throw
-  setReMultiplier(1);
+      const pData = reScores[player];
+      const ptsEarned = pts * reMult;
 
-  // Check turn advancement (3 darts per turn)
-  if (reState.dartsThisTurn.length >= 3) {
-    reState.dartsThisTurn = [];
-    reState.turnIndex = (reState.turnIndex + 1) % reState.players.length;
-
-    // Advance round if full cycle of players completed
-    if (reState.turnIndex === 0) {
-      reState.round++;
-    }
-  }
-
-  updateRomanEmpireUI();
-}
-
-// 4. Undo Last Dart
-function undoRomanEmpireDart() {
-  if (reState.dartsThisTurn.length === 0) {
-    // Go back to previous player if at start of turn
-    if (reState.turnIndex === 0 && reState.round === 1) return; // Start of game
-    
-    reState.turnIndex = (reState.turnIndex - 1 + reState.players.length) % reState.players.length;
-    if (reState.turnIndex === reState.players.length - 1) {
-      reState.round = Math.max(1, reState.round - 1);
-    }
-    // Note: To support full undo across previous turns, track global stack
-  } else {
-    const lastDart = reState.dartsThisTurn.pop();
-    const currentPlayer = reState.players[reState.turnIndex];
-    const stats = reState.playerStats[currentPlayer];
-
-    if (lastDart && stats) {
-      stats.points = Math.max(0, stats.points - lastDart.points);
-      // Remove territory/shield if no other recorded hit exists for segment
-    }
-  }
-
-  setReMultiplier(1);
-  updateRomanEmpireUI();
-}
-
-// 5. Update Roman Empire UI & Shared Tournament Scoreboard
-function updateRomanEmpireUI() {
-  const currentPlayer = reState.players[reState.turnIndex] || '—';
-  const stats = reState.playerStats[currentPlayer] || { points: 0, territories: new Set(), shields: new Set() };
-
-  // Update Meta Cards
-  const elPlayer = document.getElementById('rePlayer');
-  const elRound = document.getElementById('reRound');
-  const elScore = document.getElementById('reTotalScore');
-  const elTerr = document.getElementById('reTerritories');
-
-  if (elPlayer) elPlayer.innerText = currentPlayer;
-  if (elRound) elRound.innerText = `${Math.min(reState.round, reState.maxRounds)} / ${reState.maxRounds}`;
-  if (elScore) elScore.innerText = stats.points;
-  if (elTerr) elTerr.innerText = `${stats.territories.size} (${stats.shields.size} Shielded)`;
-
-  // Update Darts Thrown Chips
-  const dartsContainer = document.getElementById('reDartsThrown');
-  if (dartsContainer) {
-    let chipsHTML = '';
-    for (let i = 0; i < 3; i++) {
-      const d = reState.dartsThisTurn[i];
-      if (d) {
-        const prefix = d.mult === 3 ? 'T' : d.mult === 2 ? 'D' : '';
-        const label = d.segment === 25 ? 'BULL' : d.segment === 0 ? 'MISS' : `${prefix}${d.segment}`;
-        chipsHTML += `<span class="chip">${label} (${d.points}pts)</span>`;
-      } else {
-        chipsHTML += `<span class="chip">—</span>`;
+      if (pts > 0) {
+        pData.total += ptsEarned;
+        pData.territories.add(pts);
+        if (reMult > 1) {
+          pData.shields.add(pts);
+        }
       }
+
+      reDartsThisTurn.push({ pts, mult: reMult, score: ptsEarned });
+
+      // Reset multiplier to single after throw
+      reMult = 1;
+      setReMult(1);
+
+      // Advance player turn every 3 darts
+      if (reDartsThisTurn.length >= 3) {
+        reDartsThisTurn = [];
+        reTurn++;
+      }
+
+      updateReUI();
     }
-    dartsContainer.innerHTML = chipsHTML;
-  }
 
-  // Render Leaderboard / Scoreboard Table
-  renderRomanEmpireScoreboard();
-}
-
-// 6. Leaderboard Renderer (Fixed for Tournament & Module Views)
-function renderRomanEmpireScoreboard() {
-  const tbody = document.getElementById('scoreboardBody');
-  if (!tbody) return;
-
-  // Rank players by total points, then by total territories claimed
-  const rankedPlayers = [...reState.players].sort((a, b) => {
-    const statsA = reState.playerStats[a] || { points: 0, territories: new Set() };
-    const statsB = reState.playerStats[b] || { points: 0, territories: new Set() };
-    if (statsB.points !== statsA.points) {
-      return statsB.points - statsA.points;
+    function undoRomanEmpireDart() {
+      if (reDartsThisTurn.length > 0) {
+        const lastDart = reDartsThisTurn.pop();
+        const player = players[reTurn % players.length];
+        const pData = reScores[player];
+        if (pData && lastDart) {
+          pData.total = Math.max(0, pData.total - lastDart.score);
+        }
+      }
+      setReMult(1);
+      updateReUI();
     }
-    return statsB.territories.size - statsA.territories.size;
-  });
 
-  tbody.innerHTML = rankedPlayers.map((player, rank) => {
-    const stats = reState.playerStats[player] || { points: 0, territories: new Set(), shields: new Set() };
-    const isCurrentTurn = player === reState.players[reState.turnIndex];
+    function updateReUI() {
+      const player = players[reTurn % players.length];
+      const roundNum = Math.floor(reTurn / players.length) + 1;
+      const pData = reScores[player] || { total: 0, territories: new Set(), shields: new Set() };
 
-    return `
-      <tr class="scoreboard-row ${isCurrentTurn ? 'active-row' : ''}">
-        <td>
-          <strong>${rank + 1}. ${player}</strong> ${isCurrentTurn ? '🎯' : ''}
-        </td>
-        <td>
-          <strong>${stats.points} pts</strong> 
-          <br><small style="color:var(--ink-soft);">${stats.territories.size} Terr. (${stats.shields.size} Shielded)</small>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
+      document.getElementById('rePlayer').innerText = player;
+      document.getElementById('reRound').innerText = `${Math.min(roundNum, 10)} / 10`;
+      document.getElementById('reTotalScore').innerText = pData.total;
+      document.getElementById('reTerritories').innerText = `${pData.territories.size} (${pData.shields.size} Shielded)`;
 
-function updateReUI() {
-  const playerIndex = reTurn % players.length;
-  const player = players[playerIndex];
-  const roundNum = Math.floor(reTurn / players.length) + 1;
+      // Render Darts Thrown Chips
+      const dartsContainer = document.getElementById('reDartsThrown');
+      if (dartsContainer) {
+        let chipsHTML = '';
+        for (let i = 0; i < 3; i++) {
+          const d = reDartsThisTurn[i];
+          if (d) {
+            const prefix = d.mult === 3 ? 'T' : d.mult === 2 ? 'D' : '';
+            const label = d.pts === 25 ? 'BULL' : d.pts === 0 ? 'MISS' : `${prefix}${d.pts}`;
+            chipsHTML += `<span class="chip">${label} (${d.score}pts)</span>`;
+          } else {
+            chipsHTML += `<span class="chip">—</span>`;
+          }
+        }
+        dartsContainer.innerHTML = chipsHTML;
+      }
 
-  document.getElementById('rePlayer').innerText = player;
-  document.getElementById('reRound').innerText = `${Math.min(roundNum, reTotalRounds)} / ${reTotalRounds}`;
-  document.getElementById('reTotalScore').innerText = reScores[player].totalPoints;
-  document.getElementById('reTerritories').innerText = `${reScores[player].territories.size} (${reScores[player].fortified.size} Shielded)`;
-
-  // Update Leaderboard Map
-  const scoreMap = {};
-  players.forEach(p => {
-    scoreMap[p] = `${reScores[p].totalPoints} pts (${reScores[p].territories.size} Terr.)`;
-  });
-  renderScoreboard(scoreMap);
-}
+      // Update Shared Tournament Scoreboard Map
+      const scoreMap = {};
+      players.forEach(p => {
+        const data = reScores[p] || { total: 0, territories: new Set() };
+        scoreMap[p] = `${data.total} pts (${data.territories.size} Terr.)`;
+      });
+      renderScoreboard(scoreMap);
+    }
   </script>
 </body>
 </html>
