@@ -762,47 +762,57 @@
   }
 
   function evaluatePlayerSegmentProgress(p) {
-    for (let d of p.currentDarts) {
-      // Segment 1: Score 25 or higher
-      if (p.currentSegment === 1 && d.calculatedScore >= 25) {
-        advanceSegment(p);
-      } 
-      // Segment 2: Score 40 or higher
-      else if (p.currentSegment === 2 && d.calculatedScore >= 40) {
-        advanceSegment(p);
-      } 
-      // Segment 3: Score 60 or higher
-      else if (p.currentSegment === 3 && d.calculatedScore >= 60) {
-        advanceSegment(p);
-      } 
-      // Segment 4: Score 75 or higher
-      else if (p.currentSegment === 4 && d.calculatedScore >= 75) {
-        advanceSegment(p);
-      } 
-      // Segment 5: Accumulate 110+ points in 6 darts or fewer
-      else if (p.currentSegment === 5) {
-        p.seg5Darts = (p.seg5Darts || 0) + 1;
-        p.seg5Score = (p.seg5Score || 0) + (d.calculatedScore || 0);
+  for (let d of p.currentDarts) {
+    // Segment 1: Exactly 25 points on a dart
+    if (p.currentSegment === 1 && d.calculatedScore === 25) {
+      advanceSegment(p);
+    } 
+    // Segment 2: Exactly 40 points on a dart
+    else if (p.currentSegment === 2 && d.calculatedScore === 40) {
+      advanceSegment(p);
+    } 
+    // Segment 3: 60 or higher
+    else if (p.currentSegment === 3 && d.calculatedScore >= 60) {
+      advanceSegment(p);
+    } 
+    // Segment 4: 75 or higher
+    else if (p.currentSegment === 4 && d.calculatedScore >= 75) {
+      advanceSegment(p);
+    } 
+    // Segment 5: Accumulate 110+ points in 6 darts or fewer
+    else if (p.currentSegment === 5) {
+      p.seg5Darts = (p.seg5Darts || 0) + 1;
+      p.seg5Score = (p.seg5Score || 0) + (d.calculatedScore || 0);
 
-        if (p.seg5Score >= 110 && p.seg5Darts <= 6) {
-          advanceSegment(p);
-        } else if (p.seg5Darts >= 6) {
-          p.seg5Darts = 0;
-          p.seg5Score = 0;
-        }
-      } 
-      // Segment 6: Hit two consecutive matching color darts to complete lap
-      else if (p.currentSegment === 6 && d.type === 'color') {
-        if (!p.seg6Color) {
-          p.seg6Color = d.value;
-        } else if (p.seg6Color === d.value) {
+      if (p.seg5Score >= 110 && p.seg5Darts <= 6) {
+        advanceSegment(p);
+      } else if (p.seg5Darts >= 6) {
+        // Reset counter if 6 darts are used without reaching 110
+        p.seg5Darts = 0;
+        p.seg5Score = 0;
+      }
+    } 
+    // Segment 6: Hit all 3 darts of the same color in a turn to complete a lap
+    else if (p.currentSegment === 6 && d.type === 'color') {
+      if (!p.seg6Color) {
+        p.seg6Color = d.value;
+        p.seg6Count = 1;
+      } else if (p.seg6Color === d.value) {
+        p.seg6Count = (p.seg6Count || 1) + 1;
+        if (p.seg6Count >= 3) {
           p.lapsCompleted++;
           p.currentSegment = 1;
           p.seg6Color = null;
+          p.seg6Count = 0;
         }
+      } else {
+        // Reset sequence if color changes
+        p.seg6Color = d.value;
+        p.seg6Count = 1;
       }
     }
   }
+}
 
   function updateRTUI() {
     roundNumDisplay.innerText = rtCurrentRound;
