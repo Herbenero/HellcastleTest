@@ -234,6 +234,10 @@
 
           <!-- Multipliers -->
           <div class="mult-row">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+  <strong>Darts Thrown This Round:</strong>
+  <button class="btn btn-secondary" id="cuUndoBtn" onclick="undoCountUpDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
+</div>
             <button class="btn btn-secondary active" id="mult1" onclick="setMultiplier(1)">Single (1x)</button>
             <button class="btn btn-secondary" id="mult2" onclick="setMultiplier(2)">Double (2x)</button>
             <button class="btn btn-secondary" id="mult3" onclick="setMultiplier(3)">Triple (3x)</button>
@@ -334,6 +338,10 @@
               <span style="color:#c62828;">Airball / Miss</span>
               <small>0 Points</small>
             </button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+  <strong>Darts Thrown This Possession:</strong>
+  <button class="btn btn-secondary" id="bbUndoBtn" onclick="undoBasketballDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
+</div>
           </div>
         </div>
 
@@ -576,6 +584,122 @@
       missBtn.onclick = () => throwCountUpDart(0, true);
       targetsGrid.appendChild(missBtn);
     }
+    // --- COUNT UP UNDO ---
+function undoCountUpDart() {
+  // If a dart was thrown in the current turn, pop it
+  if (state.countUp.currentDarts.length > 0) {
+    state.countUp.currentDarts.pop();
+    updateCountUpUI();
+    return;
+  }
+
+  // If no dart in current turn, attempt to undo previous turn
+  let prevPlayerIdx = state.countUp.activePlayerIdx - 1;
+  let prevRound = state.countUp.currentRound;
+
+  if (prevPlayerIdx < 0) {
+    prevPlayerIdx = state.players.length - 1;
+    prevRound--;
+  }
+
+  if (prevRound < 1) return; // Nothing to undo at start of game
+
+  const prevPlayer = state.players[prevPlayerIdx];
+  const pScore = state.countUp.scores[prevPlayer.id];
+
+  if (pScore.rounds.length > 0) {
+    const lastTurnDarts = pScore.rounds.pop();
+    const turnTotal = lastTurnDarts.reduce((sum, d) => sum + d.score, 0);
+    pScore.total -= turnTotal;
+
+    // Restore turn to previous player and set currentDarts to the last turn minus its last dart
+    state.countUp.activePlayerIdx = prevPlayerIdx;
+    state.countUp.currentRound = prevRound;
+    state.countUp.currentDarts = lastTurnDarts;
+    state.countUp.currentDarts.pop();
+
+    updateCountUpUI();
+    renderActiveScoreboard();
+  }
+}
+
+// --- GOLF DARTS UNDO ---
+function undoGolfDart() {
+  const activePlayer = state.players[state.golf.activePlayerIdx];
+  const pScore = state.golf.scores[activePlayer.id];
+
+  // If a dart was already selected for current turn, reset choice
+  if (state.golf.bestHoleScore !== null) {
+    state.golf.bestHoleScore = null;
+    state.golf.bestHoleLabel = '';
+    updateGolfUI();
+    return;
+  }
+
+  // Otherwise, undo the previous player's / previous hole's committed score
+  let prevPlayerIdx = state.golf.activePlayerIdx - 1;
+  let prevHole = state.golf.currentHole;
+
+  if (prevPlayerIdx < 0) {
+    prevPlayerIdx = state.players.length - 1;
+    prevHole--;
+  }
+
+  if (prevHole < 1) return; // Nothing to undo
+
+  const prevPlayer = state.players[prevPlayerIdx];
+  const prevPScore = state.golf.scores[prevPlayer.id];
+
+  if (prevPScore.holeScores.length > 0) {
+    const lastHoleScore = prevPScore.holeScores.pop();
+    prevPScore.total -= lastHoleScore.score;
+
+    state.golf.activePlayerIdx = prevPlayerIdx;
+    state.golf.currentHole = prevHole;
+    state.golf.bestHoleScore = null;
+    state.golf.bestHoleLabel = '';
+
+    updateGolfUI();
+    renderActiveScoreboard();
+  }
+}
+
+// --- BASKETBALL DARTS UNDO ---
+function undoBasketballDart() {
+  // If a dart was thrown in the current possession, pop it
+  if (state.basketball.currentDarts.length > 0) {
+    state.basketball.currentDarts.pop();
+    updateBasketballUI();
+    return;
+  }
+
+  // If no dart in current possession, attempt to undo previous possession
+  let prevPlayerIdx = state.basketball.activePlayerIdx - 1;
+  let prevPoss = state.basketball.currentPossession;
+  let prevQtr = state.basketball.currentQuarter;
+
+  if (prevPlayerIdx < 0) {
+    prevPlayerIdx = state.players.length - 1;
+    prevPoss--;
+    if (prevPoss < 1) {
+      prevPoss = state.basketball.possessionsPerQuarter;
+      prevQtr--;
+    }
+  }
+
+  if (prevQtr < 1) return; // Nothing to undo at start of game
+
+  const prevPlayer = state.players[prevPlayerIdx];
+  const pScore = state.basketball.scores[prevPlayer.id];
+
+  // Revert quarter & total score tracking
+  state.basketball.activePlayerIdx = prevPlayerIdx;
+  state.basketball.currentQuarter = prevQtr;
+  state.basketball.currentPossession = prevPoss;
+
+  updateBasketballUI();
+  renderActiveScoreboard();
+}
 
     function throwCountUpDart(val, isFixed = false) {
       const mult = isFixed ? 1 : state.currentMultiplier;
