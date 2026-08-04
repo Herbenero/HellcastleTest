@@ -451,7 +451,7 @@
     }
 
     .section-head p{
-      max-width:56ch;
+      max-width:60ch;
       margin:0;
     }
 
@@ -1156,7 +1156,7 @@
                   <strong id="selectionSummary">0 players • 0 events selected</strong>
                   <div class="subtle">At least 1 player and 1 event are required to start</div>
                 </div>
-                <button class="btn btn-gold" id="startTournamentBtn" type="button">Start Tournament</button>
+                <button class="btn btn-gold" id="startTournamentBtn" type="button" disabled>Start Tournament</button>
               </div>
             </section>
           </div>
@@ -1799,117 +1799,8 @@
             }
           });
         }
-      },
-
-      'basketball-pub-style': null,
-      'baseball': null
-    };
-
-    GameModules['basketball-pub-style'] = GameModules['basketball-pub-style'] || {
-      id:'basketball-pub-style',
-      name:'Basketball Pub Style',
-      objective:'Highest made baskets after 8 rounds wins. Need exact target hit: single = 1, double = 2, triple = 3.',
-      scoreDirection:'desc',
-      roundsLimit:8,
-      scoreboardLabel:'Baskets',
-      create(players){
-        return makeBaseGame({
-          id:this.id,
-          name:this.name,
-          objective:this.objective,
-          scoreDirection:this.scoreDirection,
-          roundsLimit:this.roundsLimit,
-          scoreboardLabel:this.scoreboardLabel,
-          settings:{ sequence:[6,11,14,9,12,5,20,25] },
-          applyTurn(game, player, throws){
-            const target = game.settings.sequence[game.currentRound - 1];
-            let baskets = 0;
-            throws.forEach(t => {
-              if(target === 25){
-                if(Number(t.value) === 25) baskets += (t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3);
-                if(Number(t.value) === 50) baskets += 3;
-              } else if(Number(t.value) === target){
-                baskets += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
-              }
-            });
-            return {
-              turnScore:baskets,
-              newScore:player.score + baskets,
-              note:`Target ${target === 25 ? 'Bull' : target}: +${baskets}`
-            };
-          }
-        });
       }
     };
-
-    GameModules['baseball'] = GameModules['baseball'] || {
-      id:'baseball',
-      name:'Baseball',
-      objective:'Highest runs after innings 1 through 9 wins.',
-      scoreDirection:'desc',
-      roundsLimit:9,
-      scoreboardLabel:'Runs',
-      create(players){
-        return makeBaseGame({
-          id:this.id,
-          name:this.name,
-          objective:this.objective,
-          scoreDirection:this.scoreDirection,
-          roundsLimit:this.roundsLimit,
-          scoreboardLabel:this.scoreboardLabel,
-          applyTurn(game, player, throws){
-            const inning = game.currentRound;
-            let runs = 0;
-            throws.forEach(t => {
-              if(Number(t.value) === inning){
-                runs += t.multiplier === 'S' ? 1 : t.multiplier === 'D' ? 2 : 3;
-              }
-            });
-            return {
-              turnScore:runs,
-              newScore:player.score + runs,
-              note:`Inning ${inning}: +${runs}`
-            };
-          }
-        });
-      }
-    };
-
-    GameModules['count-up'] = GameModules['count-up'];
-    GameModules['golf-darts'] = GameModules['golf-darts'];
-    GameModules['shanghai'] = GameModules['shanghai'];
-    GameModules['all-5s'] = GameModules['all-5s'];
-    GameModules['shove-a-penny'] = GameModules['shove-a-penny'];
-    GameModules['roman-empire'] = GameModules['roman-empire'];
-    GameModules['robin-hood'] = GameModules['robin-hood'];
-    GameModules['racetrack'] = GameModules['racetrack'];
-
-    GameModules['basketball-pub-style'] = GameModules['basketball-pub-style'];
-
-    GameModules['shove-a-penny'].getValueChoices = () => [1,2,3,4,5,6,7,8,9];
-    GameModules['golf-darts'].getValueChoices = game => [game.currentRound,25,50];
-    GameModules['baseball'].getValueChoices = game => [game.currentRound];
-    GameModules['basketball-pub-style'].getValueChoices = game => {
-      const target = game.settings.sequence[game.currentRound - 1];
-      return target === 25 ? [25,50] : [target];
-    };
-    GameModules['roman-empire'].getValueChoices = game => {
-      const target = game.settings.sequence[game.currentRound - 1];
-      if(target === 'BULL') return [25,50];
-      if(target === 'DOUBLES' || target === 'TRIPLES') return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-      return [Number(target)];
-    };
-    GameModules['robin-hood'].getValueChoices = game => {
-      const target = game.settings.sequence[game.currentRound - 1];
-      return target === 25 ? [25,50] : [target];
-    };
-    GameModules['shanghai'].getValueChoices = game => [game.currentRound];
-    GameModules['racetrack'].getValueChoices = game => {
-      const p = game.getActivePlayer();
-      return [p.meta.track];
-    };
-    GameModules['count-up'].getValueChoices = () => [1,5,10,15,20,25,50];
-    GameModules['all-5s'].getValueChoices = () => [1,5,10,15,20,25,50];
 
     const EVENTS = [
       { id:'racetrack', name:'Racetrack', objective:GameModules['racetrack'].objective, scoreDirection:GameModules['racetrack'].scoreDirection },
@@ -1990,6 +1881,10 @@
 
     function updateSummary(){
       refs.selectionSummary.textContent = `${state.players.length} player${state.players.length === 1 ? '' : 's'} • ${state.selectedEventIds.length} event${state.selectedEventIds.length === 1 ? '' : 's'} selected`;
+      if(refs.startTournamentBtn){
+        refs.startTournamentBtn.disabled = !(state.players.length >= 1 && state.selectedEventIds.length >= 1);
+        refs.startTournamentBtn.style.opacity = refs.startTournamentBtn.disabled ? '.6' : '1';
+      }
     }
 
     function addPlayer(name){
@@ -2005,8 +1900,18 @@
     }
 
     function startTournament(){
-      if(state.players.length < 1) return showToast('Add at least one player');
-      if(state.selectedEventIds.length < 1) return showToast('Select at least one event');
+      console.log('Start button clicked — players:', state.players, 'selectedEvents:', state.selectedEventIds);
+      if(state.players.length < 1) {
+        showToast('Add at least one player');
+        console.warn('Tournament not started: no players');
+        return;
+      }
+      if(state.selectedEventIds.length < 1){
+        showToast('Select at least one event');
+        console.warn('Tournament not started: no events selected');
+        return;
+      }
+
       state.tournamentStarted = true;
       state.currentEventIndex = 0;
       state.completedEvents = [];
@@ -2016,6 +1921,7 @@
         state.totals[player] = { olympicPoints:0, eventsPlayed:0, placements:[] };
       });
 
+      console.log('Creating first game for event:', state.selectedEventIds[state.currentEventIndex]);
       createCurrentGame();
       renderCurrentEvent();
       renderLeaderboard();
@@ -2040,10 +1946,17 @@
       const eventId = state.selectedEventIds[state.currentEventIndex];
       const module = GameModules[eventId];
       if(!module){
+        console.error('Game module not found for event id:', eventId);
         state.currentGame = null;
         return;
       }
-      state.currentGame = module.create(state.players);
+      try {
+        state.currentGame = module.create(state.players);
+      } catch (err) {
+        console.error('Error creating game instance for', eventId, err);
+        showToast('Error starting event — check console');
+        state.currentGame = null;
+      }
     }
 
     function getProgressHtml(){
