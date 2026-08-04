@@ -109,7 +109,7 @@
     }
     .chip button { border: none; background: transparent; color: var(--crimson); cursor: pointer; font-weight: 900; }
     
-    .meta-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 1rem 0; }
+    .meta-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1rem 0; }
     .meta-card { background: #fff; padding: 12px; border-radius: 14px; border: 1px solid rgba(32,23,15,.08); text-align: center; }
     .meta-card .k { font-size: .75rem; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
     .meta-card .v { font-size: 1.4rem; font-weight: 800; color: var(--ink); }
@@ -119,12 +119,8 @@
     .target-btn { padding: 12px; border-radius: 10px; background: #fff; border: 1px solid rgba(32,23,15,.12); font-weight: 800; cursor: pointer; transition: var(--trans); }
     .target-btn:hover { background: #fdf5e6; transform: translateY(-1px); }
     .target-btn.bull { background: linear-gradient(180deg, #fff2b4, #d4a33f); color: #2c180d; }
-    
-    .track-container { display: flex; justify-content: space-between; gap: 8px; margin: 1rem 0; }
-    .track-segment { flex: 1; background: #fff; border: 2px solid rgba(32,23,15,.12); border-radius: 8px; padding: 10px 4px; text-align: center; }
-    .track-segment.completed { background: #e8f5e9; border-color: var(--green); color: var(--green-dark); }
-    .track-segment.active-seg { border-color: var(--crimson); background: #fdf0ed; }
 
+    .track-container { display: flex; justify-content: space-between; gap: 8px; margin: 1rem 0; }
     .golf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem; }
     .golf-btn { padding: 14px 10px; border-radius: 12px; background: #fff; border: 1px solid rgba(32,23,15,.12); cursor: pointer; text-align: center; font-weight: 800; }
 
@@ -184,13 +180,22 @@
 
       <div class="arena-grid">
         <div id="activeEventContainer">
-          <!-- COUNT UP -->
+          <!-- COUNT UP MODULE -->
           <div id="countUpModule" class="panel hidden" style="background:#fff; margin:0;">
             <div class="meta-strip">
               <div class="meta-card"><div class="k">Turn</div><div class="v" id="cuPlayer">-</div></div>
               <div class="meta-card"><div class="k">Round</div><div class="v" id="cuRound">1 / 8</div></div>
               <div class="meta-card"><div class="k">Total Score</div><div class="v" id="cuTotalScore">0</div></div>
             </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+              <strong>Darts Thrown This Turn:</strong>
+              <button class="btn btn-secondary" onclick="undoCountUpDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
+            </div>
+            <div id="cuDartsThrown" style="display:flex; gap:8px; margin-bottom: 1rem;">
+              <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
+            </div>
+
             <div class="mult-row">
               <button class="btn btn-secondary active" id="cuMult1" onclick="setCuMult(1)">1x</button>
               <button class="btn btn-secondary" id="cuMult2" onclick="setCuMult(2)">2x</button>
@@ -199,7 +204,7 @@
             <div class="targets-grid" id="cuTargetsGrid"></div>
           </div>
 
-          <!-- RACE TRACK -->
+          <!-- RACE TRACK MODULE -->
           <div id="raceTrackModule" class="panel hidden" style="background:#fff; margin:0;">
             <div class="meta-strip">
               <div class="meta-card"><div class="k">Turn</div><div class="v" id="rtPlayer">-</div></div>
@@ -210,7 +215,7 @@
             <div class="targets-grid" id="rtTargetsGrid"></div>
           </div>
 
-          <!-- GOLF DARTS -->
+          <!-- GOLF DARTS MODULE -->
           <div id="golfModule" class="panel hidden" style="background:#fff; margin:0;">
             <div class="meta-strip">
               <div class="meta-card"><div class="k">Turn</div><div class="v" id="golfPlayer">-</div></div>
@@ -226,7 +231,7 @@
             </div>
           </div>
 
-          <!-- BASKETBALL DARTS -->
+          <!-- BASKETBALL DARTS MODULE -->
           <div id="basketballModule" class="panel hidden" style="background:#fff; margin:0;">
             <div class="meta-strip">
               <div class="meta-card"><div class="k">Turn</div><div class="v" id="bbPlayer">-</div></div>
@@ -242,7 +247,7 @@
             <div class="targets-grid" id="bbTargetsGrid"></div>
           </div>
 
-          <!-- ROMAN EMPIRE -->
+          <!-- ROMAN EMPIRE MODULE -->
           <div id="romanEmpireModule" class="panel hidden" style="background:#fff; margin:0;">
             <div class="meta-strip">
               <div class="meta-card"><div class="k">Turn</div><div class="v" id="rePlayer">-</div></div>
@@ -384,28 +389,87 @@
       `).join('');
     }
 
-    // --- COUNT UP ---
-    let cuMult = 1, cuScores = {}, cuTurn = 0;
+    // --- COUNT UP (WITH UNDO) ---
+    let cuMult = 1;
+    let cuScores = {};
+    let cuTurn = 0;
+    let cuHistory = []; // Stack to record every thrown dart
+
     function initCountUp() {
-      cuScores = {}; players.forEach(p => cuScores[p] = 0);
-      cuTurn = 0; cuMult = 1;
+      cuScores = {};
+      players.forEach(p => cuScores[p] = 0);
+      cuTurn = 0;
+      cuMult = 1;
+      cuHistory = [];
+      
       const grid = document.getElementById('cuTargetsGrid');
       grid.innerHTML = '';
       for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreCu(${i})">${i}</button>`;
       grid.innerHTML += `<button class="target-btn bull" onclick="scoreCu(25)">BULL</button><button class="target-btn" onclick="scoreCu(0)">MISS</button>`;
+      
+      setCuMult(1);
       updateCuUI();
     }
-    function setCuMult(m) { cuMult = m; }
+
+    function setCuMult(m) {
+      cuMult = m;
+      document.querySelectorAll('#countUpModule .mult-row .btn-secondary').forEach((b, i) => {
+        b.classList.toggle('active', i + 1 === m);
+      });
+    }
+
     function scoreCu(pts) {
-      const p = players[cuTurn % players.length];
-      cuScores[p] += pts * cuMult;
-      cuTurn++; cuMult = 1;
+      const playerIndex = Math.floor(cuHistory.length / 3) % players.length;
+      const player = players[playerIndex];
+      const ptsEarned = pts * cuMult;
+
+      cuScores[player] += ptsEarned;
+      cuHistory.push({ player, pts, mult: cuMult, score: ptsEarned });
+
+      cuMult = 1;
+      setCuMult(1);
       updateCuUI();
     }
+
+    function undoCountUpDart() {
+      if (cuHistory.length === 0) return;
+      const lastDart = cuHistory.pop();
+      if (lastDart && cuScores[lastDart.player] !== undefined) {
+        cuScores[lastDart.player] = Math.max(0, cuScores[lastDart.player] - lastDart.score);
+      }
+      cuMult = 1;
+      setCuMult(1);
+      updateCuUI();
+    }
+
     function updateCuUI() {
-      const p = players[cuTurn % players.length];
-      document.getElementById('cuPlayer').innerText = p;
-      document.getElementById('cuTotalScore').innerText = cuScores[p] || 0;
+      const playerIndex = Math.floor(cuHistory.length / 3) % players.length;
+      const player = players[playerIndex] || players[0];
+      const totalTurns = Math.floor(cuHistory.length / 3);
+      const currentRound = Math.floor(totalTurns / players.length) + 1;
+
+      document.getElementById('cuPlayer').innerText = player;
+      document.getElementById('cuRound').innerText = `${Math.min(currentRound, 8)} / 8`;
+      document.getElementById('cuTotalScore').innerText = cuScores[player] || 0;
+
+      // Render Darts Thrown Chips for current turn
+      const dartsContainer = document.getElementById('cuDartsThrown');
+      if (dartsContainer) {
+        const turnDarts = cuHistory.slice(totalTurns * 3);
+        let chipsHTML = '';
+        for (let i = 0; i < 3; i++) {
+          const d = turnDarts[i];
+          if (d) {
+            const prefix = d.mult === 3 ? 'T' : d.mult === 2 ? 'D' : '';
+            const label = d.pts === 25 ? 'BULL' : d.pts === 0 ? 'MISS' : `${prefix}${d.pts}`;
+            chipsHTML += `<span class="chip">${label} (${d.score}pts)</span>`;
+          } else {
+            chipsHTML += `<span class="chip">—</span>`;
+          }
+        }
+        dartsContainer.innerHTML = chipsHTML;
+      }
+
       renderScoreboard(cuScores);
     }
 
@@ -483,7 +547,7 @@
       renderScoreboard(bbScores);
     }
 
-    // --- ROMAN EMPIRE (ENGINE FIX) ---
+    // --- ROMAN EMPIRE ---
     let reMult = 1;
     let reScores = {};
     let reTurn = 0;
@@ -535,11 +599,9 @@
 
       reDartsThisTurn.push({ pts, mult: reMult, score: ptsEarned });
 
-      // Reset multiplier to single after throw
       reMult = 1;
       setReMult(1);
 
-      // Advance player turn every 3 darts
       if (reDartsThisTurn.length >= 3) {
         reDartsThisTurn = [];
         reTurn++;
@@ -571,7 +633,6 @@
       document.getElementById('reTotalScore').innerText = pData.total;
       document.getElementById('reTerritories').innerText = `${pData.territories.size} (${pData.shields.size} Shielded)`;
 
-      // Render Darts Thrown Chips
       const dartsContainer = document.getElementById('reDartsThrown');
       if (dartsContainer) {
         let chipsHTML = '';
@@ -588,7 +649,6 @@
         dartsContainer.innerHTML = chipsHTML;
       }
 
-      // Update Shared Tournament Scoreboard Map
       const scoreMap = {};
       players.forEach(p => {
         const data = reScores[p] || { total: 0, territories: new Set() };
