@@ -69,7 +69,8 @@
       margin-bottom: 1.5rem;
     }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+    .arena-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
+    @media (max-width: 980px) { .arena-grid, .grid-2 { grid-template-columns: 1fr; } }
 
     .btn {
       appearance: none; border: none; cursor: pointer; border-radius: 999px;
@@ -80,7 +81,6 @@
     .btn-gold { color: #24160a; background: linear-gradient(180deg, #e8c778, var(--gold)); }
     .btn-secondary { color: var(--ink); background: rgba(255,255,255,.8); border: 1px solid rgba(32,23,15,.1); }
     .btn-secondary.active { background: var(--crimson); color: white; border-color: transparent; }
-    .btn-danger { color: #fff; background: var(--crimson); }
 
     .field, .select {
       width: 100%; border-radius: 12px; border: 1px solid rgba(32,23,15,.15);
@@ -90,7 +90,7 @@
     .chip { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1rem; border-radius: 999px; background: #fff8ee; border: 1px solid rgba(32,23,15,.1); font-weight: 700; margin: .25rem; }
     .chip button { border: none; background: transparent; color: var(--crimson); cursor: pointer; font-weight: 900; }
 
-    /* Count Up Module Styling */
+    /* Count Up Controls & Scoreboard */
     .meta-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 1rem 0; }
     .meta-card { background: #fff; padding: 12px; border-radius: 14px; border: 1px solid rgba(32,23,15,.08); text-align: center; }
     .meta-card .k { font-size: .75rem; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
@@ -101,6 +101,14 @@
     .target-btn { padding: 12px; border-radius: 10px; background: #fff; border: 1px solid rgba(32,23,15,.12); font-weight: 800; cursor: pointer; transition: var(--trans); }
     .target-btn:hover { background: #fdf5e6; transform: translateY(-1px); }
     .target-btn.bull { background: linear-gradient(180deg, #fff2b4, #d4a33f); color: #2c180d; }
+
+    /* Active Event Scoreboard Panel */
+    .scoreboard-panel { background: #fff; border-radius: 16px; border: 1px solid rgba(32,23,15,.1); padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
+    .scoreboard-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+    .scoreboard-table th, .scoreboard-table td { padding: 8px 10px; border-bottom: 1px solid rgba(32,23,15,.08); text-align: left; font-size: .9rem; }
+    .scoreboard-table th { font-size: .75rem; text-transform: uppercase; color: var(--ink-soft); background: #faf6ee; }
+    .scoreboard-row.active-row { background: rgba(201,154,59,.12); font-weight: 700; }
+    .leader-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: .7rem; font-weight: 800; background: var(--gold); color: #fff; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { padding: 10px; border-bottom: 1px solid rgba(32,23,15,.08); text-align: left; }
@@ -152,55 +160,75 @@
           </select>
 
           <h4>Active Events</h4>
-          <label><input type="checkbox" id="eventCountUp" checked> Count Up (8 Rounds)</label><br>
-          <label><input type="checkbox" id="eventRacetrack" checked> Racetrack</label><br>
-          <label><input type="checkbox" id="eventRobinHood" checked> Robin Hood</label><br><br>
+          <label><input type="checkbox" id="eventCountUp" checked> Count Up (8 Rounds)</label><br><br>
 
           <button class="btn btn-gold" id="startTournamentBtn" style="width: 100%;">Start Tournament</button>
         </div>
       </div>
     </section>
 
-    <!-- ARENA PLAY SECTION -->
+    <!-- ARENA PLAY SECTION WITH INTEGRATED ACTIVE SCOREBOARD -->
     <section id="playSection" class="panel hidden">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
         <div>
           <span style="text-transform:uppercase; font-size:.8rem; font-weight:800; color:var(--crimson);" id="currentEventBadge">Event Active</span>
           <h2 id="currentEventTitle">Count Up</h2>
         </div>
-        <button class="btn btn-secondary" id="nextEventBtn">Skip/Finish Event</button>
+        <button class="btn btn-secondary" id="finishEventBtn">Finish Event</button>
       </div>
 
-      <!-- COUNT UP EVENT MODULE -->
-      <div id="countUpModule" class="panel" style="background:#fff; margin-top:1rem;">
-        <div class="meta-strip">
-          <div class="meta-card"><div class="k">Turn</div><div class="v" id="cuPlayer">Player 1</div></div>
-          <div class="meta-card"><div class="k">Round</div><div class="v" id="cuRound">1 / 8</div></div>
-          <div class="meta-card"><div class="k">Total Score</div><div class="v" id="cuTotalScore">0</div></div>
-          <div class="meta-card"><div class="k">Current Round</div><div class="v" id="cuRoundScore">0</div></div>
-        </div>
-
-        <div style="margin-bottom: 1rem;">
-          <strong>Darts Thrown This Round:</strong>
-          <div id="cuDartsThrown" style="display:flex; gap:8px; margin-top:4px;">
-            <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
+      <div class="arena-grid">
+        <!-- COUNT UP INPUT & GAME CONTROLS -->
+        <div id="countUpModule" class="panel" style="background:#fff; margin:0;">
+          <div class="meta-strip">
+            <div class="meta-card"><div class="k">Turn</div><div class="v" id="cuPlayer">Player 1</div></div>
+            <div class="meta-card"><div class="k">Round</div><div class="v" id="cuRound">1 / 8</div></div>
+            <div class="meta-card"><div class="k">Total Score</div><div class="v" id="cuTotalScore">0</div></div>
+            <div class="meta-card"><div class="k">Current Round</div><div class="v" id="cuRoundScore">0</div></div>
           </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong>Darts Thrown This Round:</strong>
+            <div id="cuDartsThrown" style="display:flex; gap:8px; margin-top:4px;">
+              <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
+            </div>
+          </div>
+
+          <!-- Multipliers -->
+          <div class="mult-row">
+            <button class="btn btn-secondary active" id="mult1" onclick="setMultiplier(1)">Single (1x)</button>
+            <button class="btn btn-secondary" id="mult2" onclick="setMultiplier(2)">Double (2x)</button>
+            <button class="btn btn-secondary" id="mult3" onclick="setMultiplier(3)">Triple (3x)</button>
+            <button class="btn btn-secondary hidden" id="mult4" onclick="setMultiplier(4)">Quad (4x)</button>
+          </div>
+
+          <!-- Target Grid Buttons 1-20 + Bull & Miss -->
+          <div class="targets-grid" id="targetsGrid"></div>
         </div>
 
-        <!-- Multipliers -->
-        <div class="mult-row">
-          <button class="btn btn-secondary active" id="mult1" onclick="setMultiplier(1)">Single (1x)</button>
-          <button class="btn btn-secondary" id="mult2" onclick="setMultiplier(2)">Double (2x)</button>
-          <button class="btn btn-secondary" id="mult3" onclick="setMultiplier(3)">Triple (3x)</button>
-          <button class="btn btn-secondary hidden" id="mult4" onclick="setMultiplier(4)">Quad (4x)</button>
+        <!-- LIVE ACTIVE EVENT SCOREBOARD -->
+        <div class="scoreboard-panel">
+          <h3 style="margin-bottom: 0.25rem;">Event Scoreboard</h3>
+          <span class="subtle">Live standings for active game</span>
+          
+          <table class="scoreboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Rounds</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="activeScoreboardBody">
+              <!-- Live scoring rows injected dynamically -->
+            </tbody>
+          </table>
         </div>
-
-        <!-- Target Grid Buttons 1-20 + Bull & Miss -->
-        <div class="targets-grid" id="targetsGrid"></div>
       </div>
     </section>
 
-    <!-- LEADERBOARD SECTION -->
+    <!-- OVERALL LEADERBOARD SECTION -->
     <section id="leaderboardSection" class="panel hidden">
       <h2>Tournament Standings</h2>
       <p>Overall Olympic points awarded across completed events.</p>
@@ -242,10 +270,12 @@
     const playerList = document.getElementById('playerList');
     const boardTypeSelect = document.getElementById('boardTypeSelect');
     const startTournamentBtn = document.getElementById('startTournamentBtn');
+    const finishEventBtn = document.getElementById('finishEventBtn');
     const setupSection = document.getElementById('setupSection');
     const playSection = document.getElementById('playSection');
     const leaderboardSection = document.getElementById('leaderboardSection');
     const targetsGrid = document.getElementById('targetsGrid');
+    const activeScoreboardBody = document.getElementById('activeScoreboardBody');
 
     // --- SETUP LOGIC ---
     addPlayerBtn.addEventListener('click', () => {
@@ -289,6 +319,11 @@
       playSection.classList.remove('hidden');
       initCountUpBoard();
       updateCountUpUI();
+      renderActiveScoreboard();
+    });
+
+    finishEventBtn.addEventListener('click', () => {
+      finishCountUpEvent();
     });
 
     // --- COUNT UP MODULE LOGIC ---
@@ -303,7 +338,6 @@
     function initCountUpBoard() {
       targetsGrid.innerHTML = '';
       
-      // Target buttons 1 to 20
       for (let i = 20; i >= 1; i--) {
         const btn = document.createElement('button');
         btn.className = 'target-btn';
@@ -312,7 +346,6 @@
         targetsGrid.appendChild(btn);
       }
 
-      // Bullseye, Outer Bull, Miss
       const innerBull = document.createElement('button');
       innerBull.className = 'target-btn bull';
       innerBull.innerText = 'Double Bull (50)';
@@ -339,8 +372,6 @@
       const score = val * mult;
 
       state.countUp.currentDarts.push({ val, mult, score });
-      
-      // Reset multiplier back to Single (1x)
       setMultiplier(1);
 
       if (state.countUp.currentDarts.length === state.countUp.dartsPerRound) {
@@ -373,6 +404,7 @@
         finishCountUpEvent();
       } else {
         updateCountUpUI();
+        renderActiveScoreboard();
       }
     }
 
@@ -397,17 +429,40 @@
       document.getElementById('cuDartsThrown').innerHTML = chips.join('');
     }
 
+    // --- LIVE ACTIVE SCOREBOARD RENDER ---
+    function renderActiveScoreboard() {
+      const activePlayer = state.players[state.countUp.activePlayerIdx];
+
+      // Sort players by active total score descending for real-time ranking
+      const ranked = [...state.players].map(p => ({
+        ...p,
+        total: state.countUp.scores[p.id]?.total || 0,
+        roundsCompleted: state.countUp.scores[p.id]?.rounds.length || 0
+      })).sort((a, b) => b.total - a.total);
+
+      activeScoreboardBody.innerHTML = ranked.map((p, idx) => {
+        const isActive = p.id === activePlayer.id;
+        const is1st = idx === 0 && p.total > 0;
+        return `
+          <tr class="scoreboard-row ${isActive ? 'active-row' : ''}">
+            <td><strong>#${idx + 1}</strong></td>
+            <td>${p.name} ${is1st ? '<span class="leader-badge">1ST</span>' : ''}</td>
+            <td>${p.roundsCompleted} / ${state.countUp.maxRounds}</td>
+            <td><strong>${p.total}</strong></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     // --- EVENT COMPLETION & LEADERBOARD ---
     function finishCountUpEvent() {
       alert('Count Up Event Completed!');
       
-      // Calculate Rankings (Highest total score wins)
       const ranked = state.players.map(p => ({
         ...p,
         countUpTotal: state.countUp.scores[p.id].total
       })).sort((a, b) => b.countUpTotal - a.countUpTotal);
 
-      // Award Olympic Tournament Points (10, 8, 6, 5, 4...)
       const ptsDistribution = [10, 8, 6, 5, 4, 3, 2, 1];
       ranked.forEach((p, idx) => {
         const pts = ptsDistribution[idx] || 1;
