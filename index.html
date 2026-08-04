@@ -198,7 +198,7 @@
             </select>
           </div>
 
-          <label><input type="checkbox" id="eventBasketball" checked> 🏀 Basketball Darts (Pub Style)</label><br><br>
+          <label><input type="checkbox" id="eventBasketball" checked> 🏀 Basketball Darts (6 Possessions/Quarter x 4 Quarters)</label><br><br>
 
           <button class="btn btn-gold" id="startTournamentBtn" style="width: 100%;">Start Tournament</button>
         </div>
@@ -297,13 +297,13 @@
         <div id="basketballModule" class="panel hidden" style="background:#fff; margin:0;">
           <div class="meta-strip">
             <div class="meta-card"><div class="k">Turn</div><div class="v" id="bbPlayer">Player 1</div></div>
-            <div class="meta-card"><div class="k">Quarter</div><div class="v" id="bbQuarter">Q1 / 4</div></div>
+            <div class="meta-card"><div class="k">Quarter / Poss</div><div class="v" id="bbQuarter">Q1 (1/6)</div></div>
             <div class="meta-card"><div class="k">Qtr Score</div><div class="v" id="bbQtrScore" style="color:var(--orange); font-weight:800;">0</div></div>
             <div class="meta-card"><div class="k">Total Pts</div><div class="v" id="bbTotalScore">0</div></div>
           </div>
 
           <div style="margin-bottom: 1rem;">
-            <strong>Darts Thrown This Turn:</strong>
+            <strong>Darts Thrown This Possession:</strong>
             <div id="bbDartsThrown" style="display:flex; gap:8px; margin-top:4px;">
               <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
             </div>
@@ -411,9 +411,11 @@
         activePlayerIdx: 0,
         currentQuarter: 1,
         maxQuarters: 4,
-        dartsPerQuarter: 3,
+        possessionsPerQuarter: 6,
+        currentPossession: 1,
+        dartsPerPossession: 3,
         currentDarts: [],
-        scores: {} // playerId -> { total: 0, quarterScores: [] }
+        scores: {} // playerId -> { total: 0, quarterScores: [0, 0, 0, 0] }
       },
 
       tournamentPoints: {} // playerId -> totalPts
@@ -484,7 +486,7 @@
       state.players.forEach(p => {
         state.countUp.scores[p.id] = { total: 0, rounds: [] };
         state.golf.scores[p.id] = { total: 0, holeScores: [] };
-        state.basketball.scores[p.id] = { total: 0, quarterScores: [] };
+        state.basketball.scores[p.id] = { total: 0, quarterScores: [0, 0, 0, 0] };
         state.tournamentPoints[p.id] = 0;
       });
 
@@ -522,7 +524,7 @@
       } else if (activeEventKey === 'basketball') {
         eventTitle.innerText = '🏀 Basketball Darts';
         basketballModule.classList.remove('hidden');
-        document.getElementById('sbProgressCol').innerText = 'Quarter';
+        document.getElementById('sbProgressCol').innerText = 'Possessions';
         updateBasketballUI();
       }
 
@@ -696,7 +698,7 @@
     function recordBasketballDart(pts, label) {
       state.basketball.currentDarts.push({ pts, label });
 
-      if (state.basketball.currentDarts.length === state.basketball.dartsPerQuarter) {
+      if (state.basketball.currentDarts.length === state.basketball.dartsPerPossession) {
         commitBasketballTurn();
       } else {
         updateBasketballUI();
@@ -705,19 +707,27 @@
 
     function commitBasketballTurn() {
       const activePlayer = state.players[state.basketball.activePlayerIdx];
-      const qtrSum = state.basketball.currentDarts.reduce((sum, d) => sum + d.pts, 0);
+      const possSum = state.basketball.currentDarts.reduce((sum, d) => sum + d.pts, 0);
 
       const pScore = state.basketball.scores[activePlayer.id];
-      pScore.total += qtrSum;
-      pScore.quarterScores.push(qtrSum);
+      const qIdx = state.basketball.currentQuarter - 1;
+
+      pScore.total += possSum;
+      pScore.quarterScores[qIdx] = (pScore.quarterScores[qIdx] || 0) + possSum;
 
       state.basketball.currentDarts = [];
 
+      // Advance turn order
       if (state.basketball.activePlayerIdx < state.players.length - 1) {
         state.basketball.activePlayerIdx++;
       } else {
         state.basketball.activePlayerIdx = 0;
-        state.basketball.currentQuarter++;
+        state.basketball.currentPossession++;
+
+        if (state.basketball.currentPossession > state.basketball.possessionsPerQuarter) {
+          state.basketball.currentPossession = 1;
+          state.basketball.currentQuarter++;
+        }
       }
 
       if (state.basketball.currentQuarter > state.basketball.maxQuarters) {
@@ -731,13 +741,14 @@
     function updateBasketballUI() {
       const activePlayer = state.players[state.basketball.activePlayerIdx];
       const pScore = state.basketball.scores[activePlayer.id];
+      const qIdx = state.basketball.currentQuarter - 1;
 
       document.getElementById('bbPlayer').innerText = activePlayer.name;
-      document.getElementById('bbQuarter').innerText = `Q${state.basketball.currentQuarter} / ${state.basketball.maxQuarters}`;
+      document.getElementById('bbQuarter').innerText = `Q${state.basketball.currentQuarter} (${state.basketball.currentPossession}/${state.basketball.possessionsPerQuarter})`;
       document.getElementById('bbTotalScore').innerText = pScore.total;
 
-      const qtrSum = state.basketball.currentDarts.reduce((sum, d) => sum + d.pts, 0);
-      document.getElementById('bbQtrScore').innerText = qtrSum;
+      const currentQtrScore = (pScore.quarterScores[qIdx] || 0) + state.basketball.currentDarts.reduce((sum, d) => sum + d.pts, 0);
+      document.getElementById('bbQtrScore').innerText = currentQtrScore;
 
       const chips = [0, 1, 2].map(i => {
         const d = state.basketball.currentDarts[i];
@@ -772,7 +783,7 @@
         ranked = [...state.players].map(p => ({
           ...p,
           total: state.basketball.scores[p.id]?.total || 0,
-          progress: `Q${state.basketball.scores[p.id]?.quarterScores.length || 0} / ${state.basketball.maxQuarters}`
+          progress: `Q${state.basketball.currentQuarter} (${state.basketball.currentPossession}/6)`
         })).sort((a, b) => b.total - a.total); // Highest points wins
       }
 
