@@ -3,756 +3,179 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hellcastle Darts — Olympic Tournament Arena</title>
-  <meta name="description" content="Hellcastle Darts Olympic-style multi-event tournament app with integrated Count Up, Race Track, Golf Darts, Basketball Darts, Roman Empire, and tournament tracking." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Countup Multi-Device Tracker</title>
   <style>
-    :root {
-      --bg: #f4efe4;
-      --paper: #efe6d6;
-      --paper-2: #e4d5ba;
-      --ink: #20170f;
-      --ink-soft: #5a4735;
-      --gold: #c99a3b;
-      --gold-deep: #8a6420;
-      --crimson: #6f1d1b;
-      --crimson-2: #8f2a27;
-      --green: #2e7d32;
-      --green-dark: #1b4d20;
-      --orange: #e65100;
-      --orange-light: #fff3e0;
-      --line: rgba(32,23,15,.14);
-      --shadow: 0 20px 60px rgba(45,24,8,.14);
-      --radius: 24px;
-      --radius-sm: 14px;
-      --max: 1360px;
-      --trans: 280ms cubic-bezier(.2,.8,.2,1);
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      color: var(--ink);
-      background: radial-gradient(circle at 20% 10%, rgba(201,154,59,.14), transparent 24%),
-                  radial-gradient(circle at 80% 0%, rgba(111,29,27,.10), transparent 22%),
-                  linear-gradient(180deg, #f7f2e8 0%, #efe6d6 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    h1,h2,h3,h4,h5 {
-      font-family: "Cinzel", serif;
-      margin: 0 0 .5rem;
-      line-height: 1.02;
-      letter-spacing: .02em;
-    }
-    p { line-height: 1.6; color: var(--ink-soft); }
-    a { text-decoration: none; color: inherit; }
-    button, input, select { font: inherit; }
-    .shell { width: min(calc(100% - 2rem), var(--max)); margin: 0 auto; }
-    
-    .topbar {
-      position: sticky; top: 0; z-index: 30;
-      backdrop-filter: blur(12px);
-      background: rgba(244,239,228,.82);
-      border-bottom: 1px solid rgba(32,23,15,.08);
-    }
-    .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 74px; }
-    .brand { display: flex; align-items: center; gap: 1rem; }
-    .crest {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: radial-gradient(circle at 50% 45%, #f6deb0 0 14%, transparent 15%),
-                  conic-gradient(from 0deg, var(--crimson) 0 18%, var(--gold) 18% 36%, var(--green) 36% 54%, var(--crimson) 54% 72%, var(--gold) 72% 90%, var(--green) 90% 100%);
-      box-shadow: inset 0 0 0 4px #f7f1e3, 0 4px 12px rgba(111,29,27,.18);
-    }
-    .brand-copy strong { display: block; font-family: "Cinzel", serif; font-size: 1.15rem; }
-    .hero { padding: 2rem 0; }
-    
-    .panel {
-      background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.38));
-      border: 1px solid rgba(32,23,15,.08);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .arena-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
-    @media (max-width: 980px) {
-      .arena-grid, .grid-2 { grid-template-columns: 1fr; }
-    }
-    
-    .btn {
-      appearance: none; border: none; cursor: pointer;
-      border-radius: 999px; padding: .8rem 1.4rem;
-      font-weight: 800; transition: var(--trans);
-    }
-    .btn-primary { color: #fff8ef; background: linear-gradient(180deg, var(--crimson-2), var(--crimson)); box-shadow: 0 8px 20px rgba(111,29,27,.24); }
-    .btn-gold { color: #24160a; background: linear-gradient(180deg, #e8c778, var(--gold)); }
-    .btn-secondary { color: var(--ink); background: rgba(255,255,255,.8); border: 1px solid rgba(32,23,15,.1); }
-    .btn-secondary.active { background: var(--crimson); color: white; border-color: transparent; }
-    
-    .field {
-      width: 100%; border-radius: 12px;
-      border: 1px solid rgba(32,23,15,.15);
-      background: rgba(255,255,255,.8);
-      padding: .75rem 1rem; color: var(--ink);
-      margin-bottom: 1rem;
-    }
-    .chip {
-      display: inline-flex; align-items: center; gap: .5rem;
-      padding: .5rem 1rem; border-radius: 999px;
-      background: #fff8ee; border: 1px solid rgba(32,23,15,.1);
-      font-weight: 700; margin: .25rem;
-    }
-    .chip button { border: none; background: transparent; color: var(--crimson); cursor: pointer; font-weight: 900; }
-    
-    .meta-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1rem 0; }
-    .meta-card { background: #fff; padding: 12px; border-radius: 14px; border: 1px solid rgba(32,23,15,.08); text-align: center; }
-    .meta-card .k { font-size: .75rem; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
-    .meta-card .v { font-size: 1.4rem; font-weight: 800; color: var(--ink); }
-    
-    .mult-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-    .targets-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    .target-btn { padding: 12px; border-radius: 10px; background: #fff; border: 1px solid rgba(32,23,15,.12); font-weight: 800; cursor: pointer; transition: var(--trans); }
-    .target-btn:hover { background: #fdf5e6; transform: translateY(-1px); }
-    .target-btn.bull { background: linear-gradient(180deg, #fff2b4, #d4a33f); color: #2c180d; }
-
-    .track-container { display: flex; justify-content: space-between; gap: 8px; margin: 1rem 0; }
-    .golf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem; }
-    .golf-btn { padding: 14px 10px; border-radius: 12px; background: #fff; border: 1px solid rgba(32,23,15,.12); cursor: pointer; text-align: center; font-weight: 800; }
-
-    .scoreboard-panel { background: #fff; border-radius: 16px; border: 1px solid rgba(32,23,15,.1); padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
-    .scoreboard-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
-    .scoreboard-table th, .scoreboard-table td { padding: 8px 10px; border-bottom: 1px solid rgba(32,23,15,.08); text-align: left; font-size: .9rem; }
-    .scoreboard-table th { font-size: .75rem; text-transform: uppercase; color: var(--ink-soft); background: #faf6ee; }
-    .scoreboard-row.active-row { background: rgba(201,154,59,.12); font-weight: 700; }
-    .hidden { display: none !important; }
+    body { font-family: Arial, sans-serif; text-align: center; background: #121212; color: #fff; margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .status-box { display: flex; justify-content: space-around; font-size: 1.2rem; margin-bottom: 20px; background: #2a2a2a; padding: 10px; border-radius: 6px; }
+    .player-card { flex: 1; margin: 5px; padding: 10px; border-radius: 6px; border: 2px solid transparent; }
+    .active-player { border-color: #00e676; background: #26382b; }
+    .button-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+    button { background: #333; color: #fff; border: 1px solid #555; padding: 15px; font-size: 1.1rem; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #444; }
+    button:active { background: #666; }
+    .btn-action { background: #d32f2f; }
+    .btn-action:hover { background: #f44336; }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="shell topbar-inner">
-      <div class="brand">
-        <div class="crest"></div>
-        <div class="brand-copy"><strong>Hellcastle Darts</strong></div>
+
+  <div class="container">
+    <h2>Countup Multi-Device Tracker</h2>
+
+    <div class="status-box">
+      <div id="p1-card" class="player-card">
+        <h3>Player 1</h3>
+        <p>Score: <span id="p1-score">0</span></p>
+      </div>
+      <div id="p2-card" class="player-card">
+        <h3>Player 2</h3>
+        <p>Score: <span id="p2-score">0</span></p>
       </div>
     </div>
-  </header>
 
-  <main class="shell hero">
-    <!-- SETUP SECTION -->
-    <section id="setupSection" class="panel">
-      <h2>Tournament Configuration</h2>
-      <p>Set up players and select tournament events.</p>
-      <div class="grid-2">
-        <div>
-          <h3>1. Add Players</h3>
-          <div style="display:flex; gap:8px; margin-bottom: 1rem;">
-            <input type="text" id="playerInput" class="field" placeholder="Enter player name..." style="margin:0;">
-            <button class="btn btn-primary" id="addPlayerBtn" onclick="addPlayer()">Add</button>
-          </div>
-          <div id="playerList"></div>
-        </div>
-        <div>
-          <h3>2. Active Events</h3>
-          <label><input type="checkbox" id="eventCountUp" checked> 🎯 Count Up (8 Rounds)</label><br>
-          <label><input type="checkbox" id="eventRaceTrack" checked> 🏁 Race Track (2 Laps)</label><br>
-          <label><input type="checkbox" id="eventGolf" checked> ⛳ Golf Darts (9 Holes)</label><br>
-          <label><input type="checkbox" id="eventBasketball" checked> 🏀 Basketball Darts (4 Quarters)</label><br>
-          <label><input type="checkbox" id="eventRomanEmpire" checked> 🏛️ Roman Empire</label><br><br>
-          <button class="btn btn-gold" id="startTournamentBtn" onclick="startTournament()" style="width: 100%;">Start Tournament</button>
-        </div>
-      </div>
-    </section>
+    <div>
+      <p>Current Turn: <strong>Player <span id="current-player-display">1</span></strong></p>
+      <p>Round: <span id="current-round-display">1</span> | Dart: <span id="current-dart-display">1</span></p>
+    </div>
 
-    <!-- ARENA PLAY SECTION -->
-    <section id="playSection" class="panel hidden">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
-        <div>
-          <span style="text-transform:uppercase; font-size:.8rem; font-weight:800; color:var(--crimson);" id="currentEventBadge">Event 1 of 5</span>
-          <h2 id="currentEventTitle">Count Up</h2>
-        </div>
-        <button class="btn btn-secondary" onclick="nextEvent()">Skip / Finish Event</button>
-      </div>
-<div id="event-summary-modal" class="modal hidden">
-  <div class="modal-content">
-    <h2 id="summary-title">Event Complete!</h2>
-    <h3>Overall Tournament Standings</h3>
-    
-    <table id="overall-leaderboard-table">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Player</th>
-          <th>Total Points</th>
-        </tr>
-      </thead>
-      <tbody id="overall-leaderboard-body">
-        <!-- Dynamically populated -->
-      </tbody>
-    </table>
-
-    <button id="next-event-btn" onclick="goToNextEvent()">NEXT EVENT</button>
+    <div class="button-grid" id="input-board">
+      <button data-value="1">1</button>
+      <button data-value="5">5</button>
+      <button data-value="10">10</button>
+      <button data-value="20">20</button>
+      <button data-value="25">25 (Bull)</button>
+      <button data-value="50">50 (D-Bull)</button>
+      <button data-value="0">0 (Miss)</button>
+      <button id="btn-next-player" class="btn-action">Next Player</button>
+      <button id="btn-reset" class="btn-action" style="grid-column: span 4;">Reset Game</button>
+    </div>
   </div>
-</div>
-      <div class="arena-grid">
-        <div id="activeEventContainer">
-          <!-- COUNT UP MODULE -->
-          <div id="countUpModule" class="panel hidden" style="background:#fff; margin:0;">
-            <div class="meta-strip">
-              <div class="meta-card"><div class="k">Turn</div><div class="v" id="cuPlayer">-</div></div>
-              <div class="meta-card"><div class="k">Round</div><div class="v" id="cuRound">1 / 8</div></div>
-              <div class="meta-card"><div class="k">Total Score</div><div class="v" id="cuTotalScore">0</div></div>
-            </div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
-              <strong>Darts Thrown This Turn:</strong>
-              <button class="btn btn-secondary" onclick="undoCountUpDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
-            </div>
-            <div id="cuDartsThrown" style="display:flex; gap:8px; margin-bottom: 1rem;">
-              <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
-            </div>
 
-            <div class="mult-row">
-              <button class="btn btn-secondary active" id="cuMult1" onclick="setCuMult(1)">1x</button>
-              <button class="btn btn-secondary" id="cuMult2" onclick="setCuMult(2)">2x</button>
-              <button class="btn btn-secondary" id="cuMult3" onclick="setCuMult(3)">3x</button>
-            </div>
-            <div class="targets-grid" id="cuTargetsGrid"></div>
-          </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-          <!-- RACE TRACK MODULE -->
-          <div id="raceTrackModule" class="panel hidden" style="background:#fff; margin:0;">
-            <div class="meta-strip">
-              <div class="meta-card"><div class="k">Turn</div><div class="v" id="rtPlayer">-</div></div>
-              <div class="meta-card"><div class="k">Lap</div><div class="v" id="rtLap">1 / 2</div></div>
-              <div class="meta-card"><div class="k">Segment Target</div><div class="v" id="rtTarget">-</div></div>
-            </div>
-            <div class="track-container" id="rtTrackContainer"></div>
-            <div class="targets-grid" id="rtTargetsGrid"></div>
-          </div>
+    const firebaseConfig = {
+      databaseURL: "https://countupmultivice-default-rtdb.firebaseio.com"
+    };
 
-          <!-- GOLF DARTS MODULE -->
-          <div id="golfModule" class="panel hidden" style="background:#fff; margin:0;">
-            <div class="meta-strip">
-              <div class="meta-card"><div class="k">Turn</div><div class="v" id="golfPlayer">-</div></div>
-              <div class="meta-card"><div class="k">Hole</div><div class="v" id="golfHole">1 / 9</div></div>
-              <div class="meta-card"><div class="k">Target</div><div class="v" id="golfTarget">1</div></div>
-              <div class="meta-card"><div class="k">Score</div><div class="v" id="golfScore">0</div></div>
-            </div>
-            <div class="golf-grid">
-              <button class="golf-btn" onclick="recordGolfHole(1)">Triple (Hole in One / 1)</button>
-              <button class="golf-btn" onclick="recordGolfHole(2)">Double (Eagle / 2)</button>
-              <button class="golf-btn" onclick="recordGolfHole(3)">Single (Par / 3)</button>
-              <button class="golf-btn" onclick="recordGolfHole(5)">Miss (Bogey / 5)</button>
-            </div>
-          </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    
+    const roomId = "9597"; 
+    const gameStateRef = ref(db, `${roomId}/state`);
 
-          <!-- BASKETBALL DARTS MODULE -->
-          <div id="basketballModule" class="panel hidden" style="background:#fff; margin:0;">
-            <div class="meta-strip">
-              <div class="meta-card"><div class="k">Turn</div><div class="v" id="bbPlayer">-</div></div>
-              <div class="meta-card"><div class="k">Quarter</div><div class="v" id="bbQuarter">1 / 4</div></div>
-              <div class="meta-card"><div class="k">Score</div><div class="v" id="bbScore">0</div></div>
-              <div class="meta-card"><div class="k">PPQ</div><div class="v" id="bbPPQ">0.0</div></div>
-            </div>
-            <div class="mult-row">
-              <button class="btn btn-secondary active" id="bbMult1" onclick="setBbMult(1)">Single (1x)</button>
-              <button class="btn btn-secondary" id="bbMult2" onclick="setBbMult(2)">Double (2x)</button>
-              <button class="btn btn-secondary" id="bbMult3" onclick="setBbMult(3)">Triple (3x)</button>
-            </div>
-            <div class="targets-grid" id="bbTargetsGrid"></div>
-          </div>
+    const p1ScoreEl = document.getElementById("p1-score");
+    const p2ScoreEl = document.getElementById("p2-score");
+    const p1Card = document.getElementById("p1-card");
+    const p2Card = document.getElementById("p2-card");
+    const currentPlayerDisplay = document.getElementById("current-player-display");
+    const currentRoundDisplay = document.getElementById("current-round-display");
+    const currentDartDisplay = document.getElementById("current-dart-display");
+    const inputBoard = document.getElementById("input-board");
 
-          <!-- ROMAN EMPIRE MODULE -->
-          <div id="romanEmpireModule" class="panel hidden" style="background:#fff; margin:0;">
-            <div class="meta-strip">
-              <div class="meta-card"><div class="k">Turn</div><div class="v" id="rePlayer">-</div></div>
-              <div class="meta-card"><div class="k">Round</div><div class="v" id="reRound">1 / 10</div></div>
-              <div class="meta-card"><div class="k">Empire Score</div><div class="v" id="reTotalScore">0</div></div>
-              <div class="meta-card"><div class="k">Territories</div><div class="v" id="reTerritories">0</div></div>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
-              <strong>Darts Thrown This Turn:</strong>
-              <button class="btn btn-secondary" onclick="undoRomanEmpireDart()" style="padding: 0.4rem 1rem; font-size:0.85rem;">Undo Dart</button>
-            </div>
-            <div id="reDartsThrown" style="display:flex; gap:8px; margin-bottom: 1rem;">
-              <span class="chip">—</span><span class="chip">—</span><span class="chip">—</span>
-            </div>
-            <div class="mult-row">
-              <button class="btn btn-secondary active" id="reMult1" onclick="setReMult(1)">Single (1x)</button>
-              <button class="btn btn-secondary" id="reMult2" onclick="setReMult(2)">Double (2x)</button>
-              <button class="btn btn-secondary" id="reMult3" onclick="setReMult(3)">Triple (3x)</button>
-            </div>
-            <div class="targets-grid" id="reTargetsGrid"></div>
-          </div>
-        </div>
+    let localState = {};
 
-        <!-- SCOREBOARD -->
-        <div class="scoreboard-panel">
-          <h3>Leaderboard</h3>
-          <table class="scoreboard-table">
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Score / Standings</th>
-              </tr>
-            </thead>
-            <tbody id="scoreboardBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    let players = [];
-    let activeEvents = [];
-    let currentEventIndex = 0;
-
-    // --- SETUP MANAGEMENT ---
-    function addPlayer() {
-      const input = document.getElementById('playerInput');
-      const name = input.value.trim();
-      if (!name) return;
-      players.push(name);
-      input.value = '';
-      renderPlayerList();
-    }
-
-    function removePlayer(index) {
-      players.splice(index, 1);
-      renderPlayerList();
-    }
-
-    function renderPlayerList() {
-      const list = document.getElementById('playerList');
-      list.innerHTML = players.map((p, i) => `
-        <span class="chip">${p} <button onclick="removePlayer(${i})">&times;</button></span>
-      `).join('');
-    }
-
-    function startTournament() {
-      if (players.length === 0) {
-        alert("Please add at least one player before starting!");
-        return;
-      }
-      activeEvents = [];
-      if (document.getElementById('eventCountUp').checked) activeEvents.push('Count Up');
-      if (document.getElementById('eventRaceTrack').checked) activeEvents.push('Race Track');
-      if (document.getElementById('eventGolf').checked) activeEvents.push('Golf Darts');
-      if (document.getElementById('eventBasketball').checked) activeEvents.push('Basketball Darts');
-      if (document.getElementById('eventRomanEmpire').checked) activeEvents.push('Roman Empire');
-
-      if (activeEvents.length === 0) {
-        alert("Please select at least one event!");
+    // Listen for Realtime DB updates
+    onValue(gameStateRef, (snapshot) => {
+      const state = snapshot.val();
+      if (!state) {
+        initGameState();
         return;
       }
 
-      document.getElementById('setupSection').classList.add('hidden');
-      document.getElementById('playSection').classList.remove('hidden');
+      localState = state;
 
-      currentEventIndex = 0;
-      initEvent(activeEvents[currentEventIndex]);
-    }
+      // Extract scores safely
+      const p1Score = state.dartScores && state.dartScores["1"] ? state.dartScores["1"] : 0;
+      const p2Score = state.dartScores && state.dartScores["2"] ? state.dartScores["2"] : 0;
 
-    function initEvent(eventName) {
-      document.querySelectorAll('#activeEventContainer > .panel').forEach(m => m.classList.add('hidden'));
-      document.getElementById('currentEventBadge').innerText = `Event ${currentEventIndex + 1} of ${activeEvents.length}`;
-      document.getElementById('currentEventTitle').innerText = eventName;
+      p1ScoreEl.textContent = p1Score;
+      p2ScoreEl.textContent = p2Score;
+      currentPlayerDisplay.textContent = state.currentPlayer || 1;
+      currentRoundDisplay.textContent = state.currentRound || 1;
+      currentDartDisplay.textContent = state.currentDart || 1;
 
-      switch (eventName) {
-        case 'Count Up':
-          document.getElementById('countUpModule').classList.remove('hidden');
-          initCountUp();
-          break;
-        case 'Race Track':
-          document.getElementById('raceTrackModule').classList.remove('hidden');
-          initRaceTrack();
-          break;
-        case 'Golf Darts':
-          document.getElementById('golfModule').classList.remove('hidden');
-          initGolf();
-          break;
-        case 'Basketball Darts':
-          document.getElementById('basketballModule').classList.remove('hidden');
-          initBasketball();
-          break;
-        case 'Roman Empire':
-          document.getElementById('romanEmpireModule').classList.remove('hidden');
-          initRomanEmpire();
-          break;
+      // UI highlighting
+      if (String(state.currentPlayer) === "2") {
+        p2Card.classList.add("active-player");
+        p1Card.classList.remove("active-player");
+      } else {
+        p1Card.classList.add("active-player");
+        p2Card.classList.remove("active-player");
       }
-      renderScoreboard();
+    });
+
+    function initGameState() {
+      set(gameStateRef, {
+        boardType: "basic",
+        currentDart: 1,
+        currentPlayer: 1,
+        currentRound: 1,
+        dartScores: { "1": 0, "2": 0 },
+        gameOver: false,
+        gameStarted: true
+      });
     }
 
-    function nextEvent() {
-      currentEventIndex++;
-      if (currentEventIndex >= activeEvents.length) {
-        alert("Tournament Complete!");
-        location.reload();
+    // Dynamic Event Delegation for Input Buttons
+    inputBoard.addEventListener("click", (e) => {
+      if (!e.target.matches("button")) return;
+
+      if (e.target.id === "btn-reset") {
+        initGameState();
         return;
       }
-      initEvent(activeEvents[currentEventIndex]);
-    }
 
-    function renderScoreboard(scoresMap = {}) {
-      const tbody = document.getElementById('scoreboardBody');
-      tbody.innerHTML = players.map((p, i) => `
-        <tr class="scoreboard-row ${i === 0 ? 'active-row' : ''}">
-          <td>${p}</td>
-          <td>${scoresMap[p] !== undefined ? scoresMap[p] : 0}</td>
-        </tr>
-      `).join('');
-    }
+      if (e.target.id === "btn-next-player") {
+        switchPlayer();
+        return;
+      }
 
-    // --- COUNT UP (WITH UNDO) ---
-    let cuMult = 1;
-    let cuScores = {};
-    let cuTurn = 0;
-    let cuHistory = []; // Stack to record every thrown dart
+      const scoreVal = parseInt(e.target.dataset.value);
+      if (isNaN(scoreVal)) return;
 
-    function initCountUp() {
-      cuScores = {};
-      players.forEach(p => cuScores[p] = 0);
-      cuTurn = 0;
-      cuMult = 1;
-      cuHistory = [];
+      recordScoreInput(scoreVal);
+    });
+
+    function recordScoreInput(value) {
+      // Always pull dynamic current active player ("1" or "2")
+      const activePlayer = String(localState.currentPlayer || 1);
+      const currentScores = localState.dartScores || { "1": 0, "2": 0 };
       
-      const grid = document.getElementById('cuTargetsGrid');
-      grid.innerHTML = '';
-      for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreCu(${i})">${i}</button>`;
-      grid.innerHTML += `<button class="target-btn bull" onclick="scoreCu(25)">BULL</button><button class="target-btn" onclick="scoreCu(0)">MISS</button>`;
-      
-      setCuMult(1);
-      updateCuUI();
-    }
+      const newScore = (currentScores[activePlayer] || 0) + value;
+      let newDart = (localState.currentDart || 1) + 1;
+      let nextPlayer = parseInt(activePlayer);
+      let nextRound = localState.currentRound || 1;
 
-    function setCuMult(m) {
-      cuMult = m;
-      document.querySelectorAll('#countUpModule .mult-row .btn-secondary').forEach((b, i) => {
-        b.classList.toggle('active', i + 1 === m);
-      });
-    }
-
-    function scoreCu(pts) {
-      const playerIndex = Math.floor(cuHistory.length / 3) % players.length;
-      const player = players[playerIndex];
-      const ptsEarned = pts * cuMult;
-
-      cuScores[player] += ptsEarned;
-      cuHistory.push({ player, pts, mult: cuMult, score: ptsEarned });
-
-      cuMult = 1;
-      setCuMult(1);
-      updateCuUI();
-    }
-
-    function undoCountUpDart() {
-      if (cuHistory.length === 0) return;
-      const lastDart = cuHistory.pop();
-      if (lastDart && cuScores[lastDart.player] !== undefined) {
-        cuScores[lastDart.player] = Math.max(0, cuScores[lastDart.player] - lastDart.score);
-      }
-      cuMult = 1;
-      setCuMult(1);
-      updateCuUI();
-    }
-
-    function updateCuUI() {
-      const playerIndex = Math.floor(cuHistory.length / 3) % players.length;
-      const player = players[playerIndex] || players[0];
-      const totalTurns = Math.floor(cuHistory.length / 3);
-      const currentRound = Math.floor(totalTurns / players.length) + 1;
-
-      document.getElementById('cuPlayer').innerText = player;
-      document.getElementById('cuRound').innerText = `${Math.min(currentRound, 8)} / 8`;
-      document.getElementById('cuTotalScore').innerText = cuScores[player] || 0;
-
-      // Render Darts Thrown Chips for current turn
-      const dartsContainer = document.getElementById('cuDartsThrown');
-      if (dartsContainer) {
-        const turnDarts = cuHistory.slice(totalTurns * 3);
-        let chipsHTML = '';
-        for (let i = 0; i < 3; i++) {
-          const d = turnDarts[i];
-          if (d) {
-            const prefix = d.mult === 3 ? 'T' : d.mult === 2 ? 'D' : '';
-            const label = d.pts === 25 ? 'BULL' : d.pts === 0 ? 'MISS' : `${prefix}${d.pts}`;
-            chipsHTML += `<span class="chip">${label} (${d.score}pts)</span>`;
-          } else {
-            chipsHTML += `<span class="chip">—</span>`;
-          }
-        }
-        dartsContainer.innerHTML = chipsHTML;
-      }
-
-      renderScoreboard(cuScores);
-    }
-
-    // --- RACE TRACK ---
-    let rtSegments = [25, 40, 60, 80], rtProgress = {}, rtTurn = 0;
-    function initRaceTrack() {
-      rtProgress = {}; players.forEach(p => rtProgress[p] = 0);
-      rtTurn = 0;
-      const grid = document.getElementById('rtTargetsGrid');
-      grid.innerHTML = '';
-      for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreRt(${i})">${i}</button>`;
-      grid.innerHTML += `<button class="target-btn bull" onclick="scoreRt(25)">BULL</button>`;
-      updateRtUI();
-    }
-    function scoreRt(pts) {
-      const p = players[rtTurn % players.length];
-      const curSeg = rtProgress[p] % rtSegments.length;
-      if (pts >= rtSegments[curSeg]) rtProgress[p]++;
-      rtTurn++;
-      updateRtUI();
-    }
-    function updateRtUI() {
-      const p = players[rtTurn % players.length];
-      document.getElementById('rtPlayer').innerText = p;
-      document.getElementById('rtTarget').innerText = `${rtSegments[rtProgress[p] % rtSegments.length] || 'FINISHED'}`;
-      renderScoreboard(rtProgress);
-    }
-
-    // --- GOLF DARTS ---
-    let golfHoles = {}, golfTurn = 0;
-    function initGolf() {
-      golfHoles = {}; players.forEach(p => golfHoles[p] = { hole: 1, score: 0 });
-      golfTurn = 0;
-      updateGolfUI();
-    }
-    function recordGolfHole(pts) {
-      const p = players[golfTurn % players.length];
-      golfHoles[p].score += pts;
-      golfHoles[p].hole++;
-      golfTurn++;
-      updateGolfUI();
-    }
-    function updateGolfUI() {
-      const p = players[golfTurn % players.length];
-      document.getElementById('golfPlayer').innerText = p;
-      document.getElementById('golfHole').innerText = `${golfHoles[p].hole} / 9`;
-      document.getElementById('golfTarget').innerText = golfHoles[p].hole;
-      document.getElementById('golfScore').innerText = golfHoles[p].score;
-      const map = {}; players.forEach(p => map[p] = golfHoles[p].score);
-      renderScoreboard(map);
-    }
-
-    // --- BASKETBALL DARTS ---
-    let bbMult = 1, bbScores = {}, bbTurn = 0;
-    function initBasketball() {
-      bbScores = {}; players.forEach(p => bbScores[p] = 0);
-      bbTurn = 0; bbMult = 1;
-      const grid = document.getElementById('bbTargetsGrid');
-      grid.innerHTML = '';
-      for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreBb(${i})">${i}</button>`;
-      grid.innerHTML += `<button class="target-btn bull" onclick="scoreBb(25)">BULL</button>`;
-      updateBbUI();
-    }
-    function setBbMult(m) { bbMult = m; }
-    function scoreBb(pts) {
-      const p = players[bbTurn % players.length];
-      bbScores[p] += pts * bbMult;
-      bbTurn++; bbMult = 1;
-      updateBbUI();
-    }
-    function updateBbUI() {
-      const p = players[bbTurn % players.length];
-      document.getElementById('bbPlayer').innerText = p;
-      document.getElementById('bbScore').innerText = bbScores[p] || 0;
-      renderScoreboard(bbScores);
-    }
-
-    // --- ROMAN EMPIRE ---
-    let reMult = 1;
-    let reScores = {};
-    let reTurn = 0;
-    let reDartsThisTurn = [];
-
-    function initRomanEmpire() {
-      reScores = {};
-      players.forEach(p => {
-        reScores[p] = {
-          total: 0,
-          territories: new Set(),
-          shields: new Set()
-        };
-      });
-      reTurn = 0;
-      reMult = 1;
-      reDartsThisTurn = [];
-
-      const grid = document.getElementById('reTargetsGrid');
-      grid.innerHTML = '';
-      for (let i = 1; i <= 20; i++) grid.innerHTML += `<button class="target-btn" onclick="scoreRe(${i})">${i}</button>`;
-      grid.innerHTML += `<button class="target-btn bull" onclick="scoreRe(25)">BULL</button><button class="target-btn" onclick="scoreRe(0)">MISS</button>`;
-
-      setReMult(1);
-      updateReUI();
-    }
-
-    function setReMult(m) {
-      reMult = m;
-      document.querySelectorAll('#romanEmpireModule .mult-row .btn-secondary').forEach((b, i) => {
-        b.classList.toggle('active', i + 1 === m);
-      });
-    }
-
-    function scoreRe(pts) {
-      const player = players[reTurn % players.length];
-      if (!player) return;
-
-      const pData = reScores[player];
-      const ptsEarned = pts * reMult;
-
-      if (pts > 0) {
-        pData.total += ptsEarned;
-        pData.territories.add(pts);
-        if (reMult > 1) {
-          pData.shields.add(pts);
+      // Handle turn progression after 3 darts
+      if (newDart > 3) {
+        newDart = 1;
+        if (activePlayer === "1") {
+          nextPlayer = 2;
+        } else {
+          nextPlayer = 1;
+          nextRound += 1;
         }
       }
 
-      reDartsThisTurn.push({ pts, mult: reMult, score: ptsEarned });
-
-      reMult = 1;
-      setReMult(1);
-
-      if (reDartsThisTurn.length >= 3) {
-        reDartsThisTurn = [];
-        reTurn++;
-      }
-
-      updateReUI();
-    }
-
-    function undoRomanEmpireDart() {
-      if (reDartsThisTurn.length > 0) {
-        const lastDart = reDartsThisTurn.pop();
-        const player = players[reTurn % players.length];
-        const pData = reScores[player];
-        if (pData && lastDart) {
-          pData.total = Math.max(0, pData.total - lastDart.score);
-        }
-      }
-      setReMult(1);
-      updateReUI();
-    }
-
-    function updateReUI() {
-      const player = players[reTurn % players.length];
-      const roundNum = Math.floor(reTurn / players.length) + 1;
-      const pData = reScores[player] || { total: 0, territories: new Set(), shields: new Set() };
-
-      document.getElementById('rePlayer').innerText = player;
-      document.getElementById('reRound').innerText = `${Math.min(roundNum, 10)} / 10`;
-      document.getElementById('reTotalScore').innerText = pData.total;
-      document.getElementById('reTerritories').innerText = `${pData.territories.size} (${pData.shields.size} Shielded)`;
-
-      const dartsContainer = document.getElementById('reDartsThrown');
-      if (dartsContainer) {
-        let chipsHTML = '';
-        for (let i = 0; i < 3; i++) {
-          const d = reDartsThisTurn[i];
-          if (d) {
-            const prefix = d.mult === 3 ? 'T' : d.mult === 2 ? 'D' : '';
-            const label = d.pts === 25 ? 'BULL' : d.pts === 0 ? 'MISS' : `${prefix}${d.pts}`;
-            chipsHTML += `<span class="chip">${label} (${d.score}pts)</span>`;
-          } else {
-            chipsHTML += `<span class="chip">—</span>`;
-          }
-        }
-        dartsContainer.innerHTML = chipsHTML;
-      }
-
-      const scoreMap = {};
-      players.forEach(p => {
-        const data = reScores[p] || { total: 0, territories: new Set() };
-        scoreMap[p] = `${data.total} pts (${data.territories.size} Terr.)`;
+      // Explicit targeted write to Firebase path for active player
+      update(gameStateRef, {
+        [`dartScores/${activePlayer}`]: newScore,
+        currentDart: newDart,
+        currentPlayer: nextPlayer,
+        currentRound: nextRound
       });
-      renderScoreboard(scoreMap);
     }
-    // Triggered when an individual event ends
-function onEventComplete() {
-  // 1. Calculate / Update Overall Tournament Scores
-  updateOverallStandings();
 
-  // 2. Render the Overall Leaderboard Table
-  renderOverallLeaderboard();
-
-  // 3. Show the Summary View / Modal
-  document.getElementById('event-summary-modal').classList.remove('hidden');
-}
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 24px;
-  border-radius: 12px;
-  text-align: center;
-  min-width: 320px;
-}
-
-#next-event-btn {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-weight: bold;
-  background-color: #2e7d32;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-// Render the overall cumulative standings
-function renderOverallLeaderboard() {
-  const tbody = document.getElementById('overall-leaderboard-body');
-  tbody.innerHTML = '';
-
-  // Sort players by total cumulative tournament score (descending)
-  const sortedPlayers = [...players].sort((a, b) => b.overallScore - a.overallScore);
-
-  sortedPlayers.forEach((player, index) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${player.name}</td>
-      <td>${player.overallScore}</td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Action when the "NEXT EVENT" button is clicked
-function goToNextEvent() {
-  // Hide summary modal
-  document.getElementById('event-summary-modal').classList.add('hidden');
-
-  // Increment event counter and launch next game
-  currentEventIndex++;
-  if (currentEventIndex < totalEvents) {
-    loadEvent(currentEventIndex);
-  } else {
-    showFinalTournamentResults();
-  }
-}
+    function switchPlayer() {
+      const nextPlayer = String(localState.currentPlayer) === "1" ? 2 : 1;
+      update(gameStateRef, {
+        currentPlayer: nextPlayer,
+        currentDart: 1
+      });
+    }
   </script>
 </body>
 </html>
